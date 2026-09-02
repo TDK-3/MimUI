@@ -1,4 +1,4 @@
-# Mim — a single-file, immediate-mode GUI library for JavaScript
+# MimUI - A universal UI library for javascript
 
 Mim is a Dear-ImGui inspired immediate-mode GUI library written as one
 self-contained JavaScript file: `mim.js`. It has:
