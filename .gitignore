@@ -6,3 +6,4 @@ misc.md
 .package-lock.json
 ADDONS.md
 BACKEND.md
+node_modules

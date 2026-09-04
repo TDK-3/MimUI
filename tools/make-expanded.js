@@ -21,24 +21,24 @@
  *       node --check mim.js
  * Then validate with the test suites (./run-tests.sh).
  */
-'use strict';
+"use strict";
 
-const fs = require('fs');
-const path = require('path');
-const babel = require('@babel/core');
-const { isMember, LOCAL_RENAMES, PARAM_RENAMES } = require('./rename-tables');
+const fs = require("fs");
+const path = require("path");
+const babel = require("@babel/core");
+const { isMember, LOCAL_RENAMES, PARAM_RENAMES } = require("./rename-tables");
 
-const ROOT = path.join(__dirname, '..');
-const SRC = path.join(ROOT, 'mim.compressed.js');
-const OUT = path.join(ROOT, 'mim.js');
+const ROOT = path.join(__dirname, "..");
+const SRC = path.join(ROOT, "mim.compressed.js");
+const OUT = path.join(ROOT, "mim.js");
 
 /* ------------------------------------------------------------------ */
 /* transformation                                                      */
 /* ------------------------------------------------------------------ */
 
-const source = fs.readFileSync(SRC, 'utf8');
-const { parse: babelParse } = require('@babel/parser');
-const ast = babelParse(source, { sourceType: 'script', attachComment: true });
+const source = fs.readFileSync(SRC, "utf8");
+const { parse: babelParse } = require("@babel/parser");
+const ast = babelParse(source, { sourceType: "script", attachComment: true });
 
 const renames = []; // { node, name, to, scopeNode }
 
@@ -49,26 +49,38 @@ const renames = []; // { node, name, to, scopeNode }
 // --- pass 2: collect renames ---
 (function collect() {
   (function walk(n) {
-    if (!n || typeof n.type !== 'string') return;
+    if (!n || typeof n.type !== "string") return;
     // guarded local declarators
-    if (n.type === 'VariableDeclarator' && n.id && n.id.type === 'Identifier' && LOCAL_RENAMES[n.id.name] && n.init) {
+    if (
+      n.type === "VariableDeclarator" &&
+      n.id &&
+      n.id.type === "Identifier" &&
+      LOCAL_RENAMES[n.id.name] &&
+      n.init
+    ) {
       const spec = LOCAL_RENAMES[n.id.name];
-      if (spec.ok(n.init)) renames.push({ node: n.id, name: n.id.name, to: spec.to });
+      if (spec.ok(n.init))
+        renames.push({ node: n.id, name: n.id.name, to: spec.to });
     }
     for (const k in n) {
-      if (k === 'leadingComments' || k === 'trailingComments' || k === 'innerComments') continue;
+      if (
+        k === "leadingComments" ||
+        k === "trailingComments" ||
+        k === "innerComments"
+      )
+        continue;
       const v = n[k];
       if (Array.isArray(v)) v.forEach(walk);
-      else if (v && typeof v.type === 'string') walk(v);
+      else if (v && typeof v.type === "string") walk(v);
     }
   })(ast);
 })();
 
 // --- pass 3: apply renames via babel scopes ---
 function applyRenames() {
-  const t = require('@babel/types');
+  const t = require("@babel/types");
   let applied = 0;
-  const traverse = require('@babel/traverse').default;
+  const traverse = require("@babel/traverse").default;
   // only visit identifiers that are the declarator id
   const declaratorIds = new Set(renames.map((r) => r.node));
   traverse(ast, {
@@ -87,7 +99,9 @@ function applyRenames() {
         }
         binding.scope.rename(rec.name, rec.to);
         applied++;
-      } catch (e) { /* skip */ }
+      } catch (e) {
+        /* skip */
+      }
     },
   });
   let paramApplied = 0;
@@ -97,13 +111,13 @@ function applyRenames() {
     return name && PARAM_RENAMES[name] ? PARAM_RENAMES[name] : null;
   };
   traverse(ast, {
-    'FunctionDeclaration|ClassMethod'(path) {
+    "FunctionDeclaration|ClassMethod"(path) {
       const spec = specFor(path);
       if (!spec) return;
       try {
         path.scope.crawl();
         for (const p of path.node.params) {
-          if (p.type !== 'Identifier' || !spec[p.name]) continue;
+          if (p.type !== "Identifier" || !spec[p.name]) continue;
           const to = spec[p.name];
           if (to === p.name) continue;
           const binding = path.scope.getBinding(p.name);
@@ -111,26 +125,31 @@ function applyRenames() {
           let s = binding.scope;
           let free = true;
           while (s) {
-            if (s.hasBinding(to)) { free = false; break; }
+            if (s.hasBinding(to)) {
+              free = false;
+              break;
+            }
             s = s.parent;
           }
           if (!free) continue;
           path.scope.rename(p.name, to);
           paramApplied++;
         }
-      } catch (e) { /* skip */ }
+      } catch (e) {
+        /* skip */
+      }
     },
   });
-  console.log('local renames applied:', applied + '/' + renames.length);
-  console.log('param renames applied:', paramApplied);
+  console.log("local renames applied:", applied + "/" + renames.length);
+  console.log("param renames applied:", paramApplied);
 }
 applyRenames();
 
 // --- generate ---
 const generated = babel.transformFromAst(ast, source, {
-  sourceType: 'script',
+  sourceType: "script",
   generatorOpts: { retainLines: false, concise: false, compact: false },
 }).code;
 
-fs.writeFileSync(OUT, generated, 'utf8');
-console.log('wrote', OUT, generated.length, 'chars');
+fs.writeFileSync(OUT, generated, "utf8");
+console.log("wrote", OUT, generated.length, "chars");

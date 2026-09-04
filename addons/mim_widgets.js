@@ -54,11 +54,11 @@
  * gui.getRegionAvail, gui.isMouseDown/Clicked, gui.state, gui.renderer.
  */
 (function (root) {
-  'use strict';
+  "use strict";
   const Mim = root.Mim;
   if (!Mim) return;
 
-  Mim.registerAddon('widgets', function (gui, M) {
+  Mim.registerAddon("widgets", function (gui, M) {
     const r = gui.renderer;
 
     function col(name, a) {
@@ -66,7 +66,9 @@
       return a == null ? c : M.Color.withAlpha(c, Math.round(a * 255));
     }
 
-    function clamp(v, a, b) { return v < a ? a : v > b ? b : v; }
+    function clamp(v, a, b) {
+      return v < a ? a : v > b ? b : v;
+    }
 
     return {
       /** Horizontal drag bar. Returns the (possibly updated) value. */
@@ -82,38 +84,85 @@
         const w = opts.w > 0 ? opts.w : Math.max(80, avail.w);
         const h = opts.h > 0 ? opts.h : 18;
         const s = gui.state;
-        const st = gui._state('##grab' + label);
+        const st = gui._state("##grab" + label);
         const v = clamp(value, min, max);
         const t = (v - min) / (max - min); // 0..1 along the track
 
-        const it = gui._item(pos.x, pos.y, w, h, gui._id('##gr' + label).itemId, { focusable: false });
+        const it = gui._item(
+          pos.x,
+          pos.y,
+          w,
+          h,
+          gui._id("##gr" + label).itemId,
+          { focusable: false },
+        );
         if (it.visible) {
           // track
-          r.fillRoundedRect(pos.x, pos.y + h / 2 - 3, w, 6, 3, col('childBg'));
+          r.fillRoundedRect(pos.x, pos.y + h / 2 - 3, w, 6, 3, col("childBg"));
           // fill up to the knob
-          if (t > 0.004) r.fillRoundedRect(pos.x, pos.y + h / 2 - 3, w * t, 6, 3, col('sliderGrab'));
+          if (t > 0.004)
+            r.fillRoundedRect(
+              pos.x,
+              pos.y + h / 2 - 3,
+              w * t,
+              6,
+              3,
+              col("sliderGrab"),
+            );
           // knob
           const kx = pos.x + w * t;
-          r.fillRoundedRect(kx - 5, pos.y + 1, 10, h - 2, 3, col(it.hovered ? 'headerActive' : 'sliderGrab'));
-          r.strokeRoundedRect(pos.x + 0.5, pos.y + 0.5, w - 1, h - 1, 4, col('border', 0.7), 1);
+          r.fillRoundedRect(
+            kx - 5,
+            pos.y + 1,
+            10,
+            h - 2,
+            3,
+            col(it.hovered ? "headerActive" : "sliderGrab"),
+          );
+          r.strokeRoundedRect(
+            pos.x + 0.5,
+            pos.y + 0.5,
+            w - 1,
+            h - 1,
+            4,
+            col("border", 0.7),
+            1,
+          );
           // label on the right (imgui puts it left; right keeps the track clean)
           const label2 = String(label);
           const lw = gui._measure(label2, fo).w;
           if (w + lw + 10 < avail.w) {
-            gui._drawText(pos.x + w + 8, pos.y + (h - lineH) / 2 + 1, label2, col('textDisabled'), fo);
+            gui._drawText(
+              pos.x + w + 8,
+              pos.y + (h - lineH) / 2 + 1,
+              label2,
+              col("textDisabled"),
+              fo,
+            );
           }
         }
-        const clicked = gui.isMouseClicked(0) && s.activeId === 0 && !s.drag && s.disabledCount === 0;
-        if (s.drag && s.drag.type === 'grab' && s.drag.st === st && gui.isMouseDown(0)) {
+        const clicked =
+          gui.isMouseClicked(0) &&
+          s.activeId === 0 &&
+          !s.drag &&
+          s.disabledCount === 0;
+        if (
+          s.drag &&
+          s.drag.type === "grab" &&
+          s.drag.st === st &&
+          gui.isMouseDown(0)
+        ) {
           // dragging: the mouse owns the value
-          st.v = min + clamp((s.mouse.x - s.drag.px) / s.drag.pw, 0, 1) * (max - min);
+          st.v =
+            min +
+            clamp((s.mouse.x - s.drag.px) / s.drag.pw, 0, 1) * (max - min);
           st._dragging = true;
-          gui._setCursor('ew-resize', 2);
+          gui._setCursor("ew-resize", 2);
         } else if (clicked && it.hovered) {
           // press on the track: jump, then keep dragging
           st.v = min + clamp((s.mouse.x - pos.x) / w, 0, 1) * (max - min);
           st._dragging = true;
-          s.drag = { type: 'grab', st, px: pos.x, pw: w };
+          s.drag = { type: "grab", st, px: pos.x, pw: w };
           s.activeId = -1;
         } else if (st._dragging) {
           // release frame: the core already cleared s.drag at frame start,
@@ -149,10 +198,23 @@
           const a = ang + (i / 12) * Math.PI * 1.5;
           pts.push(cx + Math.cos(a) * rad, cy + Math.sin(a) * rad);
         }
-        r.polyline(pts, col(opts.color || 'sliderGrab'), 2);
-        const label2 = String(label == null ? '' : label);
-        if (label2) gui._drawText(pos.x + size + 10, pos.y + (h - lineH) / 2 + 1, label2, col('textDisabled'), fo);
-        const w = opts.w > 0 ? opts.w : Math.max(size + 10 + (label2 ? gui._measure(label2, fo).w : 0), avail.w);
+        r.polyline(pts, col(opts.color || "sliderGrab"), 2);
+        const label2 = String(label == null ? "" : label);
+        if (label2)
+          gui._drawText(
+            pos.x + size + 10,
+            pos.y + (h - lineH) / 2 + 1,
+            label2,
+            col("textDisabled"),
+            fo,
+          );
+        const w =
+          opts.w > 0
+            ? opts.w
+            : Math.max(
+                size + 10 + (label2 ? gui._measure(label2, fo).w : 0),
+                avail.w,
+              );
         gui._advance(pos.x, pos.y, w, h);
       },
 
@@ -165,13 +227,26 @@
         const rad = 2.5;
         const cx = pos.x + rad + 2;
         const cy = pos.y + lineH / 2 - 1;
-        r.fillCircle(cx, cy, rad, col(opts.color || 'text', 0.9));
-        const label2 = String(text == null ? '' : text);
-        if (label2) gui._drawText(pos.x + rad * 2 + 8, pos.y + 1, label2, col('text'), fo);
+        r.fillCircle(cx, cy, rad, col(opts.color || "text", 0.9));
+        const label2 = String(text == null ? "" : text);
+        if (label2)
+          gui._drawText(
+            pos.x + rad * 2 + 8,
+            pos.y + 1,
+            label2,
+            col("text"),
+            fo,
+          );
         // the bullet is a full-width line unless the caller opts out with w
         const w = opts.w > 0 ? opts.w : gui.getRegionAvail().w;
         gui._advance(pos.x, pos.y, w, lineH);
       },
     };
   });
-})(typeof globalThis !== 'undefined' ? globalThis : (typeof self !== 'undefined' ? self : this));
+})(
+  typeof globalThis !== "undefined"
+    ? globalThis
+    : typeof self !== "undefined"
+      ? self
+      : this,
+);

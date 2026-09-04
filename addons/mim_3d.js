@@ -40,11 +40,11 @@
  * gui.state (mouse / wheel / drag), gui.renderer.
  */
 (function (root) {
-  'use strict';
+  "use strict";
   const Mim = root.Mim;
   if (!Mim) return;
 
-  Mim.registerAddon('t3d', function (gui, M) {
+  Mim.registerAddon("t3d", function (gui, M) {
     const r = gui.renderer;
 
     function col(name, a) {
@@ -56,13 +56,20 @@
     function shareHeight(opts, minH, avail, extra) {
       extra = extra || 0;
       const s = gui.state;
-      const sp = gui._var('itemSpacing');
+      const sp = gui._var("itemSpacing");
       if (opts.share > 0) {
-        if (s._shareFrame !== s.frameId) { s._shareFrame = s.frameId; s._shareGroups = {}; }
+        if (s._shareFrame !== s.frameId) {
+          s._shareFrame = s.frameId;
+          s._shareGroups = {};
+        }
         const cont = s.layout && s.layout.container;
-        const key = (cont && (cont.title || cont.label) || '') + ':' + opts.share;
+        const key =
+          ((cont && (cont.title || cont.label)) || "") + ":" + opts.share;
         let g = s._shareGroups[key];
-        if (!g) { g = { n: opts.share, avail0: avail }; s._shareGroups[key] = g; }
+        if (!g) {
+          g = { n: opts.share, avail0: avail };
+          s._shareGroups[key] = g;
+        }
         // safety margin: content bookkeeping (trailing spacing + padding
         // rounding) exceeds the raw avail by ~one spacing — stay clear of
         // the scrollbar rather than overflow it
@@ -86,23 +93,34 @@
       else h = shareHeight(opts, 80, avail.h, opts.label !== false ? lineH : 0);
       let top = pos.y;
       if (opts.label !== false) {
-        gui._drawText(pos.x, pos.y, label, col('textDisabled'), fo);
+        gui._drawText(pos.x, pos.y, label, col("textDisabled"), fo);
         gui._advance(pos.x, pos.y, w, lineH);
         top = gui._nextPos().y;
       }
       const box = { x: pos.x, y: top, w, h };
-      r.fillRect(box.x, box.y, w, h, col('childBg'));
-      r.strokeRoundedRect(box.x + 0.5, box.y + 0.5, w - 1, h - 1, 4, col('border'), 1);
+      r.fillRect(box.x, box.y, w, h, col("childBg"));
+      r.strokeRoundedRect(
+        box.x + 0.5,
+        box.y + 0.5,
+        w - 1,
+        h - 1,
+        4,
+        col("border"),
+        1,
+      );
       gui._advance(pos.x, top, w, h);
       return box;
     }
 
     /* Project a world point (x, y, z in roughly [-1, 1]) to screen. */
     function makeProjector(box, rotX, rotY, zoom) {
-      const cx = box.x + box.w / 2, cy = box.y + box.h / 2;
+      const cx = box.x + box.w / 2,
+        cy = box.y + box.h / 2;
       const scale = Math.min(box.w, box.h) * 0.36 * zoom;
-      const cy1 = Math.cos(rotY), sy1 = Math.sin(rotY);
-      const cx2 = Math.cos(rotX), sx2 = Math.sin(rotX);
+      const cy1 = Math.cos(rotY),
+        sy1 = Math.sin(rotY);
+      const cx2 = Math.cos(rotX),
+        sx2 = Math.sin(rotX);
       return function (x, y, z) {
         const x1 = x * cy1 + z * sy1;
         const z1 = -x * sy1 + z * cy1;
@@ -118,36 +136,58 @@
       opts = opts || {};
       const s = gui.state;
       const mo = s.mouse;
-      if (st.rotX == null) { st.rotX = -0.5; st.rotY = 0.7; st.zoom = 1; }
-      const inBox = mo.x >= box.x && mo.x < box.x + box.w && mo.y >= box.y && mo.y < box.y + box.h;
-      if (s.drag && s.drag.type === '3d-rot' && s.drag.st === st && gui.isMouseDown(0)) {
+      if (st.rotX == null) {
+        st.rotX = -0.5;
+        st.rotY = 0.7;
+        st.zoom = 1;
+      }
+      const inBox =
+        mo.x >= box.x &&
+        mo.x < box.x + box.w &&
+        mo.y >= box.y &&
+        mo.y < box.y + box.h;
+      if (
+        s.drag &&
+        s.drag.type === "3d-rot" &&
+        s.drag.st === st &&
+        gui.isMouseDown(0)
+      ) {
         st.rotY += mo.dx * 0.011;
         st.rotX = clamp(st.rotX + mo.dy * 0.011, -1.5, 1.5);
-        gui._setCursor('grabbing', 2);
+        gui._setCursor("grabbing", 2);
       }
-      if (gui.isMouseClicked(0) && s.activeId === 0 && !s.drag && inBox && s.disabledCount === 0) {
-        s.drag = { type: '3d-rot', st };
+      if (
+        gui.isMouseClicked(0) &&
+        s.activeId === 0 &&
+        !s.drag &&
+        inBox &&
+        s.disabledCount === 0
+      ) {
+        s.drag = { type: "3d-rot", st };
         s.activeId = -1;
       }
       if (opts && opts.spin) st.rotY += gui.state.dt * opts.spin; // gentle auto-rotation
       if (inBox && s.mouse.wheel[1] !== 0) {
         st.zoom = clamp(st.zoom * (1 - s.mouse.wheel[1] * 0.001), 0.4, 3);
       }
-      if (inBox && !s.drag) gui._setCursor('grab', 1);
+      if (inBox && !s.drag) gui._setCursor("grab", 1);
       return { rotX: st.rotX, rotY: st.rotY, zoom: st.zoom };
     }
 
-    function clamp(v, a, b) { return v < a ? a : v > b ? b : v; }
+    function clamp(v, a, b) {
+      return v < a ? a : v > b ? b : v;
+    }
 
     /* Axes helper (drawn in world space). */
     function drawAxes(proj) {
       const seg = (a, b, c) => {
-        const p1 = proj(a[0], a[1], a[2]), p2 = proj(b[0], b[1], b[2]);
+        const p1 = proj(a[0], a[1], a[2]),
+          p2 = proj(b[0], b[1], b[2]);
         r.line(p1[0], p1[1], p2[0], p2[1], c, 1.2);
       };
-      seg([-1, 0, 0], [1, 0, 0], col('textDisabled', 0.55));
-      seg([0, -1, 0], [0, 1, 0], col('textDisabled', 0.55));
-      seg([0, 0, -1], [0, 0, 1], col('textDisabled', 0.55));
+      seg([-1, 0, 0], [1, 0, 0], col("textDisabled", 0.55));
+      seg([0, -1, 0], [0, 1, 0], col("textDisabled", 0.55));
+      seg([0, 0, -1], [0, 0, 1], col("textDisabled", 0.55));
     }
 
     return {
@@ -155,7 +195,7 @@
       plot3D(label, fn, opts) {
         opts = opts || {};
         const box = frame3D(label, opts);
-        const st = gui._state('##t3d' + label);
+        const st = gui._state("##t3d" + label);
         const v = interact3D(st, box, opts);
         const proj = makeProjector(box, v.rotX, v.rotY, v.zoom);
         const N = opts.grid || 18;
@@ -172,11 +212,20 @@
         };
         for (let iy = 0; iy <= N; iy++) {
           for (let ix = 0; ix < N; ix++) {
-            const a = at(ix, iy), b = at(ix + 1, iy);
-            lines.push({ d: a[2] + b[2], draw: () => r.line(a[0], a[1], b[0], b[1], col('sliderGrab', 0.85), 1.1) });
+            const a = at(ix, iy),
+              b = at(ix + 1, iy);
+            lines.push({
+              d: a[2] + b[2],
+              draw: () =>
+                r.line(a[0], a[1], b[0], b[1], col("sliderGrab", 0.85), 1.1),
+            });
             if (ix < N && iy < N) {
               const c2 = at(ix, iy + 1);
-              lines.push({ d: a[2] + c2[2], draw: () => r.line(a[0], a[1], c2[0], c2[1], col('sliderGrab', 0.5), 1) });
+              lines.push({
+                d: a[2] + c2[2],
+                draw: () =>
+                  r.line(a[0], a[1], c2[0], c2[1], col("sliderGrab", 0.5), 1),
+              });
             }
           }
         }
@@ -189,28 +238,44 @@
       plot3DPoints(label, pts, opts) {
         opts = opts || {};
         const box = frame3D(label, opts);
-        const st = gui._state('##t3dp' + label);
+        const st = gui._state("##t3dp" + label);
         const v = interact3D(st, box, opts);
         const proj = makeProjector(box, v.rotX, v.rotY, v.zoom);
         drawAxes(proj);
         // sanitize: accept [x,y,z] or {x,y,z}; drop non-finite coords
         const good = (pts || [])
-          .map((p) => (Array.isArray(p) ? [p[0], p[1], p[2]] : p ? [p.x, p.y, p.z] : null))
-          .filter((p) => p && isFinite(p[0]) && isFinite(p[1]) && isFinite(p[2]));
+          .map((p) =>
+            Array.isArray(p) ? [p[0], p[1], p[2]] : p ? [p.x, p.y, p.z] : null,
+          )
+          .filter(
+            (p) => p && isFinite(p[0]) && isFinite(p[1]) && isFinite(p[2]),
+          );
         let mx = 0;
         for (const p of good) mx = Math.max(mx, Math.abs(p[2]));
         if (mx === 0) mx = 1;
         const rad = opts.pointRadius || 2.2;
         for (const p of good) {
           const q = proj(p[0], p[2] / mx, p[1]);
-          r.fillCircle(q[0], q[1], rad, col(opts.color || 'sliderGrab', 0.9));
+          r.fillCircle(q[0], q[1], rad, col(opts.color || "sliderGrab", 0.9));
         }
         if (!good.length) {
           const fo = gui._fo();
-          gui._drawText(box.x + 8, box.y + box.h / 2 - gui._lineH() / 2, 'no points', col('textDisabled', 0.7), fo);
+          gui._drawText(
+            box.x + 8,
+            box.y + box.h / 2 - gui._lineH() / 2,
+            "no points",
+            col("textDisabled", 0.7),
+            fo,
+          );
         }
         return box;
       },
     };
   });
-})(typeof globalThis !== 'undefined' ? globalThis : (typeof self !== 'undefined' ? self : this));
+})(
+  typeof globalThis !== "undefined"
+    ? globalThis
+    : typeof self !== "undefined"
+      ? self
+      : this,
+);

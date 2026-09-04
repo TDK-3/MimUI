@@ -75,15 +75,15 @@
  * global symbol `Mim` (on globalThis) when none is present.
  * ==========================================================================*/
 (function (global) {
-  'use strict';
+  "use strict";
 
-  const VERSION = '1.5.0';
+  const VERSION = "1.5.1";
 
   /* ------------------------------------------------------------------------
    * Small utilities
    * -------------------------------------------------------------------- */
 
-// ---- shared math & color helpers ----
+  // ---- shared math & color helpers ----
 
   const clamp = (v, a, b) => (v < a ? a : v > b ? b : v);
 
@@ -94,7 +94,7 @@
   const easeOutCubic = (t) => 1 - Math.pow(1 - t, 3);
 
   function nowMs() {
-    if (typeof performance !== 'undefined' && performance.now) {
+    if (typeof performance !== "undefined" && performance.now) {
       return performance.now();
     }
 
@@ -114,7 +114,9 @@
   }
 
   function hashPair(a, b) {
-    return (Math.imul(a >>> 0, 0x9e3779b1) ^ Math.imul(b >>> 0, 0x85ebca6b)) >>> 0;
+    return (
+      (Math.imul(a >>> 0, 0x9e3779b1) ^ Math.imul(b >>> 0, 0x85ebca6b)) >>> 0
+    );
   }
 
   function hash3(a, b, c) {
@@ -126,7 +128,9 @@
   }
 
   function rectsOverlap(a, b) {
-    return a.x < b.x + b.w && a.x + a.w > b.x && a.y < b.y + b.h && a.y + a.h > b.y;
+    return (
+      a.x < b.x + b.w && a.x + a.w > b.x && a.y < b.y + b.h && a.y + a.h > b.y
+    );
   }
 
   /* Colors are plain arrays [r, g, b, a] (0..255). Never mutate a color you
@@ -161,12 +165,12 @@
 
     if (h.length === 3 || h.length === 4)
       h = h
-        .split('')
+        .split("")
         .map((c) => c + c)
-        .join('');
+        .join("");
 
     if (h.length === 6) {
-      h = 'ff' + h; // #rrggbb -> alpha first? we store [r,g,b,a]; append alpha
+      h = "ff" + h; // #rrggbb -> alpha first? we store [r,g,b,a]; append alpha
     }
     const r = parseInt(h.slice(0, 2), 16);
     const g = parseInt(h.slice(2, 4), 16);
@@ -181,7 +185,7 @@
       return null;
     }
 
-    if (typeof c === 'string') {
+    if (typeof c === "string") {
       return hexToColor(c);
     }
 
@@ -189,9 +193,13 @@
       return [c[0] | 0, c[1] | 0, c[2] | 0, c[3] == null ? 255 : c[3] | 0];
     }
 
-    if (typeof c.r === 'number')
-
-      return [c.r | 0, c.g | 0, c.b | 0, c.a == null ? 255 : (c.a * (c.a > 1 ? 1 : 255)) | 0];
+    if (typeof c.r === "number")
+      return [
+        c.r | 0,
+        c.g | 0,
+        c.b | 0,
+        c.a == null ? 255 : (c.a * (c.a > 1 ? 1 : 255)) | 0,
+      ];
 
     return rgba(200, 200, 200, 255);
   }
@@ -225,21 +233,21 @@
   /* Word-wrap `str` to maxW pixels using measure(line) -> width. */
   function wrapText(str, maxW, measure) {
     const out = [];
-    let line = '';
+    let line = "";
 
-    for (const rawPart of String(str).split(' ')) {
-      if (rawPart === '') {
+    for (const rawPart of String(str).split(" ")) {
+      if (rawPart === "") {
         out.push(line);
-        line = '';
+        line = "";
         continue;
       }
-      const candidate = line ? line + ' ' + rawPart : rawPart;
+      const candidate = line ? line + " " + rawPart : rawPart;
 
-      if (measure(candidate).w <= maxW || line === '') {
+      if (measure(candidate).w <= maxW || line === "") {
         // hard-break words that are longer than maxW on their own
 
-        if (line === '' && measure(rawPart).w > maxW) {
-          let chunk = '';
+        if (line === "" && measure(rawPart).w > maxW) {
+          let chunk = "";
 
           for (const ch of rawPart) {
             if (chunk && measure(chunk + ch).w > maxW) {
@@ -248,10 +256,9 @@
             } else chunk += ch;
           }
           line = chunk;
-        } else if (line === '') {
+        } else if (line === "") {
           line = rawPart;
-        }
-        else line = candidate;
+        } else line = candidate;
       } else {
         out.push(line);
         line = rawPart;
@@ -265,17 +272,17 @@
     return out;
   }
 
-// ---- value formatting ----
+  // ---- value formatting ----
 
   function fmtVal(v, fmt) {
     if (v == null || !isFinite(v)) {
-      return '∞';
+      return "∞";
     }
 
-    if (fmt === '%d') {
+    if (fmt === "%d") {
       return String(Math.round(v));
     }
-    const m = /^%\.(\d+)f$/.exec(fmt || '');
+    const m = /^%\.(\d+)f$/.exec(fmt || "");
 
     if (m) {
       return v.toFixed(+m[1]);
@@ -301,12 +308,12 @@
    *   notifications, ...)
    */
 
-// ---- public constants ----
+  // ---- public constants ----
 
   const Layers = Object.freeze({
-    Background: 'background',
-    GUI: 'gui',
-    Foreground: 'foreground',
+    Background: "background",
+    GUI: "gui",
+    Foreground: "foreground",
   });
 
   /**
@@ -315,37 +322,37 @@
    * @constant {Object} Key
    */
   const Key = Object.freeze({
-    Space: ' ',
-    Enter: 'enter',
-    Tab: 'tab',
-    Escape: 'escape',
-    Backspace: 'backspace',
-    Delete: 'delete',
-    Insert: 'insert',
-    Home: 'home',
-    End: 'end',
-    PageUp: 'pageup',
-    PageDown: 'pagedown',
-    Left: 'left',
-    Right: 'right',
-    Up: 'up',
-    Down: 'down',
-    Shift: 'shift',
-    Ctrl: 'ctrl',
-    Alt: 'alt',
-    Meta: 'meta',
-    F1: 'f1',
-    F2: 'f2',
-    F3: 'f3',
-    F4: 'f4',
-    F5: 'f5',
-    F6: 'f6',
-    F7: 'f7',
-    F8: 'f8',
-    F9: 'f9',
-    F10: 'f10',
-    F11: 'f11',
-    F12: 'f12',
+    Space: " ",
+    Enter: "enter",
+    Tab: "tab",
+    Escape: "escape",
+    Backspace: "backspace",
+    Delete: "delete",
+    Insert: "insert",
+    Home: "home",
+    End: "end",
+    PageUp: "pageup",
+    PageDown: "pagedown",
+    Left: "left",
+    Right: "right",
+    Up: "up",
+    Down: "down",
+    Shift: "shift",
+    Ctrl: "ctrl",
+    Alt: "alt",
+    Meta: "meta",
+    F1: "f1",
+    F2: "f2",
+    F3: "f3",
+    F4: "f4",
+    F5: "f5",
+    F6: "f6",
+    F7: "f7",
+    F8: "f8",
+    F9: "f9",
+    F10: "f10",
+    F11: "f11",
+    F12: "f12",
   });
 
   /**
@@ -421,7 +428,7 @@
    * rounding, titleBg, padding, ... } }).
    * -------------------------------------------------------------------- */
 
-// ---- built-in theme: dark ----
+  // ---- built-in theme: dark ----
 
   const ThemeDark = {
     windowBg: [30, 31, 36, 246],
@@ -464,7 +471,7 @@
     tableHeader: [46, 47, 54, 255],
   };
 
-// ---- built-in theme: light ----
+  // ---- built-in theme: light ----
 
   const ThemeLight = {
     windowBg: [245, 246, 248, 248],
@@ -507,7 +514,7 @@
     tableHeader: [236, 237, 241, 255],
   };
 
-// ---- default style variables ----
+  // ---- default style variables ----
 
   const DefaultVars = {
     fontSize: 13,
@@ -543,7 +550,7 @@
    * override object, or read it from an existing GUI via gui.style.
    */
 
-// ---- style model ----
+  // ---- style model ----
 
   class Style {
     /**
@@ -554,23 +561,25 @@
      * @param {Object} [partial.font] { size, id }
      */
     constructor(partial = {}) {
-      const theme = Style.themes[partial.theme || 'dark'] || ThemeDark;
+      const theme = Style.themes[partial.theme || "dark"] || ThemeDark;
       this.colors = Object.assign({}, theme);
 
       if (partial.colors)
-
-        for (const k of Object.keys(partial.colors)) this.colors[k] = normColor(partial.colors[k]);
+        for (const k of Object.keys(partial.colors))
+          this.colors[k] = normColor(partial.colors[k]);
       this.vars = Object.assign({}, DefaultVars);
 
       if (partial.vars)
-
         for (const k of Object.keys(partial.vars)) {
           const v = partial.vars[k];
           this.vars[k] = Array.isArray(v) ? v.slice() : v;
         }
       this.font = {
-        size: partial.font && partial.font.size ? partial.font.size : this.vars.fontSize,
-        id: (partial.font && partial.font.id) || 'default',
+        size:
+          partial.font && partial.font.size
+            ? partial.font.size
+            : this.vars.fontSize,
+        id: (partial.font && partial.font.id) || "default",
       };
     }
   }
@@ -589,11 +598,11 @@
    * backends never receive garbage.
    * -------------------------------------------------------------------- */
 
-// ---- feature-detection sentinel ----
+  // ---- feature-detection sentinel ----
 
   const EMPTY_FEATURES = Object.freeze({});
 
-// ---- renderer proxy: clip / offset / layers / recording ----
+  // ---- renderer proxy: clip / offset / layers / recording ----
 
   class RendererProxy {
     constructor(gui, raw) {
@@ -602,7 +611,7 @@
       this.clip = null; // current intersected clip rect (culling only)
       this.clipStack = [];
       this.layer = Layers.GUI;
-      this.cursor = 'default';
+      this.cursor = "default";
       this.offset = {
         x: 0,
         y: 0,
@@ -611,7 +620,7 @@
       this.calls = 0;
     }
     _has(method) {
-      return typeof this.raw[method] === 'function';
+      return typeof this.raw[method] === "function";
     }
     _call(method, callArgs) {
       this.calls++;
@@ -649,18 +658,18 @@
       this.offset.y = 0;
       this.recording = null;
 
-      if (this._has('beginFrame')) {
+      if (this._has("beginFrame")) {
         this.raw.beginFrame(displayWidth, displayHeight);
       }
     }
     endFrame() {
-      if (this._has('endFrame')) {
+      if (this._has("endFrame")) {
         this.raw.endFrame();
       }
     }
     setLayer(layerName) {
       this.layer = layerName;
-      this._call('setLayer', [layerName]);
+      this._call("setLayer", [layerName]);
     }
     /**
      * Optional: change the mouse cursor style ('default', 'pointer', 'text',
@@ -670,7 +679,7 @@
      */
     setCursor(cursorName) {
       this.cursor = cursorName;
-      this._call('setCursor', [cursorName]);
+      this._call("setCursor", [cursorName]);
     }
     /** Capability set advertised by the raw renderer (e.g. { cursor: true, clip: true }). */
     get features() {
@@ -692,11 +701,16 @@
               h: nb - ny,
             }
           : null;
-      this._call('pushClip', [clipX + this.offset.x, clipY + this.offset.y, clipWidth, clipHeight]);
+      this._call("pushClip", [
+        clipX + this.offset.x,
+        clipY + this.offset.y,
+        clipWidth,
+        clipHeight,
+      ]);
     }
     popClip() {
       this.clip = this.clipStack.pop() || null;
-      this._call('popClip', []);
+      this._call("popClip", []);
     }
 
     /* --- shapes ---------------------------------------------------------- */
@@ -711,7 +725,7 @@
       if (!this._clipOk(xPos, yPos, width, height)) {
         return;
       }
-      this._call('fillRect', [xPos, yPos, width, height, fillColor]);
+      this._call("fillRect", [xPos, yPos, width, height, fillColor]);
     }
     fillRoundedRect(xPos, yPos, width, height, cornerRadius, fillColor) {
       if (!fillColor || !fillColor[3]) {
@@ -723,7 +737,14 @@
       if (!this._clipOk(xPos, yPos, width, height)) {
         return;
       }
-      this._call('fillRoundedRect', [xPos, yPos, width, height, cornerRadius, fillColor]);
+      this._call("fillRoundedRect", [
+        xPos,
+        yPos,
+        width,
+        height,
+        cornerRadius,
+        fillColor,
+      ]);
     }
     strokeRect(xPos, yPos, width, height, strokeColor, thickness) {
       if (!strokeColor || !strokeColor[3]) {
@@ -741,11 +762,25 @@
           height + thickness * 2,
         )
       )
-
         return;
-      this._call('strokeRect', [xPos, yPos, width, height, strokeColor, thickness]);
+      this._call("strokeRect", [
+        xPos,
+        yPos,
+        width,
+        height,
+        strokeColor,
+        thickness,
+      ]);
     }
-    strokeRoundedRect(xPos, yPos, width, height, cornerRadius, strokeColor, thickness) {
+    strokeRoundedRect(
+      xPos,
+      yPos,
+      width,
+      height,
+      cornerRadius,
+      strokeColor,
+      thickness,
+    ) {
       if (!strokeColor || !strokeColor[3]) {
         return;
       }
@@ -761,9 +796,8 @@
           height + thickness * 2,
         )
       )
-
         return;
-      this._call('strokeRoundedRect', [
+      this._call("strokeRoundedRect", [
         xPos,
         yPos,
         width,
@@ -792,9 +826,8 @@
           Math.abs(yEnd - yStart) + m * 2,
         )
       )
-
         return;
-      this._call('line', [xStart, yStart, xEnd, yEnd, lineColor, thickness]);
+      this._call("line", [xStart, yStart, xEnd, yEnd, lineColor, thickness]);
     }
     polyline(points, lineColor, thickness) {
       if (!lineColor || !lineColor[3] || !points || points.length < 4) {
@@ -835,7 +868,6 @@
           maxY - minY + thickness * 2,
         )
       )
-
         return;
       const out = new Array(points.length);
 
@@ -843,7 +875,7 @@
         out[i] = points[i] + this.offset.x;
         out[i + 1] = points[i + 1] + this.offset.y;
       }
-      this._call('polyline', [out, lineColor, thickness]);
+      this._call("polyline", [out, lineColor, thickness]);
     }
     fillPolygon(points, fillColor) {
       if (!fillColor || !fillColor[3] || !points || points.length < 6) {
@@ -884,7 +916,7 @@
         out[i] = points[i] + this.offset.x;
         out[i + 1] = points[i + 1] + this.offset.y;
       }
-      this._call('fillPolygon', [out, fillColor]);
+      this._call("fillPolygon", [out, fillColor]);
     }
     fillCircle(centerX, centerY, radius, fillColor) {
       if (!fillColor || !fillColor[3] || radius <= 0) {
@@ -893,10 +925,17 @@
       centerX += this.offset.x;
       centerY += this.offset.y;
 
-      if (!this._clipOk(centerX - radius, centerY - radius, radius * 2, radius * 2)) {
+      if (
+        !this._clipOk(
+          centerX - radius,
+          centerY - radius,
+          radius * 2,
+          radius * 2,
+        )
+      ) {
         return;
       }
-      this._call('fillCircle', [centerX, centerY, radius, fillColor]);
+      this._call("fillCircle", [centerX, centerY, radius, fillColor]);
     }
     fillEllipse(centerX, centerY, radiusX, radiusY, fillColor) {
       if (!fillColor || !fillColor[3] || radiusX <= 0 || radiusY <= 0) {
@@ -905,10 +944,23 @@
       centerX += this.offset.x;
       centerY += this.offset.y;
 
-      if (!this._clipOk(centerX - radiusX, centerY - radiusY, radiusX * 2, radiusY * 2)) {
+      if (
+        !this._clipOk(
+          centerX - radiusX,
+          centerY - radiusY,
+          radiusX * 2,
+          radiusY * 2,
+        )
+      ) {
         return;
       }
-      this._call('fillEllipse', [centerX, centerY, radiusX, radiusY, fillColor]);
+      this._call("fillEllipse", [
+        centerX,
+        centerY,
+        radiusX,
+        radiusY,
+        fillColor,
+      ]);
     }
     drawImage(imageId, xPos, yPos, width, height, tintColor) {
       xPos += this.offset.x;
@@ -917,7 +969,14 @@
       if (!this._clipOk(xPos, yPos, width, height)) {
         return;
       }
-      this._call('drawImage', [imageId, xPos, yPos, width, height, tintColor || null]);
+      this._call("drawImage", [
+        imageId,
+        xPos,
+        yPos,
+        width,
+        height,
+        tintColor || null,
+      ]);
     }
     drawText(xPos, yPos, text, fillColor, options) {
       if (!fillColor || !fillColor[3] || !text) {
@@ -930,24 +989,22 @@
       let bx = xPos,
         bw = 1;
 
-      if (this._has('textSize')) {
+      if (this._has("textSize")) {
         const m = this.raw.textSize(text, options);
         bw = m.w;
 
-        if (options.align === 'center') {
+        if (options.align === "center") {
           bx = xPos - m.w / 2;
-        }
-        else if (options.align === 'right') bx = xPos - m.w;
+        } else if (options.align === "right") bx = xPos - m.w;
       }
 
       if (!this._clipOk(bx, yPos - 2, bw, h + 4)) {
         return;
       }
-      this._call('drawText', [xPos, yPos, text, fillColor, options]);
+      this._call("drawText", [xPos, yPos, text, fillColor, options]);
     }
     textSize(text, options) {
-      if (this._has('textSize'))
-
+      if (this._has("textSize"))
         try {
           return this.raw.textSize(text, options);
         } catch (e) {
@@ -956,7 +1013,7 @@
       const fs = (options && options.fontSize) || 13;
 
       return {
-        w: String(text == null ? '' : text).length * fs * 0.6,
+        w: String(text == null ? "" : text).length * fs * 0.6,
         h: fs * 1.25,
       };
     }
@@ -966,7 +1023,7 @@
    * Window
    * -------------------------------------------------------------------- */
 
-// ---- window record ----
+  // ---- window record ----
 
   class Window {
     constructor(title, kind) {
@@ -1076,7 +1133,7 @@
    * example.
    */
 
-// ---- GUI: the main class ----
+  // ---- GUI: the main class ----
 
   class GUI {
     /**
@@ -1098,7 +1155,7 @@
       this.renderer = new RendererProxy(this, renderer);
       this.style = new Style(options.style || {});
       this.clipboard = options.clipboard || {
-        read: () => '',
+        read: () => "",
         write: () => {},
       };
       this.flags = Object.assign(
@@ -1184,8 +1241,8 @@
         keys: new Set(),
         prevKeys: new Set(),
         cursor: null,
-        lastCursor: 'default',
-        textInput: '',
+        lastCursor: "default",
+        textInput: "",
         textConsumed: false,
         activeId: 0,
         activeIdWindow: null,
@@ -1283,9 +1340,9 @@
         if (!inst) {
           continue;
         }
-        const methods = typeof inst === 'function' ? inst(this, Mim) : inst;
+        const methods = typeof inst === "function" ? inst(this, Mim) : inst;
 
-        if (methods && typeof methods === 'object') {
+        if (methods && typeof methods === "object") {
           this.addons[name] = methods;
         }
       }
@@ -1338,7 +1395,10 @@
       // wheel: scroll the innermost scrollable container under the mouse,
       // else an open scrollable combo popup
 
-      if (this.flags.wheelScroll && (guiState.mouse.wheel[0] || guiState.mouse.wheel[1])) {
+      if (
+        this.flags.wheelScroll &&
+        (guiState.mouse.wheel[0] || guiState.mouse.wheel[1])
+      ) {
         const wx = guiState.mouse.wheel[0],
           wy = guiState.mouse.wheel[1];
         let consumed = false;
@@ -1372,11 +1432,10 @@
         }
 
         if (!consumed && wy !== 0)
-
           for (const p of guiState.popupList) {
             if (
               p.open &&
-              p.data.type === 'combo' &&
+              p.data.type === "combo" &&
               p.maxScroll > 0 &&
               p.w > 0 &&
               pointInRect(guiState.mouse.x, guiState.mouse.y, {
@@ -1428,11 +1487,12 @@
         );
 
       // keyboard / text (s.keys is our own set; s.prevKeys holds last frame's)
-      const ik = input.keys instanceof Set ? input.keys : new Set(input.keys || []);
+      const ik =
+        input.keys instanceof Set ? input.keys : new Set(input.keys || []);
       guiState.keys.clear();
 
       for (const k of ik) guiState.keys.add(k);
-      guiState.textInput = typeof input.text === 'string' ? input.text : '';
+      guiState.textInput = typeof input.text === "string" ? input.text : "";
       guiState.textConsumed = false;
       guiState.backForwardHandled = false;
 
@@ -1446,12 +1506,17 @@
         for (let i = guiState.zOrder.length - 1; i >= 0; i--) {
           const w = guiState.zOrder[i];
 
-          if (w.kind !== 'window' || w.open === false) {
+          if (w.kind !== "window" || w.open === false) {
             continue;
           }
           const wh = w.collapsed ? w.titleH : w.h;
 
-          if (mouse.x >= w.x && mouse.x < w.x + w.w && mouse.y >= w.y && mouse.y < w.y + wh) {
+          if (
+            mouse.x >= w.x &&
+            mouse.x < w.x + w.w &&
+            mouse.y >= w.y &&
+            mouse.y < w.y + wh
+          ) {
             claim = w;
             break;
           }
@@ -1499,8 +1564,7 @@
 
           if (wa && wb && wa !== wb) {
             this._makeDock(la, lb, opts);
-          }
-          else still.push([la, lb, opts]);
+          } else still.push([la, lb, opts]);
         }
         guiState.pendingDocks = still;
       }
@@ -1512,21 +1576,22 @@
         const up = !mouse.buttons[d.button == null ? 0 : d.button];
 
         if (up) {
-          if (d.type === 'closebtn' && pointInRect(mouse.x, mouse.y, d.rect)) {
+          if (d.type === "closebtn" && pointInRect(mouse.x, mouse.y, d.rect)) {
             d.win.open = false;
 
-            if (typeof d.win.onClose === 'function') {
+            if (typeof d.win.onClose === "function") {
               d.win.onClose();
             }
           }
           // drop a dragged window — or dock (combined window) — onto a
           // docking hint (join grid / edge band / screen grid)
           const didDock =
-            (d.type === 'win-move' || d.type === 'dock-move') && this._applyDockHint(guiState, d);
+            (d.type === "win-move" || d.type === "dock-move") &&
+            this._applyDockHint(guiState, d);
           // a pure (unmoved) press+release on a title bar toggles collapse
 
           if (
-            d.type === 'win-move' &&
+            d.type === "win-move" &&
             !didDock &&
             d.collapse &&
             d.moved < this.flags.dragThreshold &&
@@ -1556,7 +1621,8 @@
           guiState.activeId = 0;
         } else if (
           this.flags.windowMove &&
-          Math.abs(mouse.x - md.x) + Math.abs(mouse.y - md.y) >= this.flags.dragThreshold
+          Math.abs(mouse.x - md.x) + Math.abs(mouse.y - md.y) >=
+            this.flags.dragThreshold
         ) {
           guiState._memberDrag = null;
           const w = md.win;
@@ -1572,7 +1638,7 @@
             }
             this._raise(w);
             guiState.drag = {
-              type: 'win-move',
+              type: "win-move",
               win: w,
               button: 0,
               offX: md.offX,
@@ -1598,12 +1664,17 @@
       for (let i = guiState.zOrder.length - 1; i >= 0; i--) {
         const w = guiState.zOrder[i];
 
-        if (w.kind !== 'window' || w.open === false) {
+        if (w.kind !== "window" || w.open === false) {
           continue;
         }
         const wh = w.collapsed ? w.titleH : w.h;
 
-        if (mouse.x >= w.x && mouse.x < w.x + w.w && mouse.y >= w.y && mouse.y < w.y + wh) {
+        if (
+          mouse.x >= w.x &&
+          mouse.x < w.x + w.w &&
+          mouse.y >= w.y &&
+          mouse.y < w.y + wh
+        ) {
           claim = w;
           break;
         }
@@ -1645,25 +1716,25 @@
         if (am) {
           const W = guiState.displayW,
             H = guiState.displayH;
-          const horizontal = am.pos === 'top' || am.pos === 'bottom';
+          const horizontal = am.pos === "top" || am.pos === "bottom";
           const th = horizontal ? am.thickness : H;
           const sw = horizontal ? W : am.sideWidth;
           guiState.appBarRect =
-            am.pos === 'top'
+            am.pos === "top"
               ? {
                   x: 0,
                   y: 0,
                   w: W,
                   h: th,
                 }
-              : am.pos === 'bottom'
+              : am.pos === "bottom"
                 ? {
                     x: 0,
                     y: H - th,
                     w: W,
                     h: th,
                   }
-                : am.pos === 'left'
+                : am.pos === "left"
                   ? {
                       x: 0,
                       y: 0,
@@ -1679,14 +1750,20 @@
           // live keyboard shortcuts (fire once on the pressed frame)
 
           for (const it of guiState.appMenuShortcuts) {
-            const disabled = typeof it.disabled === 'function' ? it.disabled() : !!it.disabled;
+            const disabled =
+              typeof it.disabled === "function" ? it.disabled() : !!it.disabled;
 
             if (disabled) {
               continue;
             }
-            const modsOk = !it.keyMod || it.keyMod.every((k) => guiState.keys.has(k));
+            const modsOk =
+              !it.keyMod || it.keyMod.every((k) => guiState.keys.has(k));
 
-            if (modsOk && this.isKeyPressed(it.key) && typeof it.onActivated === 'function')
+            if (
+              modsOk &&
+              this.isKeyPressed(it.key) &&
+              typeof it.onActivated === "function"
+            )
               it.onActivated();
           }
           const fontOptions = this._fo();
@@ -1704,7 +1781,10 @@
             const rect = horizontal
               ? {
                   x: cx,
-                  y: am.pos === 'bottom' ? H - th + (th - lineH - 10) / 2 : (th - lineH - 10) / 2,
+                  y:
+                    am.pos === "bottom"
+                      ? H - th + (th - lineH - 10) / 2
+                      : (th - lineH - 10) / 2,
                   w: lw + 18,
                   h: lineH + 10,
                 }
@@ -1717,9 +1797,8 @@
 
             if (horizontal) {
               cx += rect.w + 6;
-            }
-            else cy += rect.h + 2;
-            const pid = '##appmenu' + fnv1a(label);
+            } else cy += rect.h + 2;
+            const pid = "##appmenu" + fnv1a(label);
             const p = guiState.popups.get(pid);
             const open = !!(p && p.open && p.data && p.data.appMenu);
 
@@ -1773,26 +1852,32 @@
                 continue;
               }
 
-              if (this.isMouseClicked(0) && guiState.activeId === 0 && !guiState.drag) {
+              if (
+                this.isMouseClicked(0) &&
+                guiState.activeId === 0 &&
+                !guiState.drag
+              ) {
                 const p = guiState.popups.get(sec.pid);
 
                 if (sec.open) {
                   p.open = false;
-                }
-                else {
+                } else {
                   this._openPopup(
                     sec.pid,
                     horizontal
                       ? {
                           x: sec.rect.x,
-                          y: am.pos === 'top' ? th + 2 : guiState.appBarRect.y - 2,
+                          y:
+                            am.pos === "top"
+                              ? th + 2
+                              : guiState.appBarRect.y - 2,
                         }
                       : {
-                          x: am.pos === 'left' ? sw - 2 : W - sw - 2,
+                          x: am.pos === "left" ? sw - 2 : W - sw - 2,
                           y: sec.rect.y,
                         },
                     {
-                      type: 'menu',
+                      type: "menu",
                       items: this._appMenuRows(sec.items, sec.pid),
                       appMenu: true,
                     },
@@ -1801,7 +1886,6 @@
                   );
 
                   for (const p2 of guiState.popupList)
-
                     if (p2.data && p2.data.appMenu && p2.id !== sec.pid) {
                       p2.open = false;
                     }
@@ -1813,14 +1897,15 @@
                   horizontal
                     ? {
                         x: sec.rect.x,
-                        y: am.pos === 'top' ? th + 2 : guiState.appBarRect.y - 2,
+                        y:
+                          am.pos === "top" ? th + 2 : guiState.appBarRect.y - 2,
                       }
                     : {
-                        x: am.pos === 'left' ? sw - 2 : W - sw - 2,
+                        x: am.pos === "left" ? sw - 2 : W - sw - 2,
                         y: sec.rect.y,
                       },
                   {
-                    type: 'menu',
+                    type: "menu",
                     items: this._appMenuRows(sec.items, sec.pid),
                     appMenu: true,
                   },
@@ -1829,7 +1914,6 @@
                 );
 
                 for (const p2 of guiState.popupList)
-
                   if (p2.data && p2.data.appMenu && p2.id !== sec.pid) {
                     p2.open = false;
                   }
@@ -1857,19 +1941,26 @@
 
       // keyboard: tab focus cycling
 
-      if (this.flags.keyboardNavigation && this.isKeyPressed('tab')) {
-        const list = guiState.lastFocusList.length ? guiState.lastFocusList : guiState.focusList;
+      if (this.flags.keyboardNavigation && this.isKeyPressed("tab")) {
+        const list = guiState.lastFocusList.length
+          ? guiState.lastFocusList
+          : guiState.focusList;
 
         if (list.length) {
-          const dir = guiState.keys.has('shift') ? -1 : 1;
+          const dir = guiState.keys.has("shift") ? -1 : 1;
           let i = list.indexOf(guiState.focusedId);
-          i = i < 0 ? (dir > 0 ? 0 : list.length - 1) : (i + dir + list.length) % list.length;
+          i =
+            i < 0
+              ? dir > 0
+                ? 0
+                : list.length - 1
+              : (i + dir + list.length) % list.length;
           guiState.focusedId = list[i];
         }
       }
       // Escape: close the topmost popup (text edits handle Escape themselves)
 
-      if (this.isKeyPressed('escape') && guiState.popupList.length)
+      if (this.isKeyPressed("escape") && guiState.popupList.length)
         guiState.popupList[guiState.popupList.length - 1].open = false;
       // mouse back: close the topmost popup unless a text field handled it
 
@@ -1900,7 +1991,6 @@
           !guiState.drag &&
           !this._popupAtPoint(mouse.x, mouse.y)
         )
-
           for (let i = guiState.zOrder.length - 1; i >= 0; i--) {
             const win = guiState.zOrder[i];
 
@@ -1924,27 +2014,27 @@
           claim &&
           guiState.modalWin &&
           claim !== guiState.modalWin &&
-          guiState.zOrder.indexOf(claim) < guiState.zOrder.indexOf(guiState.modalWin)
+          guiState.zOrder.indexOf(claim) <
+            guiState.zOrder.indexOf(guiState.modalWin)
         )
           claim = null; // the modal blocks windows drawn beneath it
 
         if (claim)
-          // visible-order rule: the band only claims the point when the
-          // claimed window is the TOPMOST window there — another window
-          // painted over the band owns the point (input must not travel
-          // through it to the band underneath). The app menu bar is drawn
-          // above all windows, so it owns its region too.
-
           if (guiState.appBarGrab) {
+            // visible-order rule: the band only claims the point when the
+            // claimed window is the TOPMOST window there — another window
+            // painted over the band owns the point (input must not travel
+            // through it to the band underneath). The app menu bar is drawn
+            // above all windows, so it owns its region too.
+
             claim = null;
-          }
-          else {
+          } else {
             let topAt = null;
 
             for (let i = guiState.zOrder.length - 1; i >= 0; i--) {
               const w2 = guiState.zOrder[i];
 
-              if (w2.kind !== 'window' || w2.open === false) {
+              if (w2.kind !== "window" || w2.open === false) {
                 continue;
               }
               const wh2 = w2.collapsed ? w2.titleH : w2.h;
@@ -1973,11 +2063,14 @@
         if (claim) {
           const horiz = claimEdge & 2 || claimEdge & 8,
             vert = claimEdge & 1 || claimEdge & 4;
-          this._setCursor(horiz && vert ? 'nwse-resize' : horiz ? 'ew-resize' : 'ns-resize', 1);
+          this._setCursor(
+            horiz && vert ? "nwse-resize" : horiz ? "ew-resize" : "ns-resize",
+            1,
+          );
 
           if (this.isMouseClicked(0)) {
             guiState.drag = {
-              type: 'win-resize',
+              type: "win-resize",
               win: claim,
               button: 0,
               edge: claimEdge,
@@ -2000,7 +2093,9 @@
 
       // tooltips
       this._tooltipPass();
-      guiState.scrollStack = guiState.scrollStack.filter((sc) => sc.frame >= guiState.frameId - 1);
+      guiState.scrollStack = guiState.scrollStack.filter(
+        (sc) => sc.frame >= guiState.frameId - 1,
+      );
 
       // apply a slim-header collapse toggle requested this frame (exactly one
       // member per click, the last-drawn header wins overlapping regions)
@@ -2066,12 +2161,15 @@
       const top = guiState.zOrder.filter((w) => w.alwaysOnTop);
       guiState.zOrder = norm.concat(top);
 
-      if (!guiState.focusedWindow || guiState.zOrder.indexOf(guiState.focusedWindow) < 0)
-        guiState.focusedWindow = guiState.zOrder[guiState.zOrder.length - 1] || null;
+      if (
+        !guiState.focusedWindow ||
+        guiState.zOrder.indexOf(guiState.focusedWindow) < 0
+      )
+        guiState.focusedWindow =
+          guiState.zOrder[guiState.zOrder.length - 1] || null;
       guiState.modalWin = null;
 
       for (const w of guiState.zOrder)
-
         if (w.modal && w.drawnFrame === guiState.frameId) {
           guiState.modalWin = w;
         }
@@ -2085,7 +2183,10 @@
       )
         guiState.activeId = 0;
 
-      if (guiState.focusedId && !guiState.focusList.includes(guiState.focusedId))
+      if (
+        guiState.focusedId &&
+        !guiState.focusList.includes(guiState.focusedId)
+      )
         guiState.focusedId = 0;
       guiState.lastFocusList = guiState.focusList.slice();
 
@@ -2099,15 +2200,15 @@
 
       // apply the requested cursor (only if the backend supports it)
       {
-        const desired = guiState.cursor ? guiState.cursor.style : 'default';
+        const desired = guiState.cursor ? guiState.cursor.style : "default";
         guiState.cursor = null;
         const feats = this.renderer.features;
 
         if (feats && feats.cursor && desired !== guiState.lastCursor) {
           this.renderer.setCursor(desired);
           guiState.lastCursor = desired;
-        } else if (feats && !feats.cursor && guiState.lastCursor !== 'default')
-          guiState.lastCursor = 'default';
+        } else if (feats && !feats.cursor && guiState.lastCursor !== "default")
+          guiState.lastCursor = "default";
       }
 
       if (this.debugOverlay) {
@@ -2117,7 +2218,9 @@
       const frameMs = nowMs() - guiState.frameStart;
       st.ms = st.ms ? lerp(st.ms, frameMs, 0.1) : frameMs;
       st.fps =
-        guiState.dt > 0.0005 ? lerp(st.fps || 1 / guiState.dt, 1 / guiState.dt, 0.08) : st.fps;
+        guiState.dt > 0.0005
+          ? lerp(st.fps || 1 / guiState.dt, 1 / guiState.dt, 0.08)
+          : st.fps;
       st.drawCalls = this.renderer.calls;
       st.items = guiState.items.size;
       st.windows = guiState.zOrder.length;
@@ -2133,7 +2236,8 @@
         guiState.prevKeys = t;
       }
 
-      for (let i = 0; i < 5; i++) guiState.mouse.prevButtons[i] = guiState.mouse.buttons[i];
+      for (let i = 0; i < 5; i++)
+        guiState.mouse.prevButtons[i] = guiState.mouse.buttons[i];
       this.renderer.endFrame();
     }
 
@@ -2144,7 +2248,7 @@
      * `itemId` is unique per instance within a frame (unique rects/hover). */
 
     pushId(id) {
-      const h = typeof id === 'string' ? fnv1a(id) : (id | 0) >>> 0;
+      const h = typeof id === "string" ? fnv1a(id) : (id | 0) >>> 0;
       const guiState = this.state;
       guiState.idStack.push(h);
       guiState.idStackSeed = hashPair(guiState.idStackSeed, h);
@@ -2157,16 +2261,18 @@
     popId(count = 1) {
       const guiState = this.state;
 
-      for (let i = 0; i < count && guiState.idStack.length; i++) guiState.idStack.pop();
+      for (let i = 0; i < count && guiState.idStack.length; i++)
+        guiState.idStack.pop();
       guiState.idStackSeed = guiState.idStackSeeds.length
         ? guiState.idStackSeeds[guiState.idStackSeeds.length - 1]
         : 0;
 
-      while (guiState.idStackSeeds.length > guiState.idStack.length) guiState.idStackSeeds.pop();
+      while (guiState.idStackSeeds.length > guiState.idStack.length)
+        guiState.idStackSeeds.pop();
     }
     _id(label) {
       const guiState = this.state;
-      const lh = fnv1a(String(label == null ? '' : label));
+      const lh = fnv1a(String(label == null ? "" : label));
       const stateKey = hashPair(guiState.idStackSeed, lh);
       let inner = guiState.dupCount.get(guiState.idStackSeed);
 
@@ -2212,18 +2318,25 @@
       }
       const mw = guiState.modalWin;
 
-      if (mw && win.kind !== 'popup') {
+      if (mw && win.kind !== "popup") {
         // a modal blocks only what it actually covers (topmost-element
         // rule); the modal's own widgets (and popups, which draw above
         // every window) are never blocked by it
         const top = win.owner || win;
 
-        if (top !== mw && guiState.zOrder.indexOf(top) < guiState.zOrder.indexOf(mw)) {
+        if (
+          top !== mw &&
+          guiState.zOrder.indexOf(top) < guiState.zOrder.indexOf(mw)
+        ) {
           const mouse = guiState.mouse;
           const mh = mw.collapsed ? mw.titleH : mw.h;
 
-          if (mouse.x >= mw.x && mouse.x < mw.x + mw.w && mouse.y >= mw.y && mouse.y < mw.y + mh)
-
+          if (
+            mouse.x >= mw.x &&
+            mouse.x < mw.x + mw.w &&
+            mouse.y >= mw.y &&
+            mouse.y < mw.y + mh
+          )
             return false;
         }
       }
@@ -2251,7 +2364,6 @@
             h: p.h,
           })
         )
-
           return p;
       }
 
@@ -2302,7 +2414,12 @@
       item.clicked = false;
       item.enabled = guiState.disabledCount === 0;
 
-      if (item.visible && item.enabled && item.win && this._canReceiveInput(item.win)) {
+      if (
+        item.visible &&
+        item.enabled &&
+        item.win &&
+        this._canReceiveInput(item.win)
+      ) {
         const mouse = guiState.mouse;
         const top = item.win.owner || item.win;
         // menu bar items live in the band above the content clip
@@ -2312,15 +2429,15 @@
           mouse.y >= item.win.y + item.win.titleH &&
           mouse.y < item.win.y + item.win.titleH + item.win.menuH
         );
-        const inClip = !clip || pointInRect(mouse.x, mouse.y, clip) || inMenuBar;
+        const inClip =
+          !clip || pointInRect(mouse.x, mouse.y, clip) || inMenuBar;
         // open popups paint above every window: an item hidden beneath one
         // must not show hover highlighting or take input (items laid out
         // inside the popup itself are exempt)
         let underPopup = false;
         const container = guiState.layout && guiState.layout.container;
 
-        if (!container || container.kind !== 'popup')
-
+        if (!container || container.kind !== "popup")
           for (const p of guiState.popupList) {
             if (
               p.open &&
@@ -2356,7 +2473,12 @@
     _mouseIn(it) {
       const mouse = this.state.mouse;
 
-      return mouse.x >= it.x && mouse.x < it.x + it.w && mouse.y >= it.y && mouse.y < it.y + it.h;
+      return (
+        mouse.x >= it.x &&
+        mouse.x < it.x + it.w &&
+        mouse.y >= it.y &&
+        mouse.y < it.y + it.h
+      );
     }
 
     /* Standard click/active wiring for a widget item. */
@@ -2364,7 +2486,7 @@
       const guiState = this.state;
 
       if (it.hovered && guiState.disabledCount === 0) {
-        this._setCursor('pointer', 1);
+        this._setCursor("pointer", 1);
       }
       const wasActive = guiState.activeId === it.itemId; // this item owns the press (set on an earlier frame)
 
@@ -2390,7 +2512,8 @@
       // because isMouseDown(0) is already false on the release frame
 
       if (wasActive && this.isMouseReleased(0)) {
-        it.clicked = this._mouseIn(it) || guiState.dragDistance < this.flags.dragThreshold;
+        it.clicked =
+          this._mouseIn(it) || guiState.dragDistance < this.flags.dragThreshold;
         guiState.activeId = 0;
         guiState.activeIdWindow = null;
       }
@@ -2458,7 +2581,7 @@
       if (!D || D._edge) {
         return false;
       }
-      const tH = this._var('titleBarHeight');
+      const tH = this._var("titleBarHeight");
 
       return x >= D.x && x < D.x + D.w && y >= D.y && y < D.y + tH;
     }
@@ -2484,7 +2607,7 @@
     }
     _nextPos() {
       const layout = this.state.layout;
-      const itemSpacing = this._var('itemSpacing');
+      const itemSpacing = this._var("itemSpacing");
       let x, y;
 
       if (layout.lineActive && layout.sameLine) {
@@ -2494,7 +2617,8 @@
         x =
           sl.offset != null
             ? layout.lineStartX + sl.offset
-            : layout.prevRight + (sl.spacing != null ? sl.spacing : itemSpacing[0]);
+            : layout.prevRight +
+              (sl.spacing != null ? sl.spacing : itemSpacing[0]);
         y = layout.lineY;
       } else if (layout.lineActive) {
         layout._same = false;
@@ -2516,24 +2640,24 @@
 
     _fo() {
       return {
-        fontSize: this._var('fontSize'),
+        fontSize: this._var("fontSize"),
         fontId: this.style.font.id,
       };
     }
     _measure(str, fo) {
       fo = fo || this._fo();
-      const key = str + '\x00' + fo.fontSize + '\x00' + fo.fontId;
+      const key = str + "\x00" + fo.fontSize + "\x00" + fo.fontId;
       const guiState = this.state;
       let m = guiState.textSizeCache.get(key);
 
       if (!m) {
         m = this.renderer.textSize(str, fo);
 
-        if (typeof m.w !== 'number' || !isFinite(m.w)) {
+        if (typeof m.w !== "number" || !isFinite(m.w)) {
           m.w = String(str).length * fo.fontSize * 0.6;
         }
 
-        if (typeof m.h !== 'number' || !isFinite(m.h)) {
+        if (typeof m.h !== "number" || !isFinite(m.h)) {
           m.h = fo.fontSize * 1.25;
         }
         guiState.textSizeCache.set(key, m);
@@ -2545,15 +2669,14 @@
       const guiState = this.state;
 
       if (guiState._lineHFrame === guiState.frameId && guiState._lineHCache)
-
         return guiState._lineHCache;
-      guiState._lineHCache = this._measure('M').h;
+      guiState._lineHCache = this._measure("M").h;
       guiState._lineHFrame = guiState.frameId;
 
       return guiState._lineHCache;
     }
     _frameH() {
-      const fp = this._var('framePadding');
+      const fp = this._var("framePadding");
 
       return this._lineH() + fp[1] * 2;
     }
@@ -2562,7 +2685,7 @@
       this.renderer.drawText(
         x,
         y,
-        String(str == null ? '' : str),
+        String(str == null ? "" : str),
         color,
         Object.assign(
           {
@@ -2583,12 +2706,16 @@
         const c = stack[i].colors && stack[i].colors[name];
 
         if (c) {
-          return alphaMul != null && alphaMul < 1 ? withAlpha(c, c[3] * alphaMul) : c;
+          return alphaMul != null && alphaMul < 1
+            ? withAlpha(c, c[3] * alphaMul)
+            : c;
         }
       }
       const c = this.style.colors[name] || [200, 200, 200, 255];
 
-      return alphaMul != null && alphaMul < 1 ? withAlpha(c, c[3] * alphaMul) : c;
+      return alphaMul != null && alphaMul < 1
+        ? withAlpha(c, c[3] * alphaMul)
+        : c;
     }
     _var(name) {
       const stack = this.state.styleStack;
@@ -2820,13 +2947,13 @@
       return !this.state.keys.has(k) && this.state.prevKeys.has(k);
     }
     get ctrl() {
-      return this.isKeyDown('ctrl') || this.isKeyDown('meta');
+      return this.isKeyDown("ctrl") || this.isKeyDown("meta");
     }
     get shift() {
-      return this.isKeyDown('shift');
+      return this.isKeyDown("shift");
     }
     get alt() {
-      return this.isKeyDown('alt');
+      return this.isKeyDown("alt");
     }
 
     /**
@@ -2926,7 +3053,7 @@
      * @param {number} [amount]
      */
     indent(amount) {
-      this.state.layout.indent += amount || this._var('indentSpacing');
+      this.state.layout.indent += amount || this._var("indentSpacing");
     }
     /**
      * Decreases the layout indent by amount px (default: the 'indentSpacing'
@@ -2936,7 +3063,7 @@
     unindent(amount) {
       this.state.layout.indent = Math.max(
         0,
-        this.state.layout.indent - (amount || this._var('indentSpacing')),
+        this.state.layout.indent - (amount || this._var("indentSpacing")),
       );
     }
     /**
@@ -3013,10 +3140,17 @@
      */
     spacing() {
       const pos = this._nextPos();
-      this._item(pos.x, pos.y, 0, 0, hashPair(this.state.idStackSeed, 0x5a5a5a5a), {
-        focusable: false,
-      });
-      this._advance(pos.x, pos.y, 0, this._var('itemSpacing')[1]);
+      this._item(
+        pos.x,
+        pos.y,
+        0,
+        0,
+        hashPair(this.state.idStackSeed, 0x5a5a5a5a),
+        {
+          focusable: false,
+        },
+      );
+      this._advance(pos.x, pos.y, 0, this._var("itemSpacing")[1]);
     }
     /**
      * Reserves an empty w x h rect at the cursor (layout only, nothing is
@@ -3027,9 +3161,16 @@
      */
     dummy(w, h) {
       const pos = this._nextPos();
-      const item = this._item(pos.x, pos.y, w, h, hashPair(this.state.idStackSeed, 0x5a5a5a5b), {
-        focusable: false,
-      });
+      const item = this._item(
+        pos.x,
+        pos.y,
+        w,
+        h,
+        hashPair(this.state.idStackSeed, 0x5a5a5a5b),
+        {
+          focusable: false,
+        },
+      );
       this._advance(item.x, item.y, w, h);
 
       return item;
@@ -3041,7 +3182,7 @@
     separator() {
       if (this.state.currentMenu) {
         this.state.currentMenu.push({
-          type: 'sep',
+          type: "sep",
         });
 
         return;
@@ -3053,13 +3194,27 @@
       const w = this.state.popupLayoutActive
         ? Math.max(80, layout.contentRight)
         : Math.max(0, layout.avail.w - layout.x - layout.indent);
-      const item = this._item(pos.x, pos.y, w, 1, hashPair(this.state.idStackSeed, 0x5a5a5a5c), {
-        focusable: false,
-      });
+      const item = this._item(
+        pos.x,
+        pos.y,
+        w,
+        1,
+        hashPair(this.state.idStackSeed, 0x5a5a5a5c),
+        {
+          focusable: false,
+        },
+      );
 
       if (item.visible)
-        this.renderer.line(pos.x, pos.y + 0.5, pos.x + w, pos.y + 0.5, this._col('separator'), 1);
-      this._advance(pos.x, pos.y, w, 1 + this._var('itemSpacing')[1]);
+        this.renderer.line(
+          pos.x,
+          pos.y + 0.5,
+          pos.x + w,
+          pos.y + 0.5,
+          this._col("separator"),
+          1,
+        );
+      this._advance(pos.x, pos.y, w, 1 + this._var("itemSpacing")[1]);
     }
     /**
      * Draws a separator line with a small label centered on it.
@@ -3090,10 +3245,16 @@
           pos.y + lineH / 2 + 3,
           pos.x + w,
           pos.y + lineH / 2 + 3,
-          this._col('separator'),
+          this._col("separator"),
           1,
         );
-        this._drawText(pos.x + 6, pos.y, label, this._col('textDisabled'), fontOptions);
+        this._drawText(
+          pos.x + 6,
+          pos.y,
+          label,
+          this._col("textDisabled"),
+          fontOptions,
+        );
       }
       this._advance(pos.x, pos.y, w, lineH + 6);
     }
@@ -3114,7 +3275,7 @@
         },
       });
       this.state.savedLayout.push(snap);
-      const itemSpacing = this._var('itemSpacing');
+      const itemSpacing = this._var("itemSpacing");
       let contentX = snap.x + snap.indent,
         contentY = snap.y;
 
@@ -3123,7 +3284,8 @@
         contentX =
           sl.offset != null
             ? snap.lineStartX + sl.offset
-            : snap.prevRight + (sl.spacing != null ? sl.spacing : itemSpacing[0]);
+            : snap.prevRight +
+              (sl.spacing != null ? sl.spacing : itemSpacing[0]);
         contentY = snap.lineY;
       }
       this.state.groupStart = {
@@ -3286,20 +3448,19 @@
      * dropped onto a globally docked one with the drag join grid.) */
 
     _dockKeyFor(a, b) {
-      const la = typeof a === 'string' ? a : (a && a.title) || '';
-      const lb = typeof b === 'string' ? b : (b && b.title) || '';
+      const la = typeof a === "string" ? a : (a && a.title) || "";
+      const lb = typeof b === "string" ? b : (b && b.title) || "";
 
-      return la < lb ? la + '\x01' + lb : lb + '\x01' + la;
+      return la < lb ? la + "\x01" + lb : lb + "\x01" + la;
     }
     _findDock(a, b) {
       const guiState = this.state;
 
       if (a == null || b == null) {
         // single label: find the dock containing it
-        const la = typeof a === 'string' ? a : (a && a.title) || '';
+        const la = typeof a === "string" ? a : (a && a.title) || "";
 
         for (const D of guiState.docks.values())
-
           if ((D.a && D.a.title === la) || (D.b && D.b.title === la)) {
             return D;
           }
@@ -3322,8 +3483,8 @@
     dock(a, b, opts) {
       opts = opts || {};
       const guiState = this.state;
-      const la = typeof a === 'string' ? a : a && a.title;
-      const lb = typeof b === 'string' ? b : b && b.title;
+      const la = typeof a === "string" ? a : a && a.title;
+      const lb = typeof b === "string" ? b : b && b.title;
 
       if (!la || !lb) {
         return null;
@@ -3367,8 +3528,7 @@
         }
       } else if (wa._edge) {
         combEdge = wa._edge;
-      }
-      else if (wb._edge) combEdge = wb._edge;
+      } else if (wb._edge) combEdge = wb._edge;
 
       if (combEdge && wa._edge !== combEdge && wb._edge === combEdge) {
         const tw = wa;
@@ -3393,7 +3553,7 @@
         key,
         a: wa,
         b: wb,
-        dir: opts.dir === 'v' || opts.vertical ? 'v' : 'h',
+        dir: opts.dir === "v" || opts.vertical ? "v" : "h",
         ratio: clamp(opts.ratio == null ? 0.5 : opts.ratio, 0.12, 0.88),
         x: wa.x,
         y: wa.y,
@@ -3419,7 +3579,7 @@
       if (opts.size) {
         dock.w = opts.size[0];
         dock.h = opts.size[1];
-      } else if (dock.dir === 'h') {
+      } else if (dock.dir === "h") {
         // combined width = both windows' widths added together; the height
         // takes the taller window's size (anchored on it, so it keeps its
         // position)
@@ -3450,14 +3610,20 @@
         // full docked width/height. The dock becomes the stack's unit; its
         // slot grows by the newcomer's along-size.
         const E = guiState.edgeDocks[combEdge];
-        const horiz = combEdge === 'top' || combEdge === 'bottom';
+        const horiz = combEdge === "top" || combEdge === "bottom";
         const R = E && E._rect;
         const n = E ? E.wins.length : 1;
-        const span = R ? (horiz ? R.colW : R.colH) : horiz ? wa.w + wb.w : wa.h + wb.h;
+        const span = R
+          ? horiz
+            ? R.colW
+            : R.colH
+          : horiz
+            ? wa.w + wb.w
+            : wa.h + wb.h;
         const share = Math.max(20, Math.max(20, span - 12) - 4 * (n - 1));
         const alongW = horiz ? wa.w : wa.h;
         const alongX = horiz ? wb.w : wb.h;
-        dock.dir = horiz ? 'h' : 'v';
+        dock.dir = horiz ? "h" : "v";
         dock.ratio = clamp(alongW / (alongW + alongX), 0.12, 0.88);
         dock.x = wa.x;
         dock.y = wa.y;
@@ -3622,7 +3788,7 @@
      * on the same header toggles it closed. */
     _windowContextMenu(win) {
       const guiState = this.state;
-      const id = 'winctx:' + (win.idHash || fnv1a(win.title));
+      const id = "winctx:" + (win.idHash || fnv1a(win.title));
       const existing = guiState.popups.get(id);
 
       if (existing && existing.open) {
@@ -3635,7 +3801,7 @@
 
       if (win.collapsible)
         items.push({
-          label: win.collapsed ? 'Expand' : 'Collapse',
+          label: win.collapsed ? "Expand" : "Collapse",
           onActivated: () => {
             win.collapsed = !win.collapsed;
             win._collapseToggledAt = guiState.frameId;
@@ -3644,13 +3810,13 @@
 
       if (win._edge)
         items.push({
-          label: 'Undock from screen edge',
+          label: "Undock from screen edge",
           onActivated: () => this.undockEdge(win.title),
         });
 
       if (this.flags.windowDoubleReset && !win._edge)
         items.push({
-          label: 'Reset position',
+          label: "Reset position",
           onActivated: () => {
             win.x = win.defaultX;
             win.y = win.defaultY;
@@ -3659,11 +3825,11 @@
 
       if (win.closable)
         items.push({
-          label: 'Close',
+          label: "Close",
           onActivated: () => {
             win.open = false;
 
-            if (typeof win.onClose === 'function') {
+            if (typeof win.onClose === "function") {
               win.onClose();
             }
           },
@@ -3677,7 +3843,7 @@
             y: mouse.y,
           },
           {
-            type: 'menu',
+            type: "menu",
             items,
           },
           fnv1a(win.title),
@@ -3688,7 +3854,7 @@
     }
     _dockContextMenu(D) {
       const guiState = this.state;
-      const id = 'dockctx:' + D.key;
+      const id = "dockctx:" + D.key;
       const existing = guiState.popups.get(id);
 
       if (existing && existing.open) {
@@ -3699,7 +3865,7 @@
       const mouse = guiState.mouse;
       const items = [
         {
-          label: D.collapsed ? 'Expand' : 'Collapse',
+          label: D.collapsed ? "Expand" : "Collapse",
           onActivated: () => {
             D.collapsed = !D.collapsed;
           },
@@ -3709,15 +3875,15 @@
       for (const m of [D.a, D.b]) {
         if (m && m.open !== false)
           items.push({
-            label: 'Undock: ' + m.title,
+            label: "Undock: " + m.title,
             onActivated: () => this._undockMember(m),
           });
       }
       items.push({
-        type: 'sep',
+        type: "sep",
       });
       items.push({
-        label: 'Close',
+        label: "Close",
         onActivated: () => {
           if (D.a) {
             D.a.open = false;
@@ -3738,7 +3904,7 @@
           y: mouse.y,
         },
         {
-          type: 'menu',
+          type: "menu",
           items,
         },
         fnv1a(D.key),
@@ -3749,7 +3915,7 @@
     }
     _memberContextMenu(win) {
       const guiState = this.state;
-      const id = 'memctx:' + (win.idHash || fnv1a(win.title));
+      const id = "memctx:" + (win.idHash || fnv1a(win.title));
       const existing = guiState.popups.get(id);
 
       if (existing && existing.open) {
@@ -3762,13 +3928,13 @@
 
       if (win.collapsible)
         items.push({
-          label: win.collapsed ? 'Expand' : 'Collapse',
+          label: win.collapsed ? "Expand" : "Collapse",
           onActivated: () => {
             win.collapsed = !win.collapsed;
           },
         });
       items.push({
-        label: 'Undock',
+        label: "Undock",
         onActivated: () => this._undockMember(win),
       });
       this._openPopup(
@@ -3778,7 +3944,7 @@
           y: mouse.y,
         },
         {
-          type: 'menu',
+          type: "menu",
           items,
         },
         fnv1a(win.title),
@@ -3808,10 +3974,15 @@
     dockToEdge(a, edge) {
       const guiState = this.state;
 
-      if (edge !== 'top' && edge !== 'bottom' && edge !== 'left' && edge !== 'right') {
+      if (
+        edge !== "top" &&
+        edge !== "bottom" &&
+        edge !== "left" &&
+        edge !== "right"
+      ) {
         return null;
       }
-      const w = typeof a === 'string' ? guiState.windows.get(a) : a;
+      const w = typeof a === "string" ? guiState.windows.get(a) : a;
 
       if (!w || w.noDock) {
         return null;
@@ -3826,8 +3997,12 @@
           return null;
         }
 
-        if (dock.a.noDock || dock.b.noDock || dock.a.open === false || dock.b.open === false)
-
+        if (
+          dock.a.noDock ||
+          dock.b.noDock ||
+          dock.a.open === false ||
+          dock.b.open === false
+        )
           return null;
         this._removeEdgeUnit(dock);
         const E =
@@ -3836,7 +4011,7 @@
             wins: [],
             fracs: {},
           });
-        const horiz = edge === 'top' || edge === 'bottom';
+        const horiz = edge === "top" || edge === "bottom";
 
         if (!E.size) {
           E.size = horiz ? clamp(dock.h, 110, 300) : clamp(dock.w, 180, 420);
@@ -3868,7 +4043,7 @@
           wins: [],
           fracs: {},
         });
-      const horiz = edge === 'top' || edge === 'bottom';
+      const horiz = edge === "top" || edge === "bottom";
 
       if (!E.size) {
         E.size = horiz ? clamp(w.h, 110, 300) : clamp(w.w, 180, 420);
@@ -3894,7 +4069,7 @@
      */
     undockEdge(a) {
       const guiState = this.state;
-      const w = typeof a === 'string' ? guiState.windows.get(a) : a;
+      const w = typeof a === "string" ? guiState.windows.get(a) : a;
 
       if (!w || !w._edge) {
         return false;
@@ -3913,7 +4088,8 @@
       }
       this._removeFromEdge(w);
       w.movable = true;
-      w.resizable = !w.fixedSize && !w.autoResize && !(w.flags & WindowFlags.NoResize);
+      w.resizable =
+        !w.fixedSize && !w.autoResize && !(w.flags & WindowFlags.NoResize);
 
       return true;
     }
@@ -3994,7 +4170,7 @@
       const leftW = s.edgeDocks.left ? s.edgeDocks.left.size : 0;
       const rightW = s.edgeDocks.right ? s.edgeDocks.right.size : 0;
 
-      for (const edge of ['top', 'bottom', 'left', 'right']) {
+      for (const edge of ["top", "bottom", "left", "right"]) {
         const E = s.edgeDocks[edge];
 
         if (!E) {
@@ -4042,45 +4218,45 @@
           s.edgeDocks[edge] = null;
           continue;
         }
-        const horiz = edge === 'top' || edge === 'bottom';
+        const horiz = edge === "top" || edge === "bottom";
         const n = E.wins.length;
         let x0, y0, colW, colH;
 
-        if (edge === 'left') {
-          x0 = am && am.pos === 'left' ? am.sideWidth : 0;
-          y0 = am && am.pos === 'top' ? am.thickness : 0;
+        if (edge === "left") {
+          x0 = am && am.pos === "left" ? am.sideWidth : 0;
+          y0 = am && am.pos === "top" ? am.thickness : 0;
           colW = E.size;
-          colH = H - y0 - (am && am.pos === 'bottom' ? am.thickness : 0);
-        } else if (edge === 'right') {
-          const bar = am && am.pos === 'right' ? am.sideWidth : 0;
+          colH = H - y0 - (am && am.pos === "bottom" ? am.thickness : 0);
+        } else if (edge === "right") {
+          const bar = am && am.pos === "right" ? am.sideWidth : 0;
           x0 = W - bar - E.size;
-          y0 = am && am.pos === 'top' ? am.thickness : 0;
+          y0 = am && am.pos === "top" ? am.thickness : 0;
           colW = E.size;
-          colH = H - y0 - (am && am.pos === 'bottom' ? am.thickness : 0);
-        } else if (edge === 'top') {
-          y0 = am && am.pos === 'top' ? am.thickness : 0;
+          colH = H - y0 - (am && am.pos === "bottom" ? am.thickness : 0);
+        } else if (edge === "top") {
+          y0 = am && am.pos === "top" ? am.thickness : 0;
           // inset between the left/right columns so the row never covers them
-          x0 = (am && am.pos === 'left' ? am.sideWidth : 0) + leftW;
+          x0 = (am && am.pos === "left" ? am.sideWidth : 0) + leftW;
           colH = E.size;
           colW = Math.max(
             40,
             W -
-              (am && am.pos === 'left' ? am.sideWidth : 0) -
+              (am && am.pos === "left" ? am.sideWidth : 0) -
               leftW -
-              (am && am.pos === 'right' ? am.sideWidth : 0) -
+              (am && am.pos === "right" ? am.sideWidth : 0) -
               rightW,
           );
         } else {
-          const bar = am && am.pos === 'bottom' ? am.thickness : 0;
+          const bar = am && am.pos === "bottom" ? am.thickness : 0;
           y0 = H - bar - E.size;
-          x0 = (am && am.pos === 'left' ? am.sideWidth : 0) + leftW;
+          x0 = (am && am.pos === "left" ? am.sideWidth : 0) + leftW;
           colH = E.size;
           colW = Math.max(
             40,
             W -
-              (am && am.pos === 'left' ? am.sideWidth : 0) -
+              (am && am.pos === "left" ? am.sideWidth : 0) -
               leftW -
-              (am && am.pos === 'right' ? am.sideWidth : 0) -
+              (am && am.pos === "right" ? am.sideWidth : 0) -
               rightW,
           );
         }
@@ -4095,36 +4271,36 @@
         const d = s.drag;
 
         if (d && d.edgeDock === edge && this.isMouseDown(0))
-
-          if (d.type === 'edge-split') {
+          if (d.type === "edge-split") {
             // absolute from the drag's press-time snapshot — applying the
             // delta to the live fraction each frame would re-add it and keep
             // scaling while the mouse is held. The mouse delta is mapped
             // through the normalized fractions (x sum / share) so the
             // boundary follows the cursor 1:1 and stays where released.
-            const delta = ((horiz ? mo.x - d.p0 : mo.y - d.p0) * d.sum) / Math.max(1, d.share);
+            const delta =
+              ((horiz ? mo.x - d.p0 : mo.y - d.p0) * d.sum) /
+              Math.max(1, d.share);
             const ni = clamp(d.f0 + delta, 0.04, d.total - 0.04);
             E.fracs[E.wins[d.i]] = ni;
             E.fracs[E.wins[d.i + 1]] = d.total - ni;
-            this._setCursor(horiz ? 'ew-resize' : 'ns-resize', 2);
-          } else if (d.type === 'edge-resize') {
-            if (edge === 'left') {
+            this._setCursor(horiz ? "ew-resize" : "ns-resize", 2);
+          } else if (d.type === "edge-resize") {
+            if (edge === "left") {
               E.size = clamp(mo.x - x0, 140, W * 0.65);
-            }
-            else if (edge === 'right')
+            } else if (edge === "right")
               E.size = clamp(
-                W - (am && am.pos === 'right' ? am.sideWidth : 0) - mo.x,
+                W - (am && am.pos === "right" ? am.sideWidth : 0) - mo.x,
                 140,
                 W * 0.65,
               );
-            else if (edge === 'top') E.size = clamp(mo.y - y0, 100, H * 0.6);
+            else if (edge === "top") E.size = clamp(mo.y - y0, 100, H * 0.6);
             else
               E.size = clamp(
-                H - (am && am.pos === 'bottom' ? am.thickness : 0) - mo.y,
+                H - (am && am.pos === "bottom" ? am.thickness : 0) - mo.y,
                 100,
                 H * 0.6,
               );
-            this._setCursor(horiz ? 'ns-resize' : 'ew-resize', 2);
+            this._setCursor(horiz ? "ns-resize" : "ew-resize", 2);
           }
 
         // lay the stack out
@@ -4150,7 +4326,10 @@
           if (!w) {
             continue;
           }
-          const sz = Math.max(28, Math.round(((E.fracs[E.wins[i]] || 0) / sum) * share));
+          const sz = Math.max(
+            28,
+            Math.round(((E.fracs[E.wins[i]] || 0) / sum) * share),
+          );
 
           if (w._dock && w._dock._edge === edge) {
             // a combined window (dock) as one unit: the stack owns the
@@ -4232,7 +4411,7 @@
 
               for (const t of E.wins) sumAll += E.fracs[t] || 0;
               s.drag = {
-                type: 'edge-split',
+                type: "edge-split",
                 edgeDock: edge,
                 i: b.i,
                 p0: horiz ? mo.x : mo.y,
@@ -4243,7 +4422,7 @@
               };
               s.activeId = -1;
             } else if (!s.drag) {
-              this._setCursor(horiz ? 'ew-resize' : 'ns-resize', 1);
+              this._setCursor(horiz ? "ew-resize" : "ns-resize", 1);
             }
             break;
           }
@@ -4256,18 +4435,18 @@
         // over the inner edge (see _drawEdgeResizeBars).
         const N = Math.max(2, Math.floor(this.flags.resizeBarProximity || 8));
         const inInnerBand =
-          edge === 'left' || edge === 'right'
-            ? (edge === 'left'
+          edge === "left" || edge === "right"
+            ? (edge === "left"
                 ? mo.x >= x0 + colW - N && mo.x <= x0 + colW + N
                 : mo.x >= x0 - N && mo.x <= x0 + N) &&
               mo.y >= y0 &&
               mo.y <= y0 + colH
-            : (edge === 'top'
+            : (edge === "top"
                 ? mo.y >= y0 + colH - N && mo.y <= y0 + colH + N
                 : mo.y >= y0 - N && mo.y <= y0 + N) &&
               mo.x >= x0 &&
               mo.x <= x0 + colW;
-        const resizing = d && d.edgeDock === edge && d.type === 'edge-resize';
+        const resizing = d && d.edgeDock === edge && d.type === "edge-resize";
         // bar + cursor only while the band is the topmost thing at the
         // point (a covering window/popup takes the interaction instead);
         // an in-flight edge-resize drag keeps its bar regardless
@@ -4275,21 +4454,24 @@
 
         if (resizing) {
           E._barT = 1;
-        }
-        else if (bandLive)
-          E._barT = this.flags.animations ? Math.min(1, (E._barT || 0) + s.dt / 0.12) : 1;
-        else E._barT = this.flags.animations ? Math.max(0, (E._barT || 0) - s.dt / 0.12) : 0;
+        } else if (bandLive)
+          E._barT = this.flags.animations
+            ? Math.min(1, (E._barT || 0) + s.dt / 0.12)
+            : 1;
+        else
+          E._barT = this.flags.animations
+            ? Math.max(0, (E._barT || 0) - s.dt / 0.12)
+            : 0;
 
         if (bandLive)
-
           if (canDrag && this.isMouseClicked(0) && s.activeId === 0) {
             s.drag = {
-              type: 'edge-resize',
+              type: "edge-resize",
               edgeDock: edge,
             };
             s.activeId = -1;
           } else if (!s.drag) {
-            this._setCursor(horiz ? 'ns-resize' : 'ew-resize', 1);
+            this._setCursor(horiz ? "ns-resize" : "ew-resize", 1);
           }
       }
     }
@@ -4298,7 +4480,7 @@
     _drawEdgeResizeBars() {
       const guiState = this.state;
 
-      for (const edge of ['left', 'right', 'top', 'bottom']) {
+      for (const edge of ["left", "right", "top", "bottom"]) {
         const E = guiState.edgeDocks[edge];
 
         if (!E || !E._barT || !E._rect) {
@@ -4306,24 +4488,27 @@
         }
         const R = E._rect;
         const bw = 4;
-        const horiz = edge === 'top' || edge === 'bottom';
+        const horiz = edge === "top" || edge === "bottom";
         const span = horiz ? R.colW : R.colH;
         const len = Math.max(24, Math.min(64, span * 0.35));
-        const fill = withAlpha(this._col('sliderGrab'), Math.round(230 * E._barT));
-        const lineC = withAlpha(this._col('border'), Math.round(140 * E._barT));
+        const fill = withAlpha(
+          this._col("sliderGrab"),
+          Math.round(230 * E._barT),
+        );
+        const lineC = withAlpha(this._col("border"), Math.round(140 * E._barT));
         let x, y, w, h;
 
-        if (edge === 'left') {
+        if (edge === "left") {
           x = R.x0 + R.colW - bw / 2;
           y = R.y0 + R.colH / 2 - len / 2;
           w = bw;
           h = len;
-        } else if (edge === 'right') {
+        } else if (edge === "right") {
           x = R.x0 - bw / 2;
           y = R.y0 + R.colH / 2 - len / 2;
           w = bw;
           h = len;
-        } else if (edge === 'top') {
+        } else if (edge === "top") {
           x = R.x0 + R.colW / 2 - len / 2;
           y = R.y0 + R.colH - bw / 2;
           w = len;
@@ -4335,7 +4520,15 @@
           h = bw;
         }
         this.renderer.fillRoundedRect(x, y, w, h, 2, fill);
-        this.renderer.strokeRoundedRect(x + 0.5, y + 0.5, w - 1, h - 1, 2, lineC, 1);
+        this.renderer.strokeRoundedRect(
+          x + 0.5,
+          y + 0.5,
+          w - 1,
+          h - 1,
+          2,
+          lineC,
+          1,
+        );
       }
     }
 
@@ -4348,18 +4541,22 @@
       s._dockHint = null;
       const d = s.drag;
 
-      if (!d || (d.type !== 'win-move' && d.type !== 'dock-move') || !this.flags.docking) {
+      if (
+        !d ||
+        (d.type !== "win-move" && d.type !== "dock-move") ||
+        !this.flags.docking
+      ) {
         return;
       }
       // a dock (combined window) is draggable onto screen edges too — it
       // joins the stack as one unit; the window join grid is window-only
-      const w = d.type === 'win-move' ? d.win : d.dock && d.dock.a;
+      const w = d.type === "win-move" ? d.win : d.dock && d.dock.a;
 
       if (!w) {
         return;
       }
 
-      if (d.type === 'win-move') {
+      if (d.type === "win-move") {
         if (w.noDock || w._edge) {
           return;
         }
@@ -4393,7 +4590,7 @@
         mo.y <= sbHit.y + sbHit.h
       ) {
         s._dockHint = {
-          kind: 'screen',
+          kind: "screen",
           side: this._dockGridSide(sp, mo.x, mo.y, sbHit),
           parts: sp,
         };
@@ -4404,15 +4601,14 @@
       let edge = null;
 
       if (mo.y < B) {
-        edge = 'top';
-      }
-      else if (mo.y > H - B) edge = 'bottom';
-      else if (mo.x < B) edge = 'left';
-      else if (mo.x > W - B) edge = 'right';
+        edge = "top";
+      } else if (mo.y > H - B) edge = "bottom";
+      else if (mo.x < B) edge = "left";
+      else if (mo.x > W - B) edge = "right";
 
       if (edge) {
         s._dockHint = {
-          kind: 'edge',
+          kind: "edge",
           edge,
           band: this._edgeBandRect(edge, W, H),
         };
@@ -4425,7 +4621,7 @@
       //    has no join target (it already is a combined window) — for it
       //    only the global UI (steps 1-2) applies.
 
-      if (d.type === 'dock-move') {
+      if (d.type === "dock-move") {
         return;
       }
 
@@ -4452,7 +4648,7 @@
               }
             : parts.box;
           s._dockHint = {
-            kind: 'window',
+            kind: "window",
             target: t,
             side: this._dockGridSide(parts, mo.x, mo.y, hit),
             parts,
@@ -4506,10 +4702,10 @@
       }
 
       if (dy >= (hh / hw) * dx) {
-        return y < cy ? 't' : 'b';
+        return y < cy ? "t" : "b";
       }
 
-      return x < cx ? 'l' : 'r';
+      return x < cx ? "l" : "r";
     }
     /* A representative point (centroid) inside one direction triangle —
      * handy for tests and programmatic drops. */
@@ -4521,21 +4717,21 @@
     _edgeBandRect(edge, W, H) {
       const B = 44;
 
-      return edge === 'top'
+      return edge === "top"
         ? {
             x: 0,
             y: 0,
             w: W,
             h: B,
           }
-        : edge === 'bottom'
+        : edge === "bottom"
           ? {
               x: 0,
               y: H - B,
               w: W,
               h: B,
             }
-          : edge === 'left'
+          : edge === "left"
             ? {
                 x: 0,
                 y: 0,
@@ -4607,7 +4803,7 @@
       if (!h || !this.flags.docking) {
         return false;
       }
-      const isDockMove = d.type === 'dock-move';
+      const isDockMove = d.type === "dock-move";
       const D = isDockMove ? d.dock : null;
       const w = d.win;
 
@@ -4619,7 +4815,7 @@
         return false;
       }
 
-      if (h.kind === 'window') {
+      if (h.kind === "window") {
         // the join grid only exists for window drags
 
         if (!w) {
@@ -4685,7 +4881,7 @@
               // a collapsed member is just a header strip: re-expand it and
               // grow the join to the dock's full content area
               t.collapsed = false;
-              const dT = this._var('titleBarHeight');
+              const dT = this._var("titleBarHeight");
               tx = oldD.x;
               ty = oldD.y + dT;
               tw = Math.max(20, oldD.w - 6);
@@ -4693,14 +4889,14 @@
             }
           }
         }
-        const a = h.side === 'l' || h.side === 't' ? w : t; // first = left/top
+        const a = h.side === "l" || h.side === "t" ? w : t; // first = left/top
         const b = a === w ? t : w;
-        const dir = h.side === 'l' || h.side === 'r' ? 'h' : 'v';
+        const dir = h.side === "l" || h.side === "r" ? "h" : "v";
         // combined size: both windows' sizes added together in the dock
         // direction; the cross dimension takes the larger window's size,
         // anchored on the larger one (so it keeps its position)
 
-        if (dir === 'h') {
+        if (dir === "h") {
           const cw = w.w + tw;
           const ch = Math.max(w.h, th2);
 
@@ -4725,16 +4921,22 @@
       // globally docked — a dock joins the stack as one unit
       const unitTitle = isDockMove ? D.a.title : w.title;
 
-      if (h.kind === 'edge') {
+      if (h.kind === "edge") {
         return !!this.dockToEdge(unitTitle, h.edge);
       }
 
-      if (h.kind === 'screen') {
+      if (h.kind === "screen") {
         if (!h.side) {
           return false; // no direction triangle under the cursor: plain drop
         }
         const e =
-          h.side === 't' ? 'top' : h.side === 'b' ? 'bottom' : h.side === 'l' ? 'left' : 'right';
+          h.side === "t"
+            ? "top"
+            : h.side === "b"
+              ? "bottom"
+              : h.side === "l"
+                ? "left"
+                : "right";
 
         return !!this.dockToEdge(unitTitle, e);
       }
@@ -4748,7 +4950,11 @@
       const guiState = this.state;
       const d = guiState.drag;
 
-      if (!d || (d.type !== 'win-move' && d.type !== 'dock-move') || !this.flags.docking) {
+      if (
+        !d ||
+        (d.type !== "win-move" && d.type !== "dock-move") ||
+        !this.flags.docking
+      ) {
         return;
       }
 
@@ -4762,7 +4968,7 @@
       const r = this.renderer;
       const W = guiState.displayW,
         H = guiState.displayH;
-      const acc = this._col('sliderGrab');
+      const acc = this._col("sliderGrab");
       const h = guiState._dockHint;
 
       // The screen-center dock grid is a square split into four direction
@@ -4772,15 +4978,36 @@
       // edge. The center apex has no direction, so dropping there is a plain
       // drop.
       const sp = this._dockGridParts(W / 2, H / 2);
-      this._drawDockGrid(r, sp, h && h.kind === 'screen' ? h.side : null, acc, false);
+      this._drawDockGrid(
+        r,
+        sp,
+        h && h.kind === "screen" ? h.side : null,
+        acc,
+        false,
+      );
 
-      if (h && h.kind === 'edge') {
+      if (h && h.kind === "edge") {
         const b = h.band;
-        r.fillRoundedRect(b.x + 2, b.y + 2, b.w - 4, b.h - 4, 4, withAlpha(acc, 48));
-        r.strokeRoundedRect(b.x + 2.5, b.y + 2.5, b.w - 5, b.h - 5, 4, withAlpha(acc, 170), 1.5);
+        r.fillRoundedRect(
+          b.x + 2,
+          b.y + 2,
+          b.w - 4,
+          b.h - 4,
+          4,
+          withAlpha(acc, 48),
+        );
+        r.strokeRoundedRect(
+          b.x + 2.5,
+          b.y + 2.5,
+          b.w - 5,
+          b.h - 5,
+          4,
+          withAlpha(acc, 170),
+          1.5,
+        );
       }
 
-      if (h && h.kind === 'window') {
+      if (h && h.kind === "window") {
         this._drawDockGrid(r, h.parts, h.side, acc, true);
       }
     }
@@ -4796,11 +5023,11 @@
           p.box.w - 1,
           p.box.h - 1,
           4,
-          withAlpha(this._col('text'), 80),
+          withAlpha(this._col("text"), 80),
           1,
         );
 
-      for (const k of ['t', 'b', 'l', 'r']) {
+      for (const k of ["t", "b", "l", "r"]) {
         const v = p[k];
         const on = activeSide === k;
         r.fillPolygon(v, on ? withAlpha(acc, 150) : withAlpha([0, 0, 0], 120));
@@ -4841,12 +5068,15 @@
       const guiState = this.state;
       guiState.appMenu = {
         menus: menus || [],
-        pos: ['top', 'left', 'right', 'bottom'].includes(opts.pos) ? opts.pos : 'top',
-        thickness: opts.size > 0 ? opts.size : opts.thickness > 0 ? opts.thickness : 30,
+        pos: ["top", "left", "right", "bottom"].includes(opts.pos)
+          ? opts.pos
+          : "top",
+        thickness:
+          opts.size > 0 ? opts.size : opts.thickness > 0 ? opts.thickness : 30,
         sideWidth: opts.width > 0 ? opts.width : 180,
       };
       guiState.appMenuOwner = {
-        kind: 'appmenu',
+        kind: "appmenu",
       };
       const sc = [];
       const walk = (list) => {
@@ -4873,7 +5103,8 @@
       guiState.appMenu = null;
       guiState.appMenuShortcuts = [];
 
-      for (const p of guiState.popupList) if (p.data && p.data.appMenu) p.open = false;
+      for (const p of guiState.popupList)
+        if (p.data && p.data.appMenu) p.open = false;
 
       return this;
     }
@@ -4899,9 +5130,10 @@
         }
 
         if (i === path.length - 1) {
-          const disabled = typeof m.disabled === 'function' ? m.disabled() : !!m.disabled;
+          const disabled =
+            typeof m.disabled === "function" ? m.disabled() : !!m.disabled;
 
-          if (disabled || typeof m.onActivated !== 'function') {
+          if (disabled || typeof m.onActivated !== "function") {
             return false;
           }
           m.onActivated();
@@ -4918,7 +5150,7 @@
      * any in-flight dock drag (move / resize / split) so this frame is live. */
     _dockMemberLayout(win, D, s) {
       const mouse = s.mouse;
-      const tH = this._var('titleBarHeight');
+      const tH = this._var("titleBarHeight");
       const dw = 6; // divider thickness
       const isA = D.a === win;
       win._dock = D;
@@ -4928,11 +5160,13 @@
       const d = s.drag;
 
       if (d && d.dock === D && this.isMouseDown(0))
-
-        if (d.type === 'dock-move') {
+        if (d.type === "dock-move") {
           D.x = mouse.x - d.offX;
           D.y = mouse.y - d.offY;
-          d.moved = Math.max(d.moved || 0, Math.abs(D.x - d.x0) + Math.abs(D.y - d.y0));
+          d.moved = Math.max(
+            d.moved || 0,
+            Math.abs(D.x - d.x0) + Math.abs(D.y - d.y0),
+          );
           // the first real movement brings the whole dock to the front
 
           if (d.moved >= this.flags.dragThreshold && !d.raised) {
@@ -4940,8 +5174,8 @@
             this._raise(D.b);
             this._raise(D.a);
           }
-          this._setCursor('grabbing', 2);
-        } else if (d.type === 'dock-resize') {
+          this._setCursor("grabbing", 2);
+        } else if (d.type === "dock-resize") {
           if (d.edge & 2) {
             const nw = clamp(d.w0 + (mouse.x - d.mx), D.minW, 1e5);
             D.x = d.x0 + (d.w0 - nw);
@@ -4963,17 +5197,27 @@
             D.x = d.x0 + d.w0 - nw;
             D.w = nw;
           }
-          const corner = (d.edge & 2 && d.edge & 1) || (d.edge & 4 && (d.edge & 2 || d.edge & 8));
+          const corner =
+            (d.edge & 2 && d.edge & 1) ||
+            (d.edge & 4 && (d.edge & 2 || d.edge & 8));
           this._setCursor(
-            corner ? 'nwse-resize' : d.edge & 2 || d.edge & 8 ? 'ew-resize' : 'ns-resize',
+            corner
+              ? "nwse-resize"
+              : d.edge & 2 || d.edge & 8
+                ? "ew-resize"
+                : "ns-resize",
             2,
           );
-        } else if (d.type === 'dock-split') {
-          if (D.dir === 'h') {
+        } else if (d.type === "dock-split") {
+          if (D.dir === "h") {
             D.ratio = clamp((mouse.x - D.x - dw / 2) / (D.w - dw), 0.12, 0.88);
-          }
-          else D.ratio = clamp((mouse.y - D.y - tH - dw / 2) / (D.h - tH - dw), 0.12, 0.88);
-          this._setCursor(D.dir === 'h' ? 'ew-resize' : 'ns-resize', 2);
+          } else
+            D.ratio = clamp(
+              (mouse.y - D.y - tH - dw / 2) / (D.h - tH - dw),
+              0.12,
+              0.88,
+            );
+          this._setCursor(D.dir === "h" ? "ew-resize" : "ns-resize", 2);
         }
 
       // 2) derive this member's sub-rect
@@ -4995,10 +5239,14 @@
       const ox = D.x,
         oy = D.y + tH;
 
-      if (D.dir === 'h') {
+      if (D.dir === "h") {
         const total = D.w - dw;
         const first =
-          D.a && D.a.collapsed ? 0 : D.b && D.b.collapsed ? total : Math.round(total * D.ratio);
+          D.a && D.a.collapsed
+            ? 0
+            : D.b && D.b.collapsed
+              ? total
+              : Math.round(total * D.ratio);
 
         if (myCollapsed) {
           win.x = ox;
@@ -5024,7 +5272,11 @@
       } else {
         const total = D.h - tH;
         const first =
-          D.a && D.a.collapsed ? 0 : D.b && D.b.collapsed ? total : Math.round(total * D.ratio);
+          D.a && D.a.collapsed
+            ? 0
+            : D.b && D.b.collapsed
+              ? total
+              : Math.round(total * D.ratio);
 
         if (myCollapsed) {
           win.x = ox;
@@ -5060,9 +5312,9 @@
       const guiState = this.state;
       const dock = win._dock;
       const isA = win._dockIsA;
-      const tH = this._var('titleBarHeight');
+      const tH = this._var("titleBarHeight");
       const mouse = guiState.mouse;
-      const r = this._var('windowRounding');
+      const r = this._var("windowRounding");
       const fontOptions = this._fo();
       const lineH = this._lineH();
       const inRect = (x, y, w, h) =>
@@ -5072,23 +5324,33 @@
         const dh = dock.collapsed ? tH : dock.h;
         const dragging = guiState.drag && guiState.drag.dock === dock;
         const focused =
-          dragging || guiState.hoveredWindow === dock.a || guiState.hoveredWindow === dock.b;
+          dragging ||
+          guiState.hoveredWindow === dock.a ||
+          guiState.hoveredWindow === dock.b;
         // border around the combined rect
 
-        if (this._var('windowBorder') > 0)
+        if (this._var("windowBorder") > 0)
           this.renderer.strokeRoundedRect(
             dock.x + 0.5,
             dock.y + 0.5,
             dock.w - 1,
             dh - 1,
             r,
-            this._col('border', alpha),
-            this._var('windowBorder'),
+            this._col("border", alpha),
+            this._var("windowBorder"),
           );
         // combined title bar
-        const tbColor = focused ? this._col('titleBgActive', alpha) : this._col('titleBg', alpha);
+        const tbColor = focused
+          ? this._col("titleBgActive", alpha)
+          : this._col("titleBg", alpha);
         this.renderer.fillRoundedRect(dock.x, dock.y, dock.w, tH, r, tbColor);
-        this.renderer.fillRect(dock.x, dock.y + tH / 2, dock.w, tH / 2, tbColor);
+        this.renderer.fillRect(
+          dock.x,
+          dock.y + tH / 2,
+          dock.w,
+          tH / 2,
+          tbColor,
+        );
         // close button (right end): closes both members + removes the dock
         const bx = dock.x + dock.w - 16,
           by = dock.y + tH / 2;
@@ -5097,20 +5359,31 @@
         // collapse/expand chevron (left end): hides/shows the members inside
         const ccx = dock.x + 14,
           ccy = dock.y + tH / 2;
-        const ccColor = this._col(focused ? 'text' : 'textDisabled', alpha);
+        const ccColor = this._col(focused ? "text" : "textDisabled", alpha);
 
         if (dock.collapsed)
-          this.renderer.fillPolygon([ccx - 4, ccy - 4, ccx - 4, ccy + 4, ccx + 2, ccy], ccColor);
-        else this.renderer.fillPolygon([ccx - 4, ccy - 3, ccx + 4, ccy - 3, ccx, ccy + 3], ccColor);
+          this.renderer.fillPolygon(
+            [ccx - 4, ccy - 4, ccx - 4, ccy + 4, ccx + 2, ccy],
+            ccColor,
+          );
+        else
+          this.renderer.fillPolygon(
+            [ccx - 4, ccy - 3, ccx + 4, ccy - 3, ccx, ccy + 3],
+            ccColor,
+          );
         const inChevron = inRect(dock.x + 4, dock.y, 22, tH) && !hovClose;
         const title =
           dock.title ||
-          (dock.a && dock.b ? dock.a.title + ' +' + dock.b.title : dock.a ? dock.a.title : '');
+          (dock.a && dock.b
+            ? dock.a.title + " +" + dock.b.title
+            : dock.a
+              ? dock.a.title
+              : "");
         this._drawText(
           dock.x + 30,
           dock.y + (tH - lineH) / 2 + 1,
           title,
-          this._col(focused ? 'text' : 'textDisabled', alpha),
+          this._col(focused ? "text" : "textDisabled", alpha),
           fontOptions,
         );
 
@@ -5121,14 +5394,14 @@
             20,
             18,
             4,
-            this._col('headerHovered', alpha),
+            this._col("headerHovered", alpha),
           );
         this.renderer.line(
           bx - 3,
           by - 4,
           bx + 5,
           by + 4,
-          this._col(hovClose ? 'text' : 'textDisabled', alpha),
+          this._col(hovClose ? "text" : "textDisabled", alpha),
           1.4,
         );
         this.renderer.line(
@@ -5136,7 +5409,7 @@
           by - 4,
           bx - 3,
           by + 4,
-          this._col(hovClose ? 'text' : 'textDisabled', alpha),
+          this._col(hovClose ? "text" : "textDisabled", alpha),
           1.4,
         );
 
@@ -5145,14 +5418,15 @@
         if (!dock.collapsed) {
           const dw = 6;
 
-          if (dock.dir === 'h') {
-            const divX = dock.x + Math.round((dock.w - dw) * dock.ratio) + dw / 2;
+          if (dock.dir === "h") {
+            const divX =
+              dock.x + Math.round((dock.w - dw) * dock.ratio) + dw / 2;
             this.renderer.line(
               divX,
               dock.y + tH + 3,
               divX,
               dock.y + dock.h - 3,
-              this._col('border', alpha),
+              this._col("border", alpha),
               1.5,
             );
             this.renderer.fillRoundedRect(
@@ -5161,16 +5435,20 @@
               3,
               16,
               1.5,
-              this._col('border', alpha),
+              this._col("border", alpha),
             );
           } else {
-            const divY = dock.y + tH + Math.round((dock.h - tH - dw) * dock.ratio) + dw / 2;
+            const divY =
+              dock.y +
+              tH +
+              Math.round((dock.h - tH - dw) * dock.ratio) +
+              dw / 2;
             this.renderer.line(
               dock.x + 3,
               divY,
               dock.x + dock.w - 3,
               divY,
-              this._col('border', alpha),
+              this._col("border", alpha),
               1.5,
             );
             this.renderer.fillRoundedRect(
@@ -5179,7 +5457,7 @@
               16,
               3,
               1.5,
-              this._col('border', alpha),
+              this._col("border", alpha),
             );
           }
         }
@@ -5205,9 +5483,11 @@
         const gy = dock.y + dh;
         // eT covers the top 4px of the title bar (plus 4px above it) so a
         // dock can be scaled vertically from the top edge as well
-        const eT = inRect(dock.x, dock.y - 4, dock.w, 8) && !hovClose && !inChevron;
+        const eT =
+          inRect(dock.x, dock.y - 4, dock.w, 8) && !hovClose && !inChevron;
         const eL = inRect(dock.x - 4, dock.y, 12, dh) && !hovClose;
-        const eR = inRect(dock.x + dock.w - 8, dock.y, 12, dh) && mouse.y >= dock.y + tH;
+        const eR =
+          inRect(dock.x + dock.w - 8, dock.y, 12, dh) && mouse.y >= dock.y + tH;
         const eB = inRect(dock.x, gy - 8, dock.w, 12);
         const inTitle = inRect(dock.x, dock.y, dock.w, tH);
         let inDivider = false;
@@ -5215,12 +5495,20 @@
         if (!dock.collapsed) {
           const dw = 6;
 
-          if (dock.dir === 'h') {
-            const divX = dock.x + Math.round((dock.w - dw) * dock.ratio) + dw / 2;
+          if (dock.dir === "h") {
+            const divX =
+              dock.x + Math.round((dock.w - dw) * dock.ratio) + dw / 2;
             inDivider =
-              mouse.x >= divX - 4 && mouse.x <= divX + 4 && mouse.y >= dock.y + tH && mouse.y < gy;
+              mouse.x >= divX - 4 &&
+              mouse.x <= divX + 4 &&
+              mouse.y >= dock.y + tH &&
+              mouse.y < gy;
           } else {
-            const divY = dock.y + tH + Math.round((dock.h - tH - dw) * dock.ratio) + dw / 2;
+            const divY =
+              dock.y +
+              tH +
+              Math.round((dock.h - tH - dw) * dock.ratio) +
+              dw / 2;
             inDivider =
               mouse.y >= divY - 4 &&
               mouse.y <= divY + 4 &&
@@ -5230,7 +5518,6 @@
         }
 
         if (clicked)
-
           if (hovClose) {
             if (dock.a) {
               dock.a.open = false;
@@ -5248,7 +5535,7 @@
             guiState.activeId = -1;
           } else if (eT && !dock._edge) {
             guiState.drag = {
-              type: 'dock-resize',
+              type: "dock-resize",
               dock: dock,
               win,
               button: 0,
@@ -5269,14 +5556,17 @@
               if (this.isMouseDoubleClicked(0)) {
                 this.undockEdge(dock.a.title);
               }
-            } else if (this.isMouseDoubleClicked(0) && this.flags.windowDoubleReset) {
+            } else if (
+              this.isMouseDoubleClicked(0) &&
+              this.flags.windowDoubleReset
+            ) {
               dock.x = dock.defaultX;
               dock.y = dock.defaultY;
             } else {
               // the dock is raised to the front once the drag actually moves
               // (see the dock-move apply in _dockMemberLayout)
               guiState.drag = {
-                type: 'dock-move',
+                type: "dock-move",
                 dock: dock,
                 win,
                 button: 0,
@@ -5290,7 +5580,7 @@
             }
           } else if ((eL || eR || eB) && !dock._edge) {
             guiState.drag = {
-              type: 'dock-resize',
+              type: "dock-resize",
               dock: dock,
               win,
               button: 0,
@@ -5304,13 +5594,11 @@
             };
             guiState.activeId = -1;
           } else if (inDivider)
-
             if (this.isMouseDoubleClicked(0)) {
               dock.ratio = 0.5;
-            }
-            else {
+            } else {
               guiState.drag = {
-                type: 'dock-split',
+                type: "dock-split",
                 dock: dock,
                 win,
                 button: 0,
@@ -5335,7 +5623,7 @@
           for (let i = guiState.zOrder.length - 1; i >= 0; i--) {
             const w2 = guiState.zOrder[i];
 
-            if (w2.kind !== 'window' || w2.open === false) {
+            if (w2.kind !== "window" || w2.open === false) {
               continue;
             }
             const h2 = w2.collapsed ? w2.titleH : w2.h;
@@ -5361,16 +5649,17 @@
         // geometry — the stack's inner bar and gap spliters resize it).
 
         if (!guiState.drag && chromeTop)
-
           if (inChevron) {
-            this._setCursor('pointer', 1);
-          }
-          else if (eT && !dock._edge) this._setCursor(eL || eR ? 'nwse-resize' : 'ns-resize', 1);
-          else if (inTitle && !hovClose && !dock._edge) this._setCursor('move', 1);
-          else if (inDivider) this._setCursor(dock.dir === 'h' ? 'ew-resize' : 'ns-resize', 1);
-          else if ((eL || eR) && !dock._edge) this._setCursor('ew-resize', 1);
-          else if (eB && !dock._edge) this._setCursor('ns-resize', 1);
-          else if (hovClose) this._setCursor('pointer', 1);
+            this._setCursor("pointer", 1);
+          } else if (eT && !dock._edge)
+            this._setCursor(eL || eR ? "nwse-resize" : "ns-resize", 1);
+          else if (inTitle && !hovClose && !dock._edge)
+            this._setCursor("move", 1);
+          else if (inDivider)
+            this._setCursor(dock.dir === "h" ? "ew-resize" : "ns-resize", 1);
+          else if ((eL || eR) && !dock._edge) this._setCursor("ew-resize", 1);
+          else if (eB && !dock._edge) this._setCursor("ns-resize", 1);
+          else if (hovClose) this._setCursor("pointer", 1);
       }
 
       // ---- slim member header (both members, when not dock-collapsed) ----
@@ -5385,28 +5674,37 @@
         win.y,
         win.w,
         sh,
-        win.collapsed ? this._col('titleBgCollapsed', alpha) : this._col('childBg', alpha),
+        win.collapsed
+          ? this._col("titleBgCollapsed", alpha)
+          : this._col("childBg", alpha),
       );
       this.renderer.line(
         win.x,
         win.y + sh + 0.5,
         win.x + win.w,
         win.y + sh + 0.5,
-        this._col('border', alpha),
+        this._col("border", alpha),
         1,
       );
       const ccx = win.x + 12,
         ccy = win.y + sh / 2;
-      const cc = this._col(focused ? 'text' : 'textDisabled', alpha);
+      const cc = this._col(focused ? "text" : "textDisabled", alpha);
 
       if (win.collapsed)
-        this.renderer.fillPolygon([ccx - 4, ccy - 4, ccx - 4, ccy + 4, ccx + 2, ccy], cc);
-      else this.renderer.fillPolygon([ccx - 4, ccy - 3, ccx + 4, ccy - 3, ccx - 0, ccy + 3], cc);
+        this.renderer.fillPolygon(
+          [ccx - 4, ccy - 4, ccx - 4, ccy + 4, ccx + 2, ccy],
+          cc,
+        );
+      else
+        this.renderer.fillPolygon(
+          [ccx - 4, ccy - 3, ccx + 4, ccy - 3, ccx - 0, ccy + 3],
+          cc,
+        );
       this._drawText(
         win.x + 24,
         win.y + (sh - lineH) / 2 + 1,
         win.title,
-        this._col(focused ? 'text' : 'textDisabled', alpha),
+        this._col(focused ? "text" : "textDisabled", alpha),
         fontOptions,
       );
       // undock button (right end of the slim header)
@@ -5415,7 +5713,14 @@
       const hovU = inRect(ux - 8, uy - 8, 16, 16);
 
       if (hovU)
-        this.renderer.fillRoundedRect(ux - 8, uy - 8, 16, 16, 4, this._col('headerHovered', alpha));
+        this.renderer.fillRoundedRect(
+          ux - 8,
+          uy - 8,
+          16,
+          16,
+          4,
+          this._col("headerHovered", alpha),
+        );
       // expand-style icon: small square + diagonal arrow
       this.renderer.strokeRoundedRect(
         ux - 4,
@@ -5423,7 +5728,7 @@
         7,
         5,
         1,
-        this._col(hovU ? 'text' : 'textDisabled', alpha),
+        this._col(hovU ? "text" : "textDisabled", alpha),
         1.2,
       );
       this.renderer.line(
@@ -5431,12 +5736,12 @@
         uy + 3,
         ux + 4,
         uy - 3,
-        this._col(hovU ? 'text' : 'textDisabled', alpha),
+        this._col(hovU ? "text" : "textDisabled", alpha),
         1.2,
       );
       this.renderer.polyline(
         [ux + 1, uy - 3, ux + 4, uy - 3, ux + 4, uy],
-        this._col(hovU ? 'text' : 'textDisabled', alpha),
+        this._col(hovU ? "text" : "textDisabled", alpha),
         1.2,
       );
       // input: test against LAST frame's header (this frame's layout may have
@@ -5469,8 +5774,7 @@
 
         if (clicked && inU) {
           this.undock(win);
-        }
-        else if (clicked && !inU) {
+        } else if (clicked && !inU) {
           guiState._memberDrag = {
             win,
             x: mouse.x,
@@ -5480,7 +5784,7 @@
           };
           guiState.activeId = -1;
         } else if (!guiState.drag && !inU && !inRect(win.x + 4, win.y, 22, sh))
-          this._setCursor(this.flags.windowMove ? 'move' : 'default', 1);
+          this._setCursor(this.flags.windowMove ? "move" : "default", 1);
       }
 
       if (
@@ -5496,7 +5800,7 @@
         this._memberContextMenu(win);
 
       if (hovU) {
-        this._setCursor('pointer', 1);
+        this._setCursor("pointer", 1);
       }
     }
 
@@ -5514,14 +5818,16 @@
       opts = opts || {};
       const guiState = this.state;
 
-      if (guiState.currentWindow && guiState.currentWindow.drawnFrame === guiState.frameId)
-
+      if (
+        guiState.currentWindow &&
+        guiState.currentWindow.drawnFrame === guiState.frameId
+      )
         return false; // re-entry guard
 
       let win = guiState.windows.get(title);
 
       if (!win) {
-        win = new Window(title, 'window');
+        win = new Window(title, "window");
         win.owner = win;
         guiState.windows.set(title, win);
         win.createdFrame = guiState.frameId;
@@ -5565,8 +5871,12 @@
         win.fixedSize = !!(win.flags & WindowFlags.FixedSize);
         win.allowScrollX = !!(win.flags & WindowFlags.ScrollX);
         win.movable = !(win.flags & WindowFlags.NoMove);
-        win.resizable = !(win.flags & WindowFlags.NoResize) && !win.fixedSize && !win.autoResize;
-        win.collapsible = !(win.flags & WindowFlags.NoCollapse) && !win.noTitleBar;
+        win.resizable =
+          !(win.flags & WindowFlags.NoResize) &&
+          !win.fixedSize &&
+          !win.autoResize;
+        win.collapsible =
+          !(win.flags & WindowFlags.NoCollapse) && !win.noTitleBar;
         win.noDock = !!(win.flags & WindowFlags.NoDock);
       }
 
@@ -5623,11 +5933,11 @@
       if (!win.open) {
         return false;
       }
-      const stylePad = this._var('windowPadding');
+      const stylePad = this._var("windowPadding");
       win.padX = stylePad[0];
       win.padY = stylePad[1];
-      win.titleH = win.noTitleBar ? 0 : this._var('titleBarHeight');
-      win.menuH = opts.menuBar ? this._var('menuBarHeight') : 0;
+      win.titleH = win.noTitleBar ? 0 : this._var("titleBarHeight");
+      win.menuH = opts.menuBar ? this._var("menuBarHeight") : 0;
 
       // size
 
@@ -5686,10 +5996,10 @@
         mouse.y >= win.y &&
         mouse.y < win.y + claimH
       )
-
         if (
           guiState.hoveredWindow === null ||
-          guiState.zOrder.indexOf(win) > guiState.zOrder.indexOf(guiState.hoveredWindow)
+          guiState.zOrder.indexOf(win) >
+            guiState.zOrder.indexOf(guiState.hoveredWindow)
         )
           guiState.hoveredWindow = win;
 
@@ -5698,10 +6008,13 @@
       if (guiState.drag && guiState.drag.win === win) {
         const d = guiState.drag;
 
-        if (d.type === 'win-move' && this.isMouseDown(0)) {
+        if (d.type === "win-move" && this.isMouseDown(0)) {
           win.x = mouse.x - d.offX;
           win.y = mouse.y - d.offY;
-          d.moved = Math.max(d.moved || 0, Math.abs(win.x - d.x0) + Math.abs(win.y - d.y0));
+          d.moved = Math.max(
+            d.moved || 0,
+            Math.abs(win.x - d.x0) + Math.abs(win.y - d.y0),
+          );
           // the first real movement brings the window to the front (a plain
           // title click — e.g. the collapse toggle — never reorders)
 
@@ -5709,8 +6022,8 @@
             d.raised = true;
             this._raise(win);
           }
-          this._setCursor('grabbing', 2);
-        } else if (d.type === 'win-resize' && this.isMouseDown(0)) {
+          this._setCursor("grabbing", 2);
+        } else if (d.type === "win-resize" && this.isMouseDown(0)) {
           // each claimed edge scales the window in its direction; left/top
           // moves keep the opposite edge in place
 
@@ -5733,7 +6046,10 @@
           }
           const horiz = d.edge & 2 || d.edge & 8,
             vert = d.edge & 1 || d.edge & 4;
-          this._setCursor(horiz && vert ? 'nwse-resize' : horiz ? 'ew-resize' : 'ns-resize', 2);
+          this._setCursor(
+            horiz && vert ? "nwse-resize" : horiz ? "ew-resize" : "ns-resize",
+            2,
+          );
         }
       }
 
@@ -5769,23 +6085,28 @@
           mouse.y < win.y + win.titleH
         ) {
           const inClose =
-            win.closable && mouse.x >= win.x + win.w - 28 && mouse.x <= win.x + win.w - 6;
-          const inCollapse = win.collapsible && mouse.x >= win.x && mouse.x <= win.x + 28;
+            win.closable &&
+            mouse.x >= win.x + win.w - 28 &&
+            mouse.x <= win.x + win.w - 6;
+          const inCollapse =
+            win.collapsible && mouse.x >= win.x && mouse.x <= win.x + 28;
 
           if (!inClose && !inCollapse)
-
             if (this.isMouseDoubleClicked(0) && this.flags.windowDoubleReset) {
               win.x = win.defaultX;
               win.y = win.defaultY;
               // undo the collapse toggle caused by the first click of this double-click
 
-              if (win._collapseToggledAt && guiState.frameId - win._collapseToggledAt <= 30) {
+              if (
+                win._collapseToggledAt &&
+                guiState.frameId - win._collapseToggledAt <= 30
+              ) {
                 win.collapsed = !win.collapsed;
                 win._collapseToggledAt = 0;
               }
             } else {
               guiState.drag = {
-                type: 'win-move',
+                type: "win-move",
                 win,
                 button: 0,
                 offX: mouse.x - win.x,
@@ -5856,9 +6177,14 @@
             t: 0,
           });
         const draggingResize =
-          guiState.drag && guiState.drag.type === 'win-resize' && guiState.drag.win === win;
+          guiState.drag &&
+          guiState.drag.type === "win-resize" &&
+          guiState.drag.win === win;
         const edgeNow =
-          win.resizable && this.flags.windowResize && !win.autoResize && !win.collapsed
+          win.resizable &&
+          this.flags.windowResize &&
+          !win.autoResize &&
+          !win.collapsed
             ? this._winResizeEdgeAt(win, mouse.x, mouse.y)
             : 0;
 
@@ -5867,9 +6193,13 @@
           rb.t = 1;
         } else if (edgeNow) {
           rb.sides = edgeNow;
-          rb.t = this.flags.animations ? Math.min(1, rb.t + guiState.dt / 0.12) : 1;
+          rb.t = this.flags.animations
+            ? Math.min(1, rb.t + guiState.dt / 0.12)
+            : 1;
         } else {
-          rb.t = this.flags.animations ? Math.max(0, rb.t - guiState.dt / 0.12) : 0;
+          rb.t = this.flags.animations
+            ? Math.max(0, rb.t - guiState.dt / 0.12)
+            : 0;
 
           if (!rb.t) {
             rb.sides = 0;
@@ -5884,13 +6214,16 @@
         win.alpha = 0;
       }
       win.alpha = this.flags.animations
-        ? Math.min(1, win.alpha + guiState.dt / Math.max(0.01, this._var('fadeDuration')))
+        ? Math.min(
+            1,
+            win.alpha + guiState.dt / Math.max(0.01, this._var("fadeDuration")),
+          )
         : 1;
 
       // ---- draw chrome (GUI layer)
       this.renderer.setLayer(Layers.GUI);
       this._applyStyleScope(win);
-      const r = this._var('windowRounding');
+      const r = this._var("windowRounding");
       const alpha = win.alpha;
 
       if (win.modal)
@@ -5906,7 +6239,13 @@
         // docked member: plain body; the dock chrome draws border/headers
         // (_drawDockChrome may undock this window mid-frame)
         const dock = win._dock;
-        this.renderer.fillRect(win.x, win.y, win.w, win.h, this._col('windowBg', alpha));
+        this.renderer.fillRect(
+          win.x,
+          win.y,
+          win.w,
+          win.h,
+          this._col("windowBg", alpha),
+        );
         this._drawDockChrome(win, alpha);
 
         if (dock.collapsed || win.w <= 0 || win.h <= 0) {
@@ -5919,8 +6258,8 @@
         // a collapsed window renders its header only — no body behind it
         const bodyH = win.collapsed ? win.titleH : win.h;
 
-        if (this._var('shadow') && alpha > 0.05 && !win.collapsed) {
-          const sa = this._var('shadowAlpha') * alpha;
+        if (this._var("shadow") && alpha > 0.05 && !win.collapsed) {
+          const sa = this._var("shadowAlpha") * alpha;
           this.renderer.fillRoundedRect(
             win.x,
             win.y + 5,
@@ -5938,17 +6277,24 @@
             withAlpha([0, 0, 0], sa * 0.7),
           );
         }
-        this.renderer.fillRoundedRect(win.x, win.y, win.w, bodyH, r, this._col('windowBg', alpha));
+        this.renderer.fillRoundedRect(
+          win.x,
+          win.y,
+          win.w,
+          bodyH,
+          r,
+          this._col("windowBg", alpha),
+        );
 
-        if (this._var('windowBorder') > 0)
+        if (this._var("windowBorder") > 0)
           this.renderer.strokeRoundedRect(
             win.x + 0.5,
             win.y + 0.5,
             win.w - 1,
             bodyH - 1,
             r,
-            this._col('border', alpha),
-            this._var('windowBorder'),
+            this._col("border", alpha),
+            this._var("windowBorder"),
           );
       }
       const focus = win === guiState.focusedWindow;
@@ -5957,33 +6303,43 @@
         const tbY = win.y,
           tbH = win.titleH;
         const tbColor =
-          (guiState.drag && guiState.drag.win === win && guiState.drag.type === 'win-move') || focus
-            ? this._col('titleBgActive', alpha)
+          (guiState.drag &&
+            guiState.drag.win === win &&
+            guiState.drag.type === "win-move") ||
+          focus
+            ? this._col("titleBgActive", alpha)
             : win.collapsed
-              ? this._col('titleBgCollapsed', alpha)
-              : this._col('titleBg', alpha);
-        const tr = Math.min(this._var('titleRounding') || r, tbH / 2);
+              ? this._col("titleBgCollapsed", alpha)
+              : this._col("titleBg", alpha);
+        const tr = Math.min(this._var("titleRounding") || r, tbH / 2);
         this.renderer.fillRoundedRect(win.x, tbY, win.w, tbH, tr, tbColor);
         this.renderer.fillRect(win.x, tbY + tbH / 2, win.w, tbH / 2, tbColor);
 
-        if (this._var('windowBorder') > 0 && !win.collapsed)
+        if (this._var("windowBorder") > 0 && !win.collapsed)
           this.renderer.line(
             win.x + 1,
             win.y + win.h - 0.5,
             win.x + win.w - 1,
             win.y + win.h - 0.5,
-            withAlpha(this._col('border', alpha), 153),
+            withAlpha(this._col("border", alpha), 153),
             1,
           );
 
         if (win.collapsible) {
           const cx = win.x + 14,
             cy = tbY + tbH / 2;
-          const c = this._col(focus ? 'text' : 'textDisabled', alpha);
+          const c = this._col(focus ? "text" : "textDisabled", alpha);
 
           if (win.collapsed)
-            this.renderer.fillPolygon([cx - 3, cy - 5, cx - 3, cy + 5, cx + 4, cy], c);
-          else this.renderer.fillPolygon([cx - 5, cy - 3, cx + 5, cy - 3, cx, cy + 4], c);
+            this.renderer.fillPolygon(
+              [cx - 3, cy - 5, cx - 3, cy + 5, cx + 4, cy],
+              c,
+            );
+          else
+            this.renderer.fillPolygon(
+              [cx - 5, cy - 3, cx + 5, cy - 3, cx, cy + 4],
+              c,
+            );
           // arrow button: strictly bounded hit area; pressing it toggles at once
           // (blocked while the app menu bar covers this spot; only the
           // topmost window under the mouse may toggle — a covered window's
@@ -6011,17 +6367,20 @@
           const maxW = win.w - pad - (win.closable ? 32 : 10) - 8;
           let label = win.title;
 
-          while (label.length > 2 && this._measure(label + '…', fontOptions).w > maxW)
+          while (
+            label.length > 2 &&
+            this._measure(label + "…", fontOptions).w > maxW
+          )
             label = label.slice(0, -1);
 
           if (label !== win.title) {
-            label += '…';
+            label += "…";
           }
           this._drawText(
             win.x + pad,
             tbY + (tbH - this._measure(label, fontOptions).h) / 2 + 1,
             label,
-            this._col(focus ? 'text' : 'textDisabled', alpha),
+            this._col(focus ? "text" : "textDisabled", alpha),
             fontOptions,
           );
         }
@@ -6042,23 +6401,27 @@
             !this._popupAtPoint(mouse.x, mouse.y);
 
           if (hov) {
-            const c = this._col('text', alpha);
+            const c = this._col("text", alpha);
 
-            if (guiState.drag && guiState.drag.win === win && guiState.drag.type === 'closebtn')
+            if (
+              guiState.drag &&
+              guiState.drag.win === win &&
+              guiState.drag.type === "closebtn"
+            )
               this.renderer.fillRoundedRect(
                 bx - 3,
                 by - 9,
                 21,
                 18,
                 4,
-                withAlpha(this._col('error', alpha), 0.35),
+                withAlpha(this._col("error", alpha), 0.35),
               );
             this.renderer.line(bx, by - 4, bx + 8, by + 4, c, 1.4);
             this.renderer.line(bx + 8, by - 4, bx, by + 4, c, 1.4);
 
             if (this.isMouseClicked(0) && guiState.activeId === 0) {
               guiState.drag = {
-                type: 'closebtn',
+                type: "closebtn",
                 win,
                 button: 0,
                 rect: {
@@ -6071,8 +6434,22 @@
               guiState.activeId = -1;
             }
           } else {
-            this.renderer.line(bx, by - 4, bx + 8, by + 4, this._col('textDisabled', alpha), 1.4);
-            this.renderer.line(bx + 8, by - 4, bx, by + 4, this._col('textDisabled', alpha), 1.4);
+            this.renderer.line(
+              bx,
+              by - 4,
+              bx + 8,
+              by + 4,
+              this._col("textDisabled", alpha),
+              1.4,
+            );
+            this.renderer.line(
+              bx + 8,
+              by - 4,
+              bx,
+              by + 4,
+              this._col("textDisabled", alpha),
+              1.4,
+            );
           }
         }
 
@@ -6089,10 +6466,12 @@
           mouse.y < tbY + tbH
         ) {
           const inClose =
-            win.closable && mouse.x >= win.x + win.w - 28 && mouse.x <= win.x + win.w - 6;
+            win.closable &&
+            mouse.x >= win.x + win.w - 28 &&
+            mouse.x <= win.x + win.w - 6;
 
           if (!inClose) {
-            this._setCursor('move', 1);
+            this._setCursor("move", 1);
           }
         }
       }
@@ -6112,10 +6491,24 @@
           this.flags.windowResize &&
           this._winResizeEdgeAt(win, mouse.x, mouse.y) === 3;
         const gc = gripHot
-          ? withAlpha(this._col('sliderGrab', alpha), 255)
-          : withAlpha(this._col('border', alpha), 217);
-        this.renderer.line(gx - s, gy - 2, gx - 2, gy - s, gc, gripHot ? 2 : 1.2);
-        this.renderer.line(gx - s - 6, gy - 2, gx - 2, gy - s - 6, gc, gripHot ? 2 : 1.2);
+          ? withAlpha(this._col("sliderGrab", alpha), 255)
+          : withAlpha(this._col("border", alpha), 217);
+        this.renderer.line(
+          gx - s,
+          gy - 2,
+          gx - 2,
+          gy - s,
+          gc,
+          gripHot ? 2 : 1.2,
+        );
+        this.renderer.line(
+          gx - s - 6,
+          gy - 2,
+          gx - 2,
+          gy - s - 6,
+          gc,
+          gripHot ? 2 : 1.2,
+        );
       }
 
       // resize bars: a small handle fades in over each side whose outline
@@ -6143,11 +6536,25 @@
         const hLen = Math.max(24, Math.min(64, win.w * 0.35));
         const cyV = topY + (win.h - win.titleH) / 2;
         const cxH = win.x + win.w / 2;
-        const fill = withAlpha(this._col('sliderGrab', alpha), Math.round(230 * rb.t * alpha));
-        const lineC = withAlpha(this._col('border', alpha), Math.round(140 * rb.t * alpha));
+        const fill = withAlpha(
+          this._col("sliderGrab", alpha),
+          Math.round(230 * rb.t * alpha),
+        );
+        const lineC = withAlpha(
+          this._col("border", alpha),
+          Math.round(140 * rb.t * alpha),
+        );
         const bar = (x, y, w, h) => {
           this.renderer.fillRoundedRect(x, y, w, h, 2, fill);
-          this.renderer.strokeRoundedRect(x + 0.5, y + 0.5, w - 1, h - 1, 2, lineC, 1);
+          this.renderer.strokeRoundedRect(
+            x + 0.5,
+            y + 0.5,
+            w - 1,
+            h - 1,
+            2,
+            lineC,
+            1,
+          );
         };
 
         if (rb.sides & 2) {
@@ -6169,13 +6576,19 @@
 
       if (win.menuH > 0) {
         const mbY = win.y + win.titleH;
-        this.renderer.fillRect(win.x, mbY, win.w, win.menuH, this._col('menubarBg', alpha));
+        this.renderer.fillRect(
+          win.x,
+          mbY,
+          win.w,
+          win.menuH,
+          this._col("menubarBg", alpha),
+        );
         this.renderer.line(
           win.x + 1,
           mbY + win.menuH - 0.5,
           win.x + win.w - 1,
           mbY + win.menuH - 0.5,
-          withAlpha(this._col('border', alpha), 0.5),
+          withAlpha(this._col("border", alpha), 0.5),
           1,
         );
         guiState.menuBar = {
@@ -6200,15 +6613,23 @@
       if (!win.noClip) {
         this.renderer.pushClip(win.x, contentY, win.w, contentH);
       }
-      const sbv = win.hadScrollV ? this._var('scrollbarSize') : 0;
-      const sbh = win.hadScrollH ? this._var('scrollbarSize') : 0;
+      const sbv = win.hadScrollV ? this._var("scrollbarSize") : 0;
+      const sbh = win.hadScrollH ? this._var("scrollbarSize") : 0;
 
       // resolve the scroll target before layout so this frame's positions
       // already reflect any wheel/scrollbar delta from beginFrame
 
       if (this.flags.animations) {
-        win.scrollX = lerp(win.scrollX, win.scrollTargetX, clamp(guiState.dt * 18, 0, 1));
-        win.scrollY = lerp(win.scrollY, win.scrollTargetY, clamp(guiState.dt * 18, 0, 1));
+        win.scrollX = lerp(
+          win.scrollX,
+          win.scrollTargetX,
+          clamp(guiState.dt * 18, 0, 1),
+        );
+        win.scrollY = lerp(
+          win.scrollY,
+          win.scrollTargetY,
+          clamp(guiState.dt * 18, 0, 1),
+        );
       } else {
         win.scrollX = win.scrollTargetX;
         win.scrollY = win.scrollTargetY;
@@ -6261,11 +6682,17 @@
       win.contentH = Math.max(layout.y, 1);
       const visW = win.visibleContentW;
       const visH = win.visibleContentH;
-      win.maxScrollX = win.allowScrollX ? Math.max(0, win.contentW + win.padX - visW) : 0;
+      win.maxScrollX = win.allowScrollX
+        ? Math.max(0, win.contentW + win.padX - visW)
+        : 0;
       win.maxScrollY = Math.max(0, win.contentH + win.padY - visH);
-      win.hadScrollV = win.maxScrollY > 0 && !win.noScrollbar && !win.autoResize;
+      win.hadScrollV =
+        win.maxScrollY > 0 && !win.noScrollbar && !win.autoResize;
       win.hadScrollH =
-        win.maxScrollX > 0 && win.allowScrollX && !win.noScrollbar && !win.autoResize;
+        win.maxScrollX > 0 &&
+        win.allowScrollX &&
+        !win.noScrollbar &&
+        !win.autoResize;
 
       if (win.autoResize) {
         const targetW = win.contentW + win.padX * 2;
@@ -6289,7 +6716,7 @@
             tl.y0 + 0.5,
             tl.x + 0.5,
             Math.max(tl.y0 + 4, bottom),
-            withAlpha(this._col('border'), 0.7),
+            withAlpha(this._col("border"), 0.7),
             1,
           );
         }
@@ -6299,11 +6726,11 @@
         if (win.maxScrollY > 0)
           this._drawScrollBar(
             win,
-            'v',
-            win.x + win.w - this._var('scrollbarSize') + 1,
+            "v",
+            win.x + win.w - this._var("scrollbarSize") + 1,
             win.y + win.titleH + 1,
             win.h - win.titleH - 2,
-            this._var('scrollbarSize'),
+            this._var("scrollbarSize"),
             win.contentH + win.padY,
             visH,
           );
@@ -6311,11 +6738,11 @@
         if (win.maxScrollX > 0)
           this._drawScrollBar(
             win,
-            'h',
+            "h",
             win.x + 1,
-            win.y + win.h - this._var('scrollbarSize') + 1,
+            win.y + win.h - this._var("scrollbarSize") + 1,
             win.w - 2,
-            this._var('scrollbarSize'),
+            this._var("scrollbarSize"),
             win.contentW + win.padX,
             visW,
           );
@@ -6360,16 +6787,28 @@
 
       return L;
     }
-    _drawScrollBar(win, axis, trackX, trackY, trackLen, trackThick, content, visible) {
+    _drawScrollBar(
+      win,
+      axis,
+      trackX,
+      trackY,
+      trackLen,
+      trackThick,
+      content,
+      visible,
+    ) {
       if (content <= visible + 0.5) {
         return;
       }
       const guiState = this.state;
-      const sb = this._var('scrollbarSize');
-      const rb = this._var('scrollbarRounding');
-      const isV = axis === 'v';
+      const sb = this._var("scrollbarSize");
+      const rb = this._var("scrollbarRounding");
+      const isV = axis === "v";
       const range = content - visible;
-      const grabLen = Math.max(this._var('grabMinSize'), (visible / content) * trackLen);
+      const grabLen = Math.max(
+        this._var("grabMinSize"),
+        (visible / content) * trackLen,
+      );
       const cur = isV ? win.scrollY : win.scrollX;
       const grabStart = trackY + (cur / range) * (trackLen - grabLen);
       const grabRect = isV
@@ -6393,7 +6832,7 @@
           sb - 2,
           trackLen - 2,
           rb,
-          this._col('scrollbarBg'),
+          this._col("scrollbarBg"),
         );
       else
         this.renderer.fillRoundedRect(
@@ -6402,18 +6841,27 @@
           trackLen - 2,
           sb - 2,
           rb,
-          this._col('scrollbarBg'),
+          this._col("scrollbarBg"),
         );
       const mouse = guiState.mouse;
       const hov = pointInRect(mouse.x, mouse.y, grabRect);
       const dragging =
-        guiState.drag && guiState.drag.type === 'scroll-' + axis && guiState.drag.win === win;
+        guiState.drag &&
+        guiState.drag.type === "scroll-" + axis &&
+        guiState.drag.win === win;
       const grabColor = dragging
-        ? this._col('scrollbarGrabActive')
+        ? this._col("scrollbarGrabActive")
         : hov
-          ? this._col('scrollbarGrabHovered')
-          : this._col('scrollbarGrab');
-      this.renderer.fillRoundedRect(grabRect.x, grabRect.y, grabRect.w, grabRect.h, rb, grabColor);
+          ? this._col("scrollbarGrabHovered")
+          : this._col("scrollbarGrab");
+      this.renderer.fillRoundedRect(
+        grabRect.x,
+        grabRect.y,
+        grabRect.w,
+        grabRect.h,
+        rb,
+        grabColor,
+      );
       const trackRect = isV
         ? {
             x: trackX + 1,
@@ -6440,7 +6888,7 @@
         const along = isV ? mouse.y : mouse.x;
         const grabCenter = grabStart + grabLen / 2;
         guiState.drag = {
-          type: 'scroll-' + axis,
+          type: "scroll-" + axis,
           win,
           button: 0,
           grabOffset: along - grabCenter,
@@ -6451,18 +6899,29 @@
         guiState.activeId = -1;
 
         if (!hov) {
-          const t = clamp((along - trackY - grabLen / 2) / Math.max(1, trackLen - grabLen), 0, 1);
-          win['scrollTarget' + (isV ? 'Y' : 'X')] = t * range;
+          const t = clamp(
+            (along - trackY - grabLen / 2) / Math.max(1, trackLen - grabLen),
+            0,
+            1,
+          );
+          win["scrollTarget" + (isV ? "Y" : "X")] = t * range;
         }
       }
 
-      if (guiState.drag && guiState.drag.type === 'scroll-' + axis && guiState.drag.win === win)
-
+      if (
+        guiState.drag &&
+        guiState.drag.type === "scroll-" + axis &&
+        guiState.drag.win === win
+      )
         if (this.isMouseDown(0)) {
           const d = guiState.drag;
           const along = isV ? mouse.y : mouse.x;
-          const t = clamp((along - d.grabOffset - trackY) / Math.max(1, trackLen - grabLen), 0, 1);
-          win['scrollTarget' + (isV ? 'Y' : 'X')] = t * range;
+          const t = clamp(
+            (along - d.grabOffset - trackY) / Math.max(1, trackLen - grabLen),
+            0,
+            1,
+          );
+          win["scrollTarget" + (isV ? "Y" : "X")] = t * range;
         } else {
           guiState.drag = null;
           guiState.activeId = 0;
@@ -6486,12 +6945,12 @@
       if (!parent) {
         return false;
       }
-      const ids = this._id(String(label == null ? '##child' : label));
-      const key = '\x01child\x01' + ids.stateKey;
+      const ids = this._id(String(label == null ? "##child" : label));
+      const key = "\x01child\x01" + ids.stateKey;
       let win = guiState.windows.get(key);
 
       if (!win) {
-        win = new Window(key, 'child');
+        win = new Window(key, "child");
         guiState.windows.set(key, win);
       }
       win.owner = parent.owner;
@@ -6503,13 +6962,11 @@
 
       if (w === 0) {
         w = avail.w;
-      }
-      else if (w < 0) w = avail.w + w;
+      } else if (w < 0) w = avail.w + w;
 
       if (h === 0) {
         h = avail.h;
-      }
-      else if (h < 0) h = avail.h + h;
+      } else if (h < 0) h = avail.h + h;
       w = Math.max(10, w);
       h = Math.max(10, h);
       win.x = pos.x;
@@ -6534,17 +6991,24 @@
       this.pushId(ids.itemId);
 
       // draw child background
-      const cr = this._var('childRounding');
-      this.renderer.fillRoundedRect(win.x, win.y, win.w, win.h, cr, this._col('childBg'));
+      const cr = this._var("childRounding");
+      this.renderer.fillRoundedRect(
+        win.x,
+        win.y,
+        win.w,
+        win.h,
+        cr,
+        this._col("childBg"),
+      );
 
-      if (opts.border !== false && this._var('childBorder') > 0)
+      if (opts.border !== false && this._var("childBorder") > 0)
         this.renderer.strokeRoundedRect(
           win.x + 0.5,
           win.y + 0.5,
           win.w - 1,
           win.h - 1,
           cr,
-          this._col('border'),
+          this._col("border"),
           1,
         );
       const cw = win.w - win.padX * 2;
@@ -6558,8 +7022,16 @@
       // maxScroll from the fresh content and clamps again)
 
       if (this.flags.animations) {
-        win.scrollX = lerp(win.scrollX, win.scrollTargetX, clamp(guiState.dt * 18, 0, 1));
-        win.scrollY = lerp(win.scrollY, win.scrollTargetY, clamp(guiState.dt * 18, 0, 1));
+        win.scrollX = lerp(
+          win.scrollX,
+          win.scrollTargetX,
+          clamp(guiState.dt * 18, 0, 1),
+        );
+        win.scrollY = lerp(
+          win.scrollY,
+          win.scrollTargetY,
+          clamp(guiState.dt * 18, 0, 1),
+        );
       } else {
         win.scrollX = win.scrollTargetX;
         win.scrollY = win.scrollTargetY;
@@ -6611,7 +7083,9 @@
       const visH = win.visibleContentH;
       const visW = win.visibleContentW;
       win.maxScrollY = Math.max(0, win.contentH + win.padY - visH);
-      win.maxScrollX = win.allowScrollX ? Math.max(0, win.contentW + win.padX - visW) : 0;
+      win.maxScrollX = win.allowScrollX
+        ? Math.max(0, win.contentW + win.padX - visW)
+        : 0;
       // re-clamp after the fresh maxScroll (scroll was resolved in beginChild)
       win.scrollY = clamp(win.scrollY, 0, win.maxScrollY);
       win.scrollX = clamp(win.scrollX, 0, win.maxScrollX);
@@ -6620,11 +7094,11 @@
       if (win.maxScrollY > 0)
         this._drawScrollBar(
           win,
-          'v',
-          win.x + win.w - this._var('scrollbarSize') + 1,
+          "v",
+          win.x + win.w - this._var("scrollbarSize") + 1,
           win.y + 1,
           win.h - 2,
-          this._var('scrollbarSize'),
+          this._var("scrollbarSize"),
           win.contentH + win.padY,
           visH,
         );
@@ -6670,7 +7144,7 @@
       }
       const p = {
         id,
-        kind: 'popup',
+        kind: "popup",
         open: true,
         ox: anchor.x,
         oy: anchor.y,
@@ -6706,7 +7180,7 @@
         id,
         anchor,
         {
-          type: opts.kind || 'custom',
+          type: opts.kind || "custom",
         },
         opts.sourceId || 0,
         opts.owner || null,
@@ -6746,7 +7220,7 @@
       if (!p || !p.open || guiState.popupLayoutActive) {
         return false;
       }
-      const isTip = p.data.type === 'tooltip';
+      const isTip = p.data.type === "tooltip";
 
       if (isTip) {
         p.ox = guiState.mouse.x + 14;
@@ -6760,18 +7234,30 @@
         p.h = 80;
       } // first-frame estimate
       this.renderer.setLayer(isTip ? Layers.Foreground : Layers.GUI);
-      const bgc = isTip ? this._col('tooltipBg') : this._col('popupBg');
-      this.renderer.fillRoundedRect(p.x, p.y, p.w, p.h, this._var('popupRounding'), bgc);
+      const bgc = isTip ? this._col("tooltipBg") : this._col("popupBg");
+      this.renderer.fillRoundedRect(
+        p.x,
+        p.y,
+        p.w,
+        p.h,
+        this._var("popupRounding"),
+        bgc,
+      );
       this.renderer.strokeRoundedRect(
         p.x + 0.5,
         p.y + 0.5,
         p.w - 1,
         p.h - 1,
-        this._var('popupRounding'),
-        this._col('border'),
-        this._var('popupBorder'),
+        this._var("popupRounding"),
+        this._col("border"),
+        this._var("popupBorder"),
       );
-      this.renderer.pushClip(p.x + 1, p.y + 1, Math.max(1, p.w - 2), Math.max(1, p.h - 2));
+      this.renderer.pushClip(
+        p.x + 1,
+        p.y + 1,
+        Math.max(1, p.w - 2),
+        Math.max(1, p.h - 2),
+      );
       guiState.savedLayout.push(guiState.layout);
       this._newLayout(p, p.x + 8, p.y + 6, 4000, 4000);
       guiState.popupLayoutActive = p;
@@ -6789,32 +7275,35 @@
           continue;
         }
 
-        if (m.sep || m.type === 'sep') {
+        if (m.sep || m.type === "sep") {
           rows.push({
-            type: 'sep',
+            type: "sep",
           });
           continue;
         }
-        const disabled = typeof m.disabled === 'function' ? m.disabled() : !!m.disabled;
-        const label = String(m.label != null ? m.label : '');
+        const disabled =
+          typeof m.disabled === "function" ? m.disabled() : !!m.disabled;
+        const label = String(m.label != null ? m.label : "");
 
         if (m.items && m.items.length)
           rows.push({
-            type: 'submenu',
+            type: "submenu",
             label,
-            subId: '##appsub' + fnv1a(idSeed + '\x01' + label),
-            shortcut: m.shortcut || '',
+            subId: "##appsub" + fnv1a(idSeed + "\x01" + label),
+            shortcut: m.shortcut || "",
             disabled,
             items: m.items,
           });
         else {
           rows.push({
-            type: 'item',
+            type: "item",
             label,
-            shortcut: m.shortcut || '',
-            selected: typeof m.selected === 'function' ? m.selected() : !!m.selected,
+            shortcut: m.shortcut || "",
+            selected:
+              typeof m.selected === "function" ? m.selected() : !!m.selected,
             disabled,
-            onActivated: typeof m.onActivated === 'function' ? m.onActivated : null,
+            onActivated:
+              typeof m.onActivated === "function" ? m.onActivated : null,
           });
         }
       }
@@ -6836,14 +7325,36 @@
       const fontOptions = this._fo();
       const lineH = this._lineH();
       this.renderer.setLayer(Layers.GUI);
-      this.renderer.fillRoundedRect(R.x, R.y, R.w, R.h, 0, this._col('menubarBg'));
-      const bc = this._col('border');
+      this.renderer.fillRoundedRect(
+        R.x,
+        R.y,
+        R.w,
+        R.h,
+        0,
+        this._col("menubarBg"),
+      );
+      const bc = this._col("border");
 
-      if (am.pos === 'top')
-        this.renderer.line(R.x, R.y + R.h - 0.5, R.x + R.w, R.y + R.h - 0.5, bc, 1);
-      else if (am.pos === 'bottom') this.renderer.line(R.x, R.y + 0.5, R.x + R.w, R.y + 0.5, bc, 1);
-      else if (am.pos === 'left')
-        this.renderer.line(R.x + R.w - 0.5, R.y, R.x + R.w - 0.5, R.y + R.h, bc, 1);
+      if (am.pos === "top")
+        this.renderer.line(
+          R.x,
+          R.y + R.h - 0.5,
+          R.x + R.w,
+          R.y + R.h - 0.5,
+          bc,
+          1,
+        );
+      else if (am.pos === "bottom")
+        this.renderer.line(R.x, R.y + 0.5, R.x + R.w, R.y + 0.5, bc, 1);
+      else if (am.pos === "left")
+        this.renderer.line(
+          R.x + R.w - 0.5,
+          R.y,
+          R.x + R.w - 0.5,
+          R.y + R.h,
+          bc,
+          1,
+        );
       else this.renderer.line(R.x + 0.5, R.y, R.x + 0.5, R.y + R.h, bc, 1);
 
       for (const sec of guiState.appMenuSections) {
@@ -6860,13 +7371,13 @@
             sec.rect.w,
             sec.rect.h,
             4,
-            this._col(sec.open ? 'headerActive' : 'headerHovered'),
+            this._col(sec.open ? "headerActive" : "headerHovered"),
           );
         this._drawText(
           sec.rect.x + 9,
           sec.rect.y + (sec.rect.h - lineH) / 2 + 1,
           sec.label,
-          this._col('text'),
+          this._col("text"),
           fontOptions,
         );
       }
@@ -6906,7 +7417,7 @@
       const guiState = this.state;
       const win = guiState.currentWindow;
 
-      if (win && win.kind === 'window' && !guiState.popups.has(id)) {
+      if (win && win.kind === "window" && !guiState.popups.has(id)) {
         const mouse = guiState.mouse;
         const contentRect = {
           x: win.x,
@@ -6929,7 +7440,7 @@
               y: mouse.y,
             },
             {
-              type: 'custom',
+              type: "custom",
             },
             0,
             win.owner || win,
@@ -6962,7 +7473,7 @@
             y: guiState.mouse.y + 4,
           },
           {
-            type: 'custom',
+            type: "custom",
           },
           item.itemId,
           item.win ? item.win.owner || item.win : null,
@@ -6998,9 +7509,12 @@
         }
 
         if (!inside)
-
           for (const p of guiState.popupList) {
-            if (p.open && p.frame !== guiState.frameId && p.sourceId !== guiState.clickedItemId)
+            if (
+              p.open &&
+              p.frame !== guiState.frameId &&
+              p.sourceId !== guiState.clickedItemId
+            )
               p.open = false;
           }
       }
@@ -7008,7 +7522,8 @@
       if (guiState.popupList.length) {
         guiState.popupList = guiState.popupList.filter((p) => p.open);
 
-        for (const [k, p] of guiState.popups) if (!p.open) guiState.popups.delete(k);
+        for (const [k, p] of guiState.popups)
+          if (!p.open) guiState.popups.delete(k);
       }
 
       // app menu bar strip (under its dropdowns, above all windows)
@@ -7027,11 +7542,10 @@
           continue;
         }
 
-        if (p.data.type === 'menu') {
+        if (p.data.type === "menu") {
           this._drawMenuPopup(p);
-        }
-        else if (p.data.type === 'combo') this._drawComboPopup(p);
-        else if (p.data.type === 'value') this._drawValuePopup(p);
+        } else if (p.data.type === "combo") this._drawComboPopup(p);
+        else if (p.data.type === "value") this._drawValuePopup(p);
       }
     }
     _popupLayout(p, x, y, w, h) {
@@ -7063,12 +7577,19 @@
       let w = p.data.width || 140;
 
       for (const r of rows) {
-        if (r.type === 'sep') {
+        if (r.type === "sep") {
           continue;
         }
         const lw = this._measure(r.label, fontOptions).w;
         const sw = r.shortcut ? this._measure(r.shortcut, fontOptions).w : 0;
-        w = Math.max(w, lw + sw + (r.type === 'submenu' ? 20 : 0) + (r.selected ? 20 : 0) + 26);
+        w = Math.max(
+          w,
+          lw +
+            sw +
+            (r.type === "submenu" ? 20 : 0) +
+            (r.selected ? 20 : 0) +
+            26,
+        );
       }
       w = clamp(w, 120, 340);
       const h = rows.length * rowH + pad * 2;
@@ -7082,30 +7603,43 @@
       p.y = y;
       p.w = w;
       p.h = h;
-      this.renderer.fillRoundedRect(x, y, w, h, this._var('popupRounding'), this._col('popupBg'));
+      this.renderer.fillRoundedRect(
+        x,
+        y,
+        w,
+        h,
+        this._var("popupRounding"),
+        this._col("popupBg"),
+      );
       this.renderer.strokeRoundedRect(
         x + 0.5,
         y + 0.5,
         w - 1,
         h - 1,
-        this._var('popupRounding'),
-        this._col('border'),
-        this._var('popupBorder'),
+        this._var("popupRounding"),
+        this._col("border"),
+        this._var("popupBorder"),
       );
       this.renderer.pushClip(x + 1, y + 1, w - 2, h - 2);
-      const prevClaim = this._popupLayout(p, x + pad, y + pad, w - pad * 2, h - pad * 2);
+      const prevClaim = this._popupLayout(
+        p,
+        x + pad,
+        y + pad,
+        w - pad * 2,
+        h - pad * 2,
+      );
 
       for (let i = 0; i < rows.length; i++) {
         const r = rows[i];
         const ry = y + pad + i * rowH;
 
-        if (r.type === 'sep') {
+        if (r.type === "sep") {
           this.renderer.line(
             x + 4,
             ry + rowH / 2 + 0.5,
             x + w - 4,
             ry + rowH / 2 + 0.5,
-            this._col('separator'),
+            this._col("separator"),
             1,
           );
           continue;
@@ -7114,7 +7648,7 @@
         const item = this._item(x + 4, ry, w - 8, rowH - 2, itemId);
 
         if (item.hovered && this.isMouseClicked(0) && !r.disabled) {
-          if (typeof r.onActivated === 'function') {
+          if (typeof r.onActivated === "function") {
             r.onActivated();
           }
 
@@ -7129,10 +7663,17 @@
               w - 8,
               rowH - 2,
               4,
-              this._col('headerHovered'),
+              this._col("headerHovered"),
             );
           else if (item.active && !r.disabled)
-            this.renderer.fillRoundedRect(x + 4, ry, w - 8, rowH - 2, 4, this._col('headerActive'));
+            this.renderer.fillRoundedRect(
+              x + 4,
+              ry,
+              w - 8,
+              rowH - 2,
+              4,
+              this._col("headerActive"),
+            );
           const tx = x + 10 + (r.selected ? 16 : 0);
 
           if (r.selected) {
@@ -7140,12 +7681,18 @@
               cy = ry + (rowH - 2) / 2;
             this.renderer.polyline(
               [cx - 3, cy, cx - 1, cy + 3, cx + 4, cy - 3],
-              this._col('checkMark'),
+              this._col("checkMark"),
               1.6,
             );
           }
-          const tc = r.disabled ? this._col('textDisabled') : this._col('text');
-          this._drawText(tx, ry + (rowH - 2 - lineH) / 2, r.label, tc, fontOptions);
+          const tc = r.disabled ? this._col("textDisabled") : this._col("text");
+          this._drawText(
+            tx,
+            ry + (rowH - 2 - lineH) / 2,
+            r.label,
+            tc,
+            fontOptions,
+          );
 
           if (r.shortcut) {
             const m = this._measure(r.shortcut, fontOptions);
@@ -7153,22 +7700,27 @@
               x + w - 10 - m.w,
               ry + (rowH - 2 - lineH) / 2,
               r.shortcut,
-              this._col('textDisabled'),
+              this._col("textDisabled"),
               fontOptions,
             );
           }
 
-          if (r.type === 'submenu') {
+          if (r.type === "submenu") {
             const ax = x + w - 16,
               ay = ry + (rowH - 2) / 2;
             this.renderer.fillPolygon(
               [ax, ay - 4, ax, ay + 4, ax + 5, ay],
-              this._col('textDisabled'),
+              this._col("textDisabled"),
             );
           }
         }
 
-        if (r.type === 'submenu' && item.hovered && !r.disabled && !this.isMouseClicked(0)) {
+        if (
+          r.type === "submenu" &&
+          item.hovered &&
+          !r.disabled &&
+          !this.isMouseClicked(0)
+        ) {
           const sub = guiState.popups.get(r.subId);
 
           if (!sub || !sub.open)
@@ -7179,7 +7731,7 @@
                 y: ry + 2,
               },
               {
-                type: 'menu',
+                type: "menu",
                 items: [],
               },
               itemId,
@@ -7228,7 +7780,7 @@
 
       if (!guiState.textConsumed && guiState.textInput && p.open) {
         guiState.textConsumed = true;
-        p.typeChar = (p.typeChar || '') + guiState.textInput[0].toLowerCase();
+        p.typeChar = (p.typeChar || "") + guiState.textInput[0].toLowerCase();
         p.typeTime = guiState.now;
 
         for (let i = 0; i < items.length; i++) {
@@ -7243,18 +7795,31 @@
         p.typeChar = null;
         p.hi = -1;
       }
-      this.renderer.fillRoundedRect(x, y, w, h, this._var('popupRounding'), this._col('popupBg'));
+      this.renderer.fillRoundedRect(
+        x,
+        y,
+        w,
+        h,
+        this._var("popupRounding"),
+        this._col("popupBg"),
+      );
       this.renderer.strokeRoundedRect(
         x + 0.5,
         y + 0.5,
         w - 1,
         h - 1,
-        this._var('popupRounding'),
-        this._col('border'),
-        this._var('popupBorder'),
+        this._var("popupRounding"),
+        this._col("border"),
+        this._var("popupBorder"),
       );
       this.renderer.pushClip(x + 1, y + 1, w - 2, h - 2);
-      const prevClaim = this._popupLayout(p, x + pad, y + pad, w - pad * 2, h - pad * 2);
+      const prevClaim = this._popupLayout(
+        p,
+        x + pad,
+        y + pad,
+        w - pad * 2,
+        h - pad * 2,
+      );
       const cur = p.data.value();
       const first = Math.floor(p.scrollY / rowH);
 
@@ -7280,7 +7845,7 @@
               w - pad * 2,
               rowH - 2,
               4,
-              this._col('header'),
+              this._col("header"),
             );
           else if (item.hovered)
             this.renderer.fillRoundedRect(
@@ -7289,7 +7854,7 @@
               w - pad * 2,
               rowH - 2,
               4,
-              this._col('headerHovered'),
+              this._col("headerHovered"),
             );
 
           if (i === cur) {
@@ -7297,31 +7862,34 @@
               cy = ry + (rowH - 2) / 2;
             this.renderer.polyline(
               [cx - 3, cy, cx - 1, cy + 3, cx + 4, cy - 3],
-              this._col('checkMark'),
+              this._col("checkMark"),
               1.6,
             );
           }
           let str = String(items[i]);
           const maxW = w - pad * 2 - (i === cur ? 22 : 8);
 
-          while (str.length > 2 && this._measure(str + '…', fontOptions).w > maxW)
+          while (
+            str.length > 2 &&
+            this._measure(str + "…", fontOptions).w > maxW
+          )
             str = str.slice(0, -1);
 
           if (str !== String(items[i])) {
-            str += '…';
+            str += "…";
           }
           this._drawText(
             x + pad + (i === cur ? 20 : 8),
             ry + (rowH - 2 - lineH) / 2,
             str,
-            this._col('text'),
+            this._col("text"),
             fontOptions,
           );
         }
       }
       // enter selects the highlighted row
 
-      if (p.hi >= 0 && this.isKeyPressed('enter')) {
+      if (p.hi >= 0 && this.isKeyPressed("enter")) {
         p.data.set(p.hi);
         p.open = false;
       }
@@ -7329,24 +7897,27 @@
       this.renderer.popClip();
 
       if (p.maxScroll > 0) {
-        const sb = this._var('scrollbarSize');
-        const grabH = Math.max(this._var('grabMinSize'), (visRows / items.length) * (h - 2));
+        const sb = this._var("scrollbarSize");
+        const grabH = Math.max(
+          this._var("grabMinSize"),
+          (visRows / items.length) * (h - 2),
+        );
         const grabY = y + 1 + (p.scrollY / p.maxScroll) * (h - 2 - grabH);
         this.renderer.fillRoundedRect(
           x + w - sb + 1,
           y + 1,
           sb - 2,
           h - 2,
-          this._var('scrollbarRounding'),
-          this._col('scrollbarBg'),
+          this._var("scrollbarRounding"),
+          this._col("scrollbarBg"),
         );
         this.renderer.fillRoundedRect(
           x + w - sb + 2,
           grabY,
           sb - 4,
           grabH,
-          this._var('scrollbarRounding'),
-          this._col('scrollbarGrab'),
+          this._var("scrollbarRounding"),
+          this._col("scrollbarGrab"),
         );
       }
     }
@@ -7366,21 +7937,40 @@
       p.y = y;
       p.w = w;
       p.h = h;
-      this.renderer.fillRoundedRect(x, y, w, h, this._var('popupRounding'), this._col('popupBg'));
+      this.renderer.fillRoundedRect(
+        x,
+        y,
+        w,
+        h,
+        this._var("popupRounding"),
+        this._col("popupBg"),
+      );
       this.renderer.strokeRoundedRect(
         x + 0.5,
         y + 0.5,
         w - 1,
         h - 1,
-        this._var('popupRounding'),
-        this._col('border'),
-        this._var('popupBorder'),
+        this._var("popupRounding"),
+        this._col("border"),
+        this._var("popupBorder"),
       );
       this.renderer.pushClip(x + 1, y + 1, w - 2, h - 2);
-      const prevClaim = this._popupLayout(p, x + pad, y + pad, w - pad * 2, h - pad * 2);
+      const prevClaim = this._popupLayout(
+        p,
+        x + pad,
+        y + pad,
+        w - pad * 2,
+        h - pad * 2,
+      );
 
       if (d.label)
-        this._drawText(x + pad, y + pad, d.label, this._col('textDisabled'), fontOptions);
+        this._drawText(
+          x + pad,
+          y + pad,
+          d.label,
+          this._col("textDisabled"),
+          fontOptions,
+        );
       const fy = y + pad + labelH;
       const fw = w - pad * 2;
       const itemId = hash3(fnv1a(p.id), 0x745a, 1);
@@ -7392,39 +7982,38 @@
         guiState.focusedId = itemId;
         guiState.activeId = itemId;
         d.editing = true;
-        d.buf = ''; // start with an empty buffer; typing replaces the value
+        d.buf = ""; // start with an empty buffer; typing replaces the value
         d.caret = 0;
       }
 
       if (d.editing) {
-        if (k('enter')) {
+        if (k("enter")) {
           const v = parseFloat(d.buf);
 
           if (isFinite(v)) {
             d.set(clamp(v, d.min, d.max));
           }
           p.open = false;
-        } else if (k('escape')) {
+        } else if (k("escape")) {
           p.open = false;
           d.editing = false;
-        } else if (k('left')) {
+        } else if (k("left")) {
           d.caret = Math.max(0, d.caret - 1);
-        }
-        else if (k('right')) d.caret = Math.min(d.buf.length, d.caret + 1);
-        else if (k('backspace') && d.caret > 0) {
+        } else if (k("right")) d.caret = Math.min(d.buf.length, d.caret + 1);
+        else if (k("backspace") && d.caret > 0) {
           d.buf = d.buf.slice(0, d.caret - 1) + d.buf.slice(d.caret);
           d.caret = d.caret - 1;
-        } else if ((k('up') || k('right')) && this.ctrl) {
+        } else if ((k("up") || k("right")) && this.ctrl) {
           d.set(clamp(d.value() + step * 10, d.min, d.max));
-          d.buf = fmtVal(d.value(), d.fmt || '%.3f');
+          d.buf = fmtVal(d.value(), d.fmt || "%.3f");
           d.caret = d.buf.length;
-        } else if ((k('down') || k('left')) && this.ctrl) {
+        } else if ((k("down") || k("left")) && this.ctrl) {
           d.set(clamp(d.value() - step * 10, d.min, d.max));
-          d.buf = fmtVal(d.value(), d.fmt || '%.3f');
+          d.buf = fmtVal(d.value(), d.fmt || "%.3f");
           d.caret = d.buf.length;
         } else if (!guiState.textConsumed && guiState.textInput) {
           guiState.textConsumed = true;
-          const t = guiState.textInput.replace(/[^0-9.eE+-]/g, '');
+          const t = guiState.textInput.replace(/[^0-9.eE+-]/g, "");
 
           if (t) {
             d.buf += t;
@@ -7432,19 +8021,23 @@
           }
         }
 
-        if (guiState.focusedId !== itemId && guiState.activeId !== itemId && !item.hovered)
+        if (
+          guiState.focusedId !== itemId &&
+          guiState.activeId !== itemId &&
+          !item.hovered
+        )
           d.editing = false;
       }
 
       if (item.visible) {
         this._drawFrame(x + pad, fy, fw, fieldH, item);
-        const str = d.editing ? d.buf : fmtVal(d.value(), d.fmt || '%.3f');
+        const str = d.editing ? d.buf : fmtVal(d.value(), d.fmt || "%.3f");
         const m = this._measure(str, fontOptions);
         this._drawText(
           x + pad + (fw - m.w) / 2,
           fy + (fieldH - lineH) / 2 + 1,
           str,
-          this._col('text'),
+          this._col("text"),
           fontOptions,
         );
 
@@ -7455,7 +8048,7 @@
             fy + 2,
             x + pad + (fw - this._measure(d.buf, fontOptions).w) / 2 + cx,
             fy + fieldH - 2,
-            this._col('text'),
+            this._col("text"),
             1,
           );
         }
@@ -7512,7 +8105,7 @@
       if (!guiState.tooltip || guiState.tooltip.id !== item.itemId)
         guiState.tooltip = {
           id: item.itemId,
-          text: '',
+          text: "",
           since: guiState.now,
         };
 
@@ -7520,21 +8113,21 @@
         return false;
       }
 
-      if (!guiState.popups.has('##tooltip'))
+      if (!guiState.popups.has("##tooltip"))
         this._openPopup(
-          '##tooltip',
+          "##tooltip",
           {
             x: guiState.mouse.x + 14,
             y: guiState.mouse.y + 18,
           },
           {
-            type: 'tooltip',
+            type: "tooltip",
           },
           item.itemId,
           item.win ? item.win.owner || item.win : guiState.hoveredWindow,
         );
 
-      return this.beginPopup('##tooltip');
+      return this.beginPopup("##tooltip");
     }
     /**
      * Ends the tooltip started with beginTooltip().
@@ -7544,7 +8137,7 @@
     }
     _tooltipPass() {
       const guiState = this.state;
-      const tp = guiState.popups.get('##tooltip');
+      const tp = guiState.popups.get("##tooltip");
 
       if (tp && tp.open) {
         const item = guiState.items.get(tp.sourceId);
@@ -7572,7 +8165,7 @@
         const top = item.win.owner || item.win;
 
         if (
-          (top.kind === 'window' || top.kind === 'child') &&
+          (top.kind === "window" || top.kind === "child") &&
           guiState.hoveredWindow &&
           top !== guiState.hoveredWindow
         ) {
@@ -7588,7 +8181,9 @@
       }
       const fontOptions = this._fo();
       const maxW = 280;
-      const lines = wrapText(guiState.tooltip.text, maxW, (t) => this._measure(t, fontOptions));
+      const lines = wrapText(guiState.tooltip.text, maxW, (t) =>
+        this._measure(t, fontOptions),
+      );
       const pad = 8;
       let tw = 0;
 
@@ -7597,30 +8192,36 @@
       const h = lines.length * this._lineH() + pad * 2;
       // pop up at the cursor, above it when there is room (else below),
       // clamped on-screen; drawn on the foreground layer (above all windows)
-      const x = clamp(guiState.mouse.x + 14, 4, Math.max(4, guiState.displayW - w - 4));
+      const x = clamp(
+        guiState.mouse.x + 14,
+        4,
+        Math.max(4, guiState.displayW - w - 4),
+      );
       let y = guiState.mouse.y - h - 12;
 
       if (y < 4) {
         y = guiState.mouse.y + 18;
       }
       y = clamp(y, 4, Math.max(4, guiState.displayH - h - 4));
-      const a = this.flags.animations ? clamp((age - this.flags.tooltipDelay) / 0.12, 0, 1) : 1;
+      const a = this.flags.animations
+        ? clamp((age - this.flags.tooltipDelay) / 0.12, 0, 1)
+        : 1;
       this.renderer.setLayer(Layers.Foreground);
       this.renderer.fillRoundedRect(
         x,
         y,
         w,
         h,
-        this._var('popupRounding'),
-        withAlpha(this._col('tooltipBg'), a),
+        this._var("popupRounding"),
+        withAlpha(this._col("tooltipBg"), a),
       );
       this.renderer.strokeRoundedRect(
         x + 0.5,
         y + 0.5,
         w - 1,
         h - 1,
-        this._var('popupRounding'),
-        withAlpha(this._col('border'), a),
+        this._var("popupRounding"),
+        withAlpha(this._col("border"), a),
         1,
       );
 
@@ -7629,7 +8230,7 @@
           x + pad,
           y + pad + i * this._lineH(),
           lines[i],
-          withAlpha(this._col('text'), a),
+          withAlpha(this._col("text"), a),
           fontOptions,
         );
       }
@@ -7644,27 +8245,47 @@
         y = 8,
         w = 220;
       const lines = [
-        'Mim v' + VERSION,
-        'FPS ' + (st.fps | 0) + '   (' + st.ms.toFixed(2) + ' ms)',
-        'draw calls   ' + st.drawCalls,
-        'items        ' + st.items,
-        'windows      ' + st.windows,
-        'states       ' + st.states,
-        'mouse        ' + (guiState.mouse.x | 0) + ', ' + (guiState.mouse.y | 0),
-        'active       ' + (guiState.activeId || '-') + '  hover ' + (guiState.hoveredId || '-'),
+        "Mim v" + VERSION,
+        "FPS " + (st.fps | 0) + "   (" + st.ms.toFixed(2) + " ms)",
+        "draw calls   " + st.drawCalls,
+        "items        " + st.items,
+        "windows      " + st.windows,
+        "states       " + st.states,
+        "mouse        " +
+          (guiState.mouse.x | 0) +
+          ", " +
+          (guiState.mouse.y | 0),
+        "active       " +
+          (guiState.activeId || "-") +
+          "  hover " +
+          (guiState.hoveredId || "-"),
       ];
       const fs = 11;
       const lh = fs * 1.4;
       const h = lines.length * lh + 12;
       this.renderer.setLayer(Layers.Foreground);
       this.renderer.fillRoundedRect(x, y, w, h, 6, [20, 21, 26, 225]);
-      this.renderer.strokeRoundedRect(x + 0.5, y + 0.5, w - 1, h - 1, 6, [70, 71, 84, 255], 1);
+      this.renderer.strokeRoundedRect(
+        x + 0.5,
+        y + 0.5,
+        w - 1,
+        h - 1,
+        6,
+        [70, 71, 84, 255],
+        1,
+      );
 
       for (let i = 0; i < lines.length; i++) {
-        this.renderer.drawText(x + 8, y + 7 + i * lh, lines[i], [222, 224, 230, 255], {
-          fontSize: fs,
-          fontId: this.style.font.id,
-        });
+        this.renderer.drawText(
+          x + 8,
+          y + 7 + i * lh,
+          lines[i],
+          [222, 224, 230, 255],
+          {
+            fontSize: fs,
+            fontId: this.style.font.id,
+          },
+        );
       }
     }
 
@@ -7678,7 +8299,10 @@
      * @returns {*} the stored value, or undefined
      */
     state(label) {
-      const k = hashPair(this.state.idStackSeed, fnv1a(String(label == null ? '' : label)));
+      const k = hashPair(
+        this.state.idStackSeed,
+        fnv1a(String(label == null ? "" : label)),
+      );
       const v = this.state.widgetStates.get(k);
 
       if (!v) {
@@ -7695,7 +8319,10 @@
      * @returns {GUI} the gui instance (chainable)
      */
     setState(label, value) {
-      const k = hashPair(this.state.idStackSeed, fnv1a(String(label == null ? '' : label)));
+      const k = hashPair(
+        this.state.idStackSeed,
+        fnv1a(String(label == null ? "" : label)),
+      );
       let v = this.state.widgetStates.get(k);
 
       if (!v) {
@@ -7730,8 +8357,8 @@
       const guiState = this.state;
       const ids = this._id(label);
       const fontOptions = this._fo();
-      const fp = this._var('framePadding');
-      const itemSpacing = this._var('itemSpacing');
+      const fp = this._var("framePadding");
+      const itemSpacing = this._var("itemSpacing");
       const lineH = this._lineH();
       const h = opts.h || lineH + fp[1] * 2;
       const lw = label ? this._measure(label, fontOptions).w : 0;
@@ -7746,11 +8373,9 @@
         rectH = h;
 
       if (w <= 0)
-
         if (lw > 0 && availW >= lw + itemSpacing[0] * 2 + 40) {
           w = availW - lw - itemSpacing[0];
-        }
-        else {
+        } else {
           w = availW;
           labelAbove = lw > 0;
         }
@@ -7793,31 +8418,42 @@
       };
     }
     _drawFrame(x, y, w, h, it) {
-      const rr = this._var('frameRounding');
+      const rr = this._var("frameRounding");
       const bg = !it.enabled
-        ? this._col('frameBg')
+        ? this._col("frameBg")
         : it.active
-          ? this._col('frameBgActive')
+          ? this._col("frameBgActive")
           : it.hovered
-            ? this._col('frameBgHovered')
-            : this._col('frameBg');
+            ? this._col("frameBgHovered")
+            : this._col("frameBg");
       this.renderer.fillRoundedRect(x, y, w, h, rr, bg);
 
-      if (this._var('frameBorder') > 0)
-        this.renderer.strokeRoundedRect(x + 0.5, y + 0.5, w - 1, h - 1, rr, this._col('border'), 1);
+      if (this._var("frameBorder") > 0)
+        this.renderer.strokeRoundedRect(
+          x + 0.5,
+          y + 0.5,
+          w - 1,
+          h - 1,
+          rr,
+          this._col("border"),
+          1,
+        );
     }
     _drawFocusRing(it) {
-      if (this.state.focusedId !== it.itemId || !this.flags.keyboardNavigation) {
+      if (
+        this.state.focusedId !== it.itemId ||
+        !this.flags.keyboardNavigation
+      ) {
         return;
       }
-      const rr = this._var('frameRounding') + 2;
+      const rr = this._var("frameRounding") + 2;
       this.renderer.strokeRoundedRect(
         it.x - 1.5,
         it.y - 1.5,
         it.w + 3,
         it.h + 3,
         rr,
-        this._col('focusRing'),
+        this._col("focusRing"),
         1,
       );
     }
@@ -7830,8 +8466,7 @@
       for (let i = 0; i < buf.length; i++) {
         if (this._measure(buf.slice(0, i + 1), fontOptions).w <= rel) {
           best = i + 1;
-        }
-        else break;
+        } else break;
       }
 
       return best;
@@ -7842,7 +8477,6 @@
         b = caret;
 
       if (caret >= buf.length || !isWord(buf[caret]))
-
         return [caret, Math.min(buf.length, caret + 1)];
 
       while (a > 0 && isWord(buf[a - 1])) a--;
@@ -7863,12 +8497,25 @@
       const pos = this._nextPos();
       const fontOptions = this._fo();
       const m = this._measure(String(str), fontOptions);
-      const item = this._item(pos.x, pos.y, m.w, m.h, this._id(String(str)).itemId, {
-        focusable: false,
-      });
+      const item = this._item(
+        pos.x,
+        pos.y,
+        m.w,
+        m.h,
+        this._id(String(str)).itemId,
+        {
+          focusable: false,
+        },
+      );
 
       if (item.visible) {
-        this._drawText(pos.x, pos.y, str, color || this._col('text'), fontOptions);
+        this._drawText(
+          pos.x,
+          pos.y,
+          str,
+          color || this._col("text"),
+          fontOptions,
+        );
       }
       this._advance(pos.x, pos.y, m.w, m.h);
     }
@@ -7891,20 +8538,28 @@
       const fontOptions = this._fo();
       const lineH = this._lineH();
       const w = opts.maxWidth > 0 ? opts.maxWidth : this.getRegionAvail().w;
-      const lines = wrapText(String(str), w, (t) => this._measure(t, fontOptions));
+      const lines = wrapText(String(str), w, (t) =>
+        this._measure(t, fontOptions),
+      );
       const h = lines.length * lineH;
-      const item = this._item(pos.x, pos.y, w, h, this._id(String(str) + '##wrapped').itemId, {
-        focusable: false,
-      });
+      const item = this._item(
+        pos.x,
+        pos.y,
+        w,
+        h,
+        this._id(String(str) + "##wrapped").itemId,
+        {
+          focusable: false,
+        },
+      );
 
       if (item.visible)
-
         for (let i = 0; i < lines.length; i++) {
           this._drawText(
             pos.x,
             pos.y + i * lineH,
             lines[i],
-            opts.color || this._col('text'),
+            opts.color || this._col("text"),
             fontOptions,
           );
         }
@@ -7921,17 +8576,18 @@
       options = options || {};
       const fontOptions = this._fo();
       const lineH = this._lineH();
-      const fp = this._var('framePadding');
+      const fp = this._var("framePadding");
       const pos = this._nextPos();
       const textWidth = this._measure(label, fontOptions).w;
-      const w = options.width > 0 ? options.width : Math.max(24, textWidth + fp[0] * 2);
+      const w =
+        options.width > 0 ? options.width : Math.max(24, textWidth + fp[0] * 2);
       const h = options.height > 0 ? options.height : lineH + fp[1] * 2;
       const item = this._item(pos.x, pos.y, w, h, this._id(label).itemId);
       const res = this._clickable(item);
       const kbd =
         this.flags.keyboardNavigation &&
         this.state.focusedId === item.itemId &&
-        (this.isKeyPressed('enter') || this.isKeyPressed(' '));
+        (this.isKeyPressed("enter") || this.isKeyPressed(" "));
       const clicked = res.clicked || kbd;
 
       if (clicked) {
@@ -7940,7 +8596,7 @@
 
       if (item.visible) {
         this._drawFrame(pos.x, pos.y, w, h, item);
-        const tc = item.enabled ? this._col('text') : this._col('textDisabled');
+        const tc = item.enabled ? this._col("text") : this._col("textDisabled");
         this._drawText(
           pos.x + (w - textWidth) / 2,
           pos.y + (h - lineH) / 2 + 1,
@@ -7972,12 +8628,12 @@
       const kbd =
         this.flags.keyboardNavigation &&
         this.state.focusedId === item.itemId &&
-        (this.isKeyPressed('enter') || this.isKeyPressed(' '));
+        (this.isKeyPressed("enter") || this.isKeyPressed(" "));
       const clicked = res.clicked || kbd;
 
       if (item.visible) {
         this._drawFrame(pos.x, pos.y, w, h, item);
-        const tc = item.enabled ? this._col('text') : this._col('textDisabled');
+        const tc = item.enabled ? this._col("text") : this._col("textDisabled");
         this._drawText(
           pos.x + (w - textWidth) / 2,
           pos.y + (h - lineH) / 2 + 1,
@@ -8012,7 +8668,7 @@
       const pos = this._nextPos();
       const box = Math.max(lineH, 16);
       const lw = this._measure(label, fontOptions).w;
-      const isp = this._var('itemInnerSpacing');
+      const isp = this._var("itemInnerSpacing");
       const w = box + isp[0] + lw;
       const item = this._item(pos.x, pos.y, w, box, ids.itemId);
       const res = this._clickable(item);
@@ -8020,7 +8676,7 @@
       const kbd =
         this.flags.keyboardNavigation &&
         guiState.focusedId === item.itemId &&
-        this.isKeyPressed(' ');
+        this.isKeyPressed(" ");
 
       if (res.clicked || kbd) {
         checked = !checked;
@@ -8042,8 +8698,15 @@
           const bx = pos.x + box * 0.24,
             by = pos.y + box * 0.54;
           this.renderer.polyline(
-            [bx, by, bx + box * 0.16, by + box * 0.18, bx + box * 0.42, by - box * 0.2],
-            this._col('checkMark'),
+            [
+              bx,
+              by,
+              bx + box * 0.16,
+              by + box * 0.18,
+              bx + box * 0.42,
+              by - box * 0.2,
+            ],
+            this._col("checkMark"),
             2,
           );
         }
@@ -8051,7 +8714,7 @@
           pos.x + box + isp[0],
           pos.y + (box - lineH) / 2 + 1,
           label,
-          item.enabled ? this._col('text') : this._col('textDisabled'),
+          item.enabled ? this._col("text") : this._col("textDisabled"),
           fontOptions,
         );
       }
@@ -8077,7 +8740,7 @@
       const pos = this._nextPos();
       const box = Math.max(lineH, 14);
       const lw = this._measure(label, fontOptions).w;
-      const isp = this._var('itemInnerSpacing');
+      const isp = this._var("itemInnerSpacing");
       const w = box + isp[0] + lw;
       const item = this._item(pos.x, pos.y, w, box, ids.itemId);
       const res = this._clickable(item);
@@ -8085,7 +8748,7 @@
       const kbd =
         this.flags.keyboardNavigation &&
         guiState.focusedId === item.itemId &&
-        this.isKeyPressed(' ');
+        this.isKeyPressed(" ");
 
       if ((res.clicked || kbd) && !selected) {
         checked = groupIndex;
@@ -8104,13 +8767,13 @@
             pos.x + box / 2,
             pos.y + box / 2,
             box * 0.26,
-            item.enabled ? this._col('checkMark') : this._col('textDisabled'),
+            item.enabled ? this._col("checkMark") : this._col("textDisabled"),
           );
         this._drawText(
           pos.x + box + isp[0],
           pos.y + (box - lineH) / 2 + 1,
           label,
-          item.enabled ? this._col('text') : this._col('textDisabled'),
+          item.enabled ? this._col("text") : this._col("textDisabled"),
           fontOptions,
         );
       }
@@ -8160,7 +8823,13 @@
           this._drawFrame(fw.x, fw.y, fw.w, fw.h, item);
 
           if (fw.labelRect.w > 0)
-            this._drawText(fw.labelRect.x, fw.labelRect.y, label, this._col('textDisabled'), fw.fo);
+            this._drawText(
+              fw.labelRect.x,
+              fw.labelRect.y,
+              label,
+              this._col("textDisabled"),
+              fw.fo,
+            );
         }
 
         return value;
@@ -8169,18 +8838,19 @@
       const guiState = this.state;
       const openValuePopup = () => {
         this._openPopup(
-          '##val' + item.itemId,
+          "##val" + item.itemId,
           {
             x: fw.x,
             y: fw.y + fw.h + 2,
           },
           {
-            type: 'value',
+            type: "value",
             min: minValue,
             max: maxValue,
-            fmt: format || '%.3f',
+            fmt: format || "%.3f",
             label: String(label),
-            value: () => (stateful ? (st.value != null ? st.value : minValue) : value),
+            value: () =>
+              stateful ? (st.value != null ? st.value : minValue) : value,
             // commits happen in endFrame (after this frame's return), so route
             // the result through st.pending; the widget consumes it next frame
             set: (v) => {
@@ -8195,10 +8865,17 @@
         );
       };
 
-      if (this.flags.rightClickNumeric && item.hovered && this.isMouseClicked(1)) {
+      if (
+        this.flags.rightClickNumeric &&
+        item.hovered &&
+        this.isMouseClicked(1)
+      ) {
         openValuePopup();
-      }
-      else if (this.flags.doubleClick && item.hovered && this.isMouseDoubleClicked(0))
+      } else if (
+        this.flags.doubleClick &&
+        item.hovered &&
+        this.isMouseDoubleClicked(0)
+      )
         openValuePopup();
 
       if (res.active) {
@@ -8211,7 +8888,8 @@
           st.dragX0 = guiState.mouse.x;
           // click-to-set: the value jumps to where the slider was clicked;
           // dragging then continues from that exact point
-          value = minValue + clamp01((guiState.mouse.x - fw.x - 3) / innerW) * range;
+          value =
+            minValue + clamp01((guiState.mouse.x - fw.x - 3) / innerW) * range;
           st.dragV0 = value;
         }
         value = st.dragV0 + ((guiState.mouse.x - st.dragX0) / innerW) * range;
@@ -8236,32 +8914,32 @@
       if (guiState.focusedId === item.itemId && this.flags.keyboardNavigation) {
         const step = range / 100;
 
-        if (this.isKeyPressed('left') || this.isKeyPressed('down')) {
+        if (this.isKeyPressed("left") || this.isKeyPressed("down")) {
           value = clamp(value - step, minValue, maxValue);
           changed = true;
         }
 
-        if (this.isKeyPressed('right') || this.isKeyPressed('up')) {
+        if (this.isKeyPressed("right") || this.isKeyPressed("up")) {
           value = clamp(value + step, minValue, maxValue);
           changed = true;
         }
 
-        if (this.isKeyPressed('pageup')) {
+        if (this.isKeyPressed("pageup")) {
           value = clamp(value + step * 10, minValue, maxValue);
           changed = true;
         }
 
-        if (this.isKeyPressed('pagedown')) {
+        if (this.isKeyPressed("pagedown")) {
           value = clamp(value - step * 10, minValue, maxValue);
           changed = true;
         }
 
-        if (this.isKeyPressed('home')) {
+        if (this.isKeyPressed("home")) {
           value = minValue;
           changed = true;
         }
 
-        if (this.isKeyPressed('end')) {
+        if (this.isKeyPressed("end")) {
           value = maxValue;
           changed = true;
         }
@@ -8282,14 +8960,14 @@
         const innerW = Math.max(1, fw.w - 6);
         const gx = fw.x + 3 + (innerW - grabW) * frac;
         const gc = !item.enabled
-          ? this._col('textDisabled')
+          ? this._col("textDisabled")
           : res.active
-            ? this._col('sliderGrabActive')
+            ? this._col("sliderGrabActive")
             : item.hovered
-              ? this._col('sliderGrabHovered')
-              : this._col('sliderGrab');
+              ? this._col("sliderGrabHovered")
+              : this._col("sliderGrab");
         this.renderer.fillRoundedRect(gx, fw.y + 3, grabW, fw.h - 6, 3, gc);
-        const vstr = fmtVal(value, format || '%.3f');
+        const vstr = fmtVal(value, format || "%.3f");
         const vm = this._measure(vstr, fw.fo);
 
         if (vm.w < fw.w - 10)
@@ -8297,7 +8975,7 @@
             fw.x + (fw.w - vm.w) / 2,
             fw.y + (fw.h - vm.h) / 2 + 1,
             vstr,
-            item.enabled ? this._col('text') : this._col('textDisabled'),
+            item.enabled ? this._col("text") : this._col("textDisabled"),
             fw.fo,
           );
 
@@ -8306,14 +8984,14 @@
             fw.labelRect.x,
             fw.labelRect.y,
             label,
-            item.enabled ? this._col('text') : this._col('textDisabled'),
+            item.enabled ? this._col("text") : this._col("textDisabled"),
             fw.fo,
           );
       }
       this._drawFocusRing(item);
 
       if (item.hovered) {
-        this.setTooltip(fmtVal(value, format || '%.3f'));
+        this.setTooltip(fmtVal(value, format || "%.3f"));
       }
 
       return value;
@@ -8330,7 +9008,13 @@
      * @returns {number} the new integer value
      */
     sliderInt(label, value, minValue, maxValue, format) {
-      value = this.sliderFloat(label, value, minValue, maxValue, format || '%d');
+      value = this.sliderFloat(
+        label,
+        value,
+        minValue,
+        maxValue,
+        format || "%d",
+      );
 
       return Math.round(value);
     }
@@ -8393,18 +9077,19 @@
       const res = this._clickable(item);
       const openValuePopup = () => {
         this._openPopup(
-          '##val' + item.itemId,
+          "##val" + item.itemId,
           {
             x: fw.x,
             y: fw.y + fw.h + 2,
           },
           {
-            type: 'value',
+            type: "value",
             min: minValue,
             max: maxValue,
-            fmt: '%.3f',
+            fmt: "%.3f",
             label: String(label),
-            value: () => (stateful ? (st.value != null ? st.value : minValue) : value),
+            value: () =>
+              stateful ? (st.value != null ? st.value : minValue) : value,
             set: (v) => {
               value = v;
               changed = true;
@@ -8418,15 +9103,26 @@
         );
       };
 
-      if (this.flags.rightClickNumeric && item.hovered && this.isMouseClicked(1)) {
+      if (
+        this.flags.rightClickNumeric &&
+        item.hovered &&
+        this.isMouseClicked(1)
+      ) {
         openValuePopup();
-      }
-      else if (this.flags.doubleClick && item.hovered && this.isMouseDoubleClicked(0))
+      } else if (
+        this.flags.doubleClick &&
+        item.hovered &&
+        this.isMouseDoubleClicked(0)
+      )
         openValuePopup();
 
       if (res.active) {
         const mult = this.shift ? 0.1 : this.ctrl ? 10 : 1;
-        value = clamp(value + guiState.mouse.dx * dragSpeed * mult, minValue, maxValue);
+        value = clamp(
+          value + guiState.mouse.dx * dragSpeed * mult,
+          minValue,
+          maxValue,
+        );
         changed = true;
       }
 
@@ -8445,22 +9141,22 @@
       }
 
       if (guiState.focusedId === item.itemId && this.flags.keyboardNavigation) {
-        if (this.isKeyPressed('left') || this.isKeyPressed('down')) {
+        if (this.isKeyPressed("left") || this.isKeyPressed("down")) {
           value = clamp(value - dragSpeed, minValue, maxValue);
           changed = true;
         }
 
-        if (this.isKeyPressed('right') || this.isKeyPressed('up')) {
+        if (this.isKeyPressed("right") || this.isKeyPressed("up")) {
           value = clamp(value + dragSpeed, minValue, maxValue);
           changed = true;
         }
 
-        if (this.isKeyPressed('home')) {
+        if (this.isKeyPressed("home")) {
           value = minValue;
           changed = true;
         }
 
-        if (this.isKeyPressed('end')) {
+        if (this.isKeyPressed("end")) {
           value = maxValue;
           changed = true;
         }
@@ -8476,13 +9172,13 @@
 
       if (item.visible) {
         this._drawFrame(fw.x, fw.y, fw.w, fw.h, item);
-        const vstr = fmtVal(value, '%.3f');
+        const vstr = fmtVal(value, "%.3f");
         const vm = this._measure(vstr, fw.fo);
         this._drawText(
           fw.x + (fw.w - vm.w) / 2,
           fw.y + (fw.h - vm.h) / 2 + 1,
           vstr,
-          item.enabled ? this._col('text') : this._col('textDisabled'),
+          item.enabled ? this._col("text") : this._col("textDisabled"),
           fw.fo,
         );
 
@@ -8491,7 +9187,7 @@
             fw.labelRect.x,
             fw.labelRect.y,
             label,
-            item.enabled ? this._col('text') : this._col('textDisabled'),
+            item.enabled ? this._col("text") : this._col("textDisabled"),
             fw.fo,
           );
       }
@@ -8509,7 +9205,9 @@
      * @returns {number} the new integer value
      */
     dragInt(label, value, dragSpeed, minValue, maxValue) {
-      return Math.round(this.dragFloat(label, value, dragSpeed, minValue, maxValue));
+      return Math.round(
+        this.dragFloat(label, value, dragSpeed, minValue, maxValue),
+      );
     }
 
     /**
@@ -8528,12 +9226,14 @@
       const stepFast = options.stepFast != null ? options.stepFast : 10;
 
       return this._input(label, value, {
-        parse: (b) => (/^[+-]?\d+$/.test(String(b).trim()) ? parseInt(b, 10) : NaN),
+        parse: (b) =>
+          /^[+-]?\d+$/.test(String(b).trim()) ? parseInt(b, 10) : NaN,
         invalid: (v) => !isFinite(v),
         clamp: (v) => clamp(Math.round(v), min, max),
-        fmt: (v) => fmtVal(v, '%d'),
-        step: (v, dir, fast) => clamp(Math.round(v) + dir * (fast ? stepFast : step), min, max),
-        sanitize: (t) => t.replace(/[^0-9+-]/g, ''),
+        fmt: (v) => fmtVal(v, "%d"),
+        step: (v, dir, fast) =>
+          clamp(Math.round(v) + dir * (fast ? stepFast : step), min, max),
+        sanitize: (t) => t.replace(/[^0-9+-]/g, ""),
         live: true,
         init: 0,
       });
@@ -8551,7 +9251,7 @@
       const max = options.max != null ? options.max : Infinity;
       const step = options.step != null ? options.step : 0.1;
       const stepFast = options.stepFast != null ? options.stepFast : 1;
-      const fmt = options.fmt || '%.3f';
+      const fmt = options.fmt || "%.3f";
 
       return this._input(label, value, {
         parse: (b) => {
@@ -8562,13 +9262,14 @@
         invalid: (v) => !isFinite(v),
         clamp: (v) => clamp(v, min, max),
         fmt: (v) => fmtVal(v, fmt),
-        step: (v, dir, fast) => clamp(v + dir * (fast ? stepFast : step), min, max),
+        step: (v, dir, fast) =>
+          clamp(v + dir * (fast ? stepFast : step), min, max),
         sanitize: (t) => {
-          let out = t.replace(/[^0-9.eE+-]/g, '');
-          const dot = out.indexOf('.');
+          let out = t.replace(/[^0-9.eE+-]/g, "");
+          const dot = out.indexOf(".");
 
           if (dot >= 0) {
-            out = out.slice(0, dot + 1) + out.slice(dot + 1).replace(/\./g, '');
+            out = out.slice(0, dot + 1) + out.slice(dot + 1).replace(/\./g, "");
           }
 
           return out;
@@ -8594,11 +9295,11 @@
         parse: (b) => b,
         invalid: () => false,
         clamp: null,
-        fmt: (v) => String(v == null ? '' : v),
+        fmt: (v) => String(v == null ? "" : v),
         step: null,
-        sanitize: (t) => t.replace(/[\r\n]+/g, ' '),
+        sanitize: (t) => t.replace(/[\r\n]+/g, " "),
         live: true,
-        init: '',
+        init: "",
         maxLength: options.maxLength,
         onSubmit: options.onSubmit,
       });
@@ -8610,11 +9311,12 @@
       const stateful = value == null;
 
       if (stateful) {
-        value = st.value !== undefined ? st.value : cfg.init != null ? cfg.init : '';
+        value =
+          st.value !== undefined ? st.value : cfg.init != null ? cfg.init : "";
       }
 
-      if (typeof value !== 'string' && typeof value !== 'number')
-        value = cfg.init != null ? cfg.init : '';
+      if (typeof value !== "string" && typeof value !== "number")
+        value = cfg.init != null ? cfg.init : "";
       const fw = this._frameWidget(label);
       const item = fw.it;
       const res = this._clickable(item);
@@ -8648,7 +9350,6 @@
       };
 
       if (!editing)
-
         if (item.hovered && this.isMouseClicked(0)) {
           st.edit = true;
           st.buf = cfg.fmt(value);
@@ -8683,7 +9384,7 @@
         }
 
         if (item.hovered) {
-          this._setCursor('text', 2);
+          this._setCursor("text", 2);
         }
         const mouse = guiState.mouse;
         const k = (t) => this.isKeyPressed(t);
@@ -8774,7 +9475,7 @@
           st.sel = null;
         }
 
-        if (k('escape')) {
+        if (k("escape")) {
           if (st.buf !== st.base) {
             st.buf = st.base;
             st.caret = st.buf.length;
@@ -8792,13 +9493,13 @@
           st.edit = false;
           st.buf = null;
           st.sel = null;
-        } else if (k('enter')) {
+        } else if (k("enter")) {
           commit();
 
           if (cfg.onSubmit) {
             cfg.onSubmit(value);
           }
-        } else if (k('tab')) {
+        } else if (k("tab")) {
           commit();
 
           if (this.flags.keyboardNavigation) {
@@ -8811,7 +9512,7 @@
               guiState.focusedId = list[(i + 1) % list.length];
             }
           }
-        } else if (k('backspace')) {
+        } else if (k("backspace")) {
           pushUndo();
 
           if (st.sel) {
@@ -8823,7 +9524,7 @@
             st.caret = st.caret - 1;
           }
           st.caretT = 0;
-        } else if (k('delete')) {
+        } else if (k("delete")) {
           pushUndo();
 
           if (st.sel) {
@@ -8834,31 +9535,29 @@
             st.buf = st.buf.slice(0, st.caret) + st.buf.slice(st.caret + 1);
           }
           st.caretT = 0;
-        } else if (k('left')) {
+        } else if (k("left")) {
           const c = Math.max(0, st.caret - 1);
 
           if (this.shift && st.sel) {
             st.sel = [Math.min(st.sel[0], c), Math.max(st.sel[1], c)];
-          }
-          else if (this.shift) st.sel = [c, st.caret];
+          } else if (this.shift) st.sel = [c, st.caret];
           else {
             st.caret = c;
             st.sel = null;
           }
           st.caretT = 0;
-        } else if (k('right')) {
+        } else if (k("right")) {
           const c = Math.min(L, st.caret + 1);
 
           if (this.shift && st.sel) {
             st.sel = [Math.min(st.sel[0], c), Math.max(st.sel[1], c)];
-          }
-          else if (this.shift) st.sel = [st.caret, c];
+          } else if (this.shift) st.sel = [st.caret, c];
           else {
             st.caret = c;
             st.sel = null;
           }
           st.caretT = 0;
-        } else if (k('home')) {
+        } else if (k("home")) {
           if (this.shift) {
             st.sel = [0, st.caret];
           }
@@ -8867,7 +9566,7 @@
           if (!this.shift) {
             st.sel = null;
           }
-        } else if (k('end')) {
+        } else if (k("end")) {
           if (this.shift) {
             st.sel = [st.caret, L];
           }
@@ -8876,37 +9575,35 @@
           if (!this.shift) {
             st.sel = null;
           }
-        } else if (k('pageup') || k('pagedown')) {
+        } else if (k("pageup") || k("pagedown")) {
           if (cfg.step) {
-            value = cfg.step(value, k('pageup') ? 1 : -1, true);
+            value = cfg.step(value, k("pageup") ? 1 : -1, true);
             changed = true;
             st.buf = cfg.fmt(value);
             st.caret = st.buf.length;
           } else {
-            st.caret = clamp(st.caret + (k('pageup') ? -12 : 12), 0, L);
+            st.caret = clamp(st.caret + (k("pageup") ? -12 : 12), 0, L);
           }
-        } else if (cfg.step && k('up')) {
+        } else if (cfg.step && k("up")) {
           value = cfg.step(value, 1, this.shift);
           changed = true;
           st.buf = cfg.fmt(value);
           st.caret = st.buf.length;
           st.sel = null;
-        } else if (cfg.step && k('down')) {
+        } else if (cfg.step && k("down")) {
           value = cfg.step(value, -1, this.shift);
           changed = true;
           st.buf = cfg.fmt(value);
           st.caret = st.buf.length;
           st.sel = null;
         } else if (this.ctrl && this.flags.keyboardShortcuts)
-
-          if (k('a')) {
+          if (k("a")) {
             st.sel = [0, L];
-          }
-          else if (k('c') && st.sel) {
+          } else if (k("c") && st.sel) {
             if (this.flags.clipboard) {
               this.clipboard.write(st.buf.slice(st.sel[0], st.sel[1]));
             }
-          } else if (k('x') && st.sel) {
+          } else if (k("x") && st.sel) {
             if (this.flags.clipboard) {
               this.clipboard.write(st.buf.slice(st.sel[0], st.sel[1]));
             }
@@ -8914,9 +9611,9 @@
             st.buf = st.buf.slice(0, st.sel[0]) + st.buf.slice(st.sel[1]);
             st.caret = st.sel[0];
             st.sel = null;
-          } else if (k('v')) {
+          } else if (k("v")) {
             if (this.flags.clipboard) {
-              let t = String(this.clipboard.read() || '');
+              let t = String(this.clipboard.read() || "");
               t = cfg.sanitize ? cfg.sanitize(t) : t;
 
               if (t) {
@@ -8933,10 +9630,9 @@
                 }
               }
             }
-          } else if (k('z') && !this.shift) {
+          } else if (k("z") && !this.shift) {
             doUndo();
-          }
-          else if (k('y') || (k('z') && this.shift)) doRedo();
+          } else if (k("y") || (k("z") && this.shift)) doRedo();
 
         if (this.flags.mouseBackForward && this.flags.undoRedo) {
           if (this.isMouseClicked(3)) {
@@ -9026,28 +9722,30 @@
               textY,
               Math.max(1, x2 - x1),
               fw.lineH,
-              this._col('textSelectedBg'),
+              this._col("textSelectedBg"),
             );
           }
           this._drawText(
             textX - textScroll,
             textY,
             drawStr,
-            item.enabled ? this._col('text') : this._col('textDisabled'),
+            item.enabled ? this._col("text") : this._col("textDisabled"),
             fw.fo,
           );
           const blink = this.flags.animations
-            ? Math.floor((st.caretT || 0) / this._var('caretBlinkRate')) % 2 === 0
+            ? Math.floor((st.caretT || 0) / this._var("caretBlinkRate")) % 2 ===
+              0
             : true;
 
           if (blink || st.sel) {
-            const cx = this._measure(drawStr.slice(0, st.caret), fw.fo).w - textScroll;
+            const cx =
+              this._measure(drawStr.slice(0, st.caret), fw.fo).w - textScroll;
             this.renderer.line(
               textX + cx,
               textY + 1,
               textX + cx,
               textY + fw.lineH - 1,
-              this._col('text'),
+              this._col("text"),
               1,
             );
           }
@@ -9058,8 +9756,8 @@
               fw.y + 0.5,
               fw.w - 1,
               fw.h - 1,
-              this._var('frameRounding'),
-              this._col('error'),
+              this._var("frameRounding"),
+              this._col("error"),
               1.5,
             );
         } else {
@@ -9068,7 +9766,7 @@
             textX,
             textY,
             display,
-            item.enabled ? this._col('text') : this._col('textDisabled'),
+            item.enabled ? this._col("text") : this._col("textDisabled"),
             fw.fo,
           );
 
@@ -9079,7 +9777,7 @@
               textY + 1,
               textX + m + 2,
               textY + fw.lineH - 1,
-              this._col('text'),
+              this._col("text"),
               1,
             );
           }
@@ -9091,7 +9789,7 @@
             fw.labelRect.x,
             fw.labelRect.y,
             label,
-            item.enabled ? this._col('text') : this._col('textDisabled'),
+            item.enabled ? this._col("text") : this._col("textDisabled"),
             fw.fo,
           );
       }
@@ -9138,7 +9836,7 @@
       const item = fw.it;
       const res = this._clickable(item);
       let changed = false;
-      const pid = '##combo' + item.itemId;
+      const pid = "##combo" + item.itemId;
       const p = guiState.popups.get(pid);
       const openIt = () =>
         this._openPopup(
@@ -9148,7 +9846,7 @@
             y: fw.y + fw.h + 2,
           },
           {
-            type: 'combo',
+            type: "combo",
             items: itemList,
             maxVisible: options.maxVisible || 8,
             width: fw.w,
@@ -9165,14 +9863,12 @@
         );
 
       if (res.clicked)
-
         if (p && p.open) {
           p.open = false;
-        }
-        else openIt();
+        } else openIt();
 
       if (guiState.focusedId === item.itemId && this.flags.keyboardNavigation) {
-        if (this.isKeyPressed('up')) {
+        if (this.isKeyPressed("up")) {
           value = (value - 1 + itemList.length) % itemList.length;
           changed = true;
 
@@ -9181,7 +9877,7 @@
           }
         }
 
-        if (this.isKeyPressed('down')) {
+        if (this.isKeyPressed("down")) {
           value = (value + 1) % itemList.length;
           changed = true;
 
@@ -9190,38 +9886,39 @@
           }
         }
 
-        if (this.isKeyPressed('enter') || this.isKeyPressed(' '))
-
+        if (this.isKeyPressed("enter") || this.isKeyPressed(" "))
           if (p && p.open) {
             p.open = false;
-          }
-          else openIt();
+          } else openIt();
       }
 
       if (item.visible) {
         this._drawFrame(fw.x, fw.y, fw.w, fw.h, item);
-        let preview = itemList[value] != null ? String(itemList[value]) : '';
+        let preview = itemList[value] != null ? String(itemList[value]) : "";
         const arrowW = 18;
         const maxW = fw.w - arrowW - fpPad(this);
 
-        while (preview.length > 2 && this._measure(preview + '…', fw.fo).w > maxW)
+        while (
+          preview.length > 2 &&
+          this._measure(preview + "…", fw.fo).w > maxW
+        )
           preview = preview.slice(0, -1);
 
         if (preview !== String(itemList[value])) {
-          preview += '…';
+          preview += "…";
         }
         this._drawText(
           fw.x + 8,
           fw.y + (fw.h - fw.lineH) / 2 + 1,
           preview,
-          item.enabled ? this._col('text') : this._col('textDisabled'),
+          item.enabled ? this._col("text") : this._col("textDisabled"),
           fw.fo,
         );
         const ax = fw.x + fw.w - 14,
           ay = fw.y + fw.h / 2;
         this.renderer.fillPolygon(
           [ax - 4, ay - 2.5, ax + 4, ay - 2.5, ax, ay + 3],
-          item.enabled ? this._col('text') : this._col('textDisabled'),
+          item.enabled ? this._col("text") : this._col("textDisabled"),
         );
 
         if (fw.labelRect.w > 0)
@@ -9229,7 +9926,7 @@
             fw.labelRect.x,
             fw.labelRect.y,
             label,
-            item.enabled ? this._col('text') : this._col('textDisabled'),
+            item.enabled ? this._col("text") : this._col("textDisabled"),
             fw.fo,
           );
       }
@@ -9270,18 +9967,27 @@
       itemList = itemList || [];
       const fontOptions = this._fo();
       const lineH = this._lineH();
-      const itemSpacing = this._var('itemSpacing');
+      const itemSpacing = this._var("itemSpacing");
       const rowH = options.rowH || lineH + 10;
       const avail = this.getRegionAvail();
       const w = options.w > 0 ? options.w : avail.w;
       const maxRows = Math.max(1, options.rows || 8);
       const visible = Math.min(itemList.length || 1, maxRows);
-      const boxH = options.h > 0 ? options.h : visible * (rowH + itemSpacing[1]) + itemSpacing[1];
+      const boxH =
+        options.h > 0
+          ? options.h
+          : visible * (rowH + itemSpacing[1]) + itemSpacing[1];
       const pos = this._nextPos();
       let boxTop = pos.y;
 
       if (options.label !== false && label) {
-        this._drawText(pos.x, pos.y, label, this._col('textDisabled'), fontOptions);
+        this._drawText(
+          pos.x,
+          pos.y,
+          label,
+          this._col("textDisabled"),
+          fontOptions,
+        );
         this._advance(pos.x, pos.y, w, lineH);
         const p2 = this._nextPos();
         boxTop = p2.y;
@@ -9289,7 +9995,7 @@
       let changed = false;
 
       if (
-        this.beginChild('##listbox' + ids.itemId, {
+        this.beginChild("##listbox" + ids.itemId, {
           w: w,
           h: boxH,
           padding: 4,
@@ -9313,14 +10019,16 @@
                 p.y + 2,
                 rw - 4,
                 rowH - 4,
-                this._var('frameRounding'),
-                i === value ? this._col('headerActive') : this._col('headerHovered'),
+                this._var("frameRounding"),
+                i === value
+                  ? this._col("headerActive")
+                  : this._col("headerHovered"),
               );
             this._drawText(
               p.x + 10,
               p.y + (rowH - lineH) / 2 + 1,
               String(itemList[i]),
-              item.enabled ? this._col('text') : this._col('textDisabled'),
+              item.enabled ? this._col("text") : this._col("textDisabled"),
               fontOptions,
             );
           }
@@ -9351,8 +10059,7 @@
 
           if (top < cw.scrollY) {
             cw.scrollTargetY = top;
-          }
-          else if (bot > cw.scrollY + vh) cw.scrollTargetY = bot - vh;
+          } else if (bot > cw.scrollY + vh) cw.scrollTargetY = bot - vh;
         }
       }
       this._advance(pos.x, boxTop, w, boxH);
@@ -9382,13 +10089,21 @@
       const pos = this._nextPos();
       const layout = this.state.layout;
       const w =
-        options.width > 0 ? options.width : Math.max(10, layout.avail.w - layout.x - layout.indent);
-      const item = this._item(pos.x, pos.y, w, lineH + 6, this._id(label).itemId);
+        options.width > 0
+          ? options.width
+          : Math.max(10, layout.avail.w - layout.x - layout.indent);
+      const item = this._item(
+        pos.x,
+        pos.y,
+        w,
+        lineH + 6,
+        this._id(label).itemId,
+      );
       const res = this._clickable(item);
       const kbd =
         this.flags.keyboardNavigation &&
         this.state.focusedId === item.itemId &&
-        this.isKeyPressed(' ');
+        this.isKeyPressed(" ");
       const clicked = res.clicked || kbd;
 
       if (item.visible) {
@@ -9398,14 +10113,14 @@
             pos.y,
             w,
             lineH + 6,
-            this._var('frameRounding'),
-            isSelected ? this._col('headerActive') : this._col('headerHovered'),
+            this._var("frameRounding"),
+            isSelected ? this._col("headerActive") : this._col("headerHovered"),
           );
         this._drawText(
           pos.x + 8,
           pos.y + (lineH + 6 - lineH) / 2,
           label,
-          item.enabled ? this._col('text') : this._col('textDisabled'),
+          item.enabled ? this._col("text") : this._col("textDisabled"),
           fontOptions,
         );
 
@@ -9433,14 +10148,16 @@
       const pos = this._nextPos();
       const layout = this.state.layout;
       const w =
-        opts.width > 0 ? opts.width : Math.max(10, layout.avail.w - layout.x - layout.indent);
+        opts.width > 0
+          ? opts.width
+          : Math.max(10, layout.avail.w - layout.x - layout.indent);
       const h = opts.height > 0 ? opts.height : Math.max(12, lineH + 4);
       const item = this._item(
         pos.x,
         pos.y,
         w,
         h,
-        this._id('##progress' + (opts.id || 'x')).itemId,
+        this._id("##progress" + (opts.id || "x")).itemId,
         {
           focusable: false,
         },
@@ -9453,8 +10170,8 @@
           pos.y,
           w,
           h,
-          this._var('frameRounding'),
-          this._col('frameBg'),
+          this._var("frameRounding"),
+          this._col("frameBg"),
         );
 
         if (frac > 0)
@@ -9463,10 +10180,13 @@
             pos.y + 2,
             Math.max(2, (w - 4) * frac),
             h - 4,
-            this._var('frameRounding') - 1,
-            this._col('sliderGrab'),
+            this._var("frameRounding") - 1,
+            this._col("sliderGrab"),
           );
-        const overlay = opts.overlay != null ? String(opts.overlay) : Math.round(frac * 100) + '%';
+        const overlay =
+          opts.overlay != null
+            ? String(opts.overlay)
+            : Math.round(frac * 100) + "%";
         const m = this._measure(overlay, fontOptions);
 
         if (m.w < w - 12)
@@ -9474,7 +10194,7 @@
             pos.x + (w - m.w) / 2,
             pos.y + (h - lineH) / 2 + 1,
             overlay,
-            this._col('text'),
+            this._col("text"),
             fontOptions,
           );
       }
@@ -9509,7 +10229,7 @@
       const kbd =
         this.flags.keyboardNavigation &&
         guiState.focusedId === item.itemId &&
-        (this.isKeyPressed(' ') || this.isKeyPressed('enter'));
+        (this.isKeyPressed(" ") || this.isKeyPressed("enter"));
 
       if (res.clicked || kbd) {
         open = !open;
@@ -9526,22 +10246,41 @@
 
       if (item.visible) {
         const bg = !item.enabled
-          ? this._col('header')
+          ? this._col("header")
           : item.active
-            ? this._col('headerActive')
+            ? this._col("headerActive")
             : item.hovered
-              ? this._col('headerHovered')
-              : this._col('header');
-        this.renderer.fillRoundedRect(pos.x, pos.y, w, h, this._var('frameRounding'), bg);
+              ? this._col("headerHovered")
+              : this._col("header");
+        this.renderer.fillRoundedRect(
+          pos.x,
+          pos.y,
+          w,
+          h,
+          this._var("frameRounding"),
+          bg,
+        );
         const cx = pos.x + 12,
           cy = pos.y + h / 2;
-        const c = item.enabled ? this._col('text') : this._col('textDisabled');
+        const c = item.enabled ? this._col("text") : this._col("textDisabled");
 
         if (open) {
-          this.renderer.fillPolygon([cx - 5, cy - 3, cx + 5, cy - 3, cx, cy + 4], c);
-        }
-        else this.renderer.fillPolygon([cx - 3, cy - 5, cx - 3, cy + 5, cx + 4, cy], c);
-        this._drawText(pos.x + 24, pos.y + (h - lineH) / 2 + 1, label, c, fontOptions);
+          this.renderer.fillPolygon(
+            [cx - 5, cy - 3, cx + 5, cy - 3, cx, cy + 4],
+            c,
+          );
+        } else
+          this.renderer.fillPolygon(
+            [cx - 3, cy - 5, cx - 3, cy + 5, cx + 4, cy],
+            c,
+          );
+        this._drawText(
+          pos.x + 24,
+          pos.y + (h - lineH) / 2 + 1,
+          label,
+          c,
+          fontOptions,
+        );
       }
       this._drawFocusRing(item);
       this._advance(item.x, item.y, w, h);
@@ -9571,7 +10310,7 @@
       const kbd =
         this.flags.keyboardNavigation &&
         guiState.focusedId === item.itemId &&
-        (this.isKeyPressed(' ') || this.isKeyPressed('enter'));
+        (this.isKeyPressed(" ") || this.isKeyPressed("enter"));
 
       if (res.clicked || kbd) {
         open = !open;
@@ -9590,8 +10329,8 @@
             pos.y,
             w,
             h,
-            this._var('frameRounding'),
-            this._col('headerHovered'),
+            this._var("frameRounding"),
+            this._col("headerHovered"),
           );
         const cx = pos.x + 10,
           cy = pos.y + h / 2;
@@ -9599,18 +10338,18 @@
         if (open)
           this.renderer.fillPolygon(
             [cx - 4, cy - 2.5, cx + 4, cy - 2.5, cx, cy + 3.5],
-            this._col('text'),
+            this._col("text"),
           );
         else
           this.renderer.fillPolygon(
             [cx - 2.5, cy - 4, cx - 2.5, cy + 4, cx + 3.5, cy],
-            this._col('textDisabled'),
+            this._col("textDisabled"),
           );
         this._drawText(
           pos.x + 20,
           pos.y + (h - lineH) / 2 + 1,
           label,
-          this._col('text'),
+          this._col("text"),
           fontOptions,
         );
       }
@@ -9656,7 +10395,7 @@
      */
     beginTabBar(id) {
       const guiState = this.state;
-      const ids = this._id(id || '##tabbar');
+      const ids = this._id(id || "##tabbar");
       const st = this._state(ids.stateKey);
 
       if (st.tab == null) {
@@ -9715,9 +10454,8 @@
       const res = this._clickable(item);
 
       if (res.clicked)
-
         if (options.closable && guiState.mouse.x >= x + tw - 16) {
-          if (typeof options.onClose === 'function') {
+          if (typeof options.onClose === "function") {
             options.onClose();
           }
         } else if (!active) {
@@ -9726,12 +10464,12 @@
         }
 
       if (item.visible) {
-        const rr = this._var('tabRounding');
+        const rr = this._var("tabRounding");
         const bg = active
-          ? this._col('tabActive')
+          ? this._col("tabActive")
           : item.hovered
-            ? this._col('tabHovered')
-            : this._col('tab');
+            ? this._col("tabHovered")
+            : this._col("tab");
         this.renderer.fillRoundedRect(x, y, tw, h, rr, bg);
 
         if (active) {
@@ -9741,26 +10479,40 @@
           x + 11,
           y + (h - lineH) / 2,
           label,
-          active ? this._col('text') : this._col('textDisabled'),
+          active ? this._col("text") : this._col("textDisabled"),
           fontOptions,
         );
 
         if (options.closable && (item.hovered || active)) {
           const bx = x + tw - 12,
             by = y + h / 2;
-          this.renderer.line(bx - 3, by - 3, bx + 3, by + 3, this._col('textDisabled'), 1.2);
-          this.renderer.line(bx + 3, by - 3, bx - 3, by + 3, this._col('textDisabled'), 1.2);
+          this.renderer.line(
+            bx - 3,
+            by - 3,
+            bx + 3,
+            by + 3,
+            this._col("textDisabled"),
+            1.2,
+          );
+          this.renderer.line(
+            bx + 3,
+            by - 3,
+            bx - 3,
+            by + 3,
+            this._col("textDisabled"),
+            1.2,
+          );
         }
       }
 
       if (guiState.focusedId === item.itemId && this.flags.keyboardNavigation) {
         const n = Math.max(1, bar.prevCount);
 
-        if (this.isKeyPressed('left')) {
+        if (this.isKeyPressed("left")) {
           st.tab = (st.tab - 1 + n) % n;
         }
 
-        if (this.isKeyPressed('right')) {
+        if (this.isKeyPressed("right")) {
           st.tab = (st.tab + 1) % n;
         }
       }
@@ -9849,9 +10601,9 @@
       if (guiState.currentMenu) {
         // nested menu inside an open menu
         const parent = guiState.currentMenu.popup;
-        const subId = '##sub' + fnv1a(label + '\x01' + parent.id);
+        const subId = "##sub" + fnv1a(label + "\x01" + parent.id);
         guiState.currentMenu.rows.push({
-          type: 'submenu',
+          type: "submenu",
           label,
           subId,
         });
@@ -9882,7 +10634,7 @@
       const x = mb.x,
         y = mb.y - 4;
       mb.x += w + 6;
-      const pid = '##menu' + fnv1a(label + '\x01' + mb.win.idHash);
+      const pid = "##menu" + fnv1a(label + "\x01" + mb.win.idHash);
       const p = guiState.popups.get(pid);
       const itemId = hash3(fnv1a(pid), 0x42a1, 0);
       const item = this._item(x, y, w, lineH + 8, itemId, {
@@ -9893,8 +10645,7 @@
       if (p && p.open) {
         if (item.hovered && this.isMouseClicked(0)) {
           p.open = false;
-        }
-        else {
+        } else {
           opened = true;
           p.data.items.length = 0;
           guiState.currentMenu = {
@@ -9905,7 +10656,14 @@
         }
 
         if (item.visible && item.hovered)
-          this.renderer.fillRoundedRect(x, y, w, lineH + 8, 4, this._col('headerHovered'));
+          this.renderer.fillRoundedRect(
+            x,
+            y,
+            w,
+            lineH + 8,
+            4,
+            this._col("headerHovered"),
+          );
       } else {
         if (item.hovered && this.isMouseClicked(0)) {
           guiState.clickedItemId = itemId; // protect the popup from same-frame/next-frame dismissal
@@ -9916,7 +10674,7 @@
               y: y + lineH + 12,
             },
             {
-              type: 'menu',
+              type: "menu",
               items: [],
             },
             itemId,
@@ -9925,11 +10683,18 @@
         }
 
         if (item.visible && item.hovered)
-          this.renderer.fillRoundedRect(x, y, w, lineH + 8, 4, this._col('headerHovered'));
+          this.renderer.fillRoundedRect(
+            x,
+            y,
+            w,
+            lineH + 8,
+            4,
+            this._col("headerHovered"),
+          );
       }
 
       if (item.visible) {
-        this._drawText(x + 10, y + 4, label, this._col('text'), fontOptions);
+        this._drawText(x + 10, y + 4, label, this._col("text"), fontOptions);
       }
 
       return opened;
@@ -9958,9 +10723,9 @@
 
       if (guiState.currentMenu) {
         guiState.currentMenu.rows.push({
-          type: 'item',
+          type: "item",
           label,
-          shortcut: shortcutLabel || '',
+          shortcut: shortcutLabel || "",
           selected: !!options.selected,
           disabled: !!options.disabled,
           onActivated: options.onActivated || null,
@@ -9975,12 +10740,20 @@
         const pos = this._nextPos();
         // natural width (label + shortcut + padding) so the popup sizes to content
         const labelW = this._measure(label, fontOptions).w;
-        const scW = shortcutLabel ? this._measure(shortcutLabel, fontOptions).w + 16 : 0;
+        const scW = shortcutLabel
+          ? this._measure(shortcutLabel, fontOptions).w + 16
+          : 0;
         const w = Math.max(40, labelW + scW + (options.selected ? 26 : 20));
-        const item = this._item(pos.x, pos.y, w, lineH + 6, this._id('##mi' + label).itemId);
+        const item = this._item(
+          pos.x,
+          pos.y,
+          w,
+          lineH + 6,
+          this._id("##mi" + label).itemId,
+        );
         const res = this._clickable(item);
 
-        if (res.clicked && typeof options.onActivated === 'function') {
+        if (res.clicked && typeof options.onActivated === "function") {
           options.onActivated();
         }
 
@@ -9996,7 +10769,7 @@
               w,
               lineH + 6,
               4,
-              this._col('headerHovered'),
+              this._col("headerHovered"),
             );
           const tx = pos.x + 10 + (options.selected ? 16 : 0);
 
@@ -10005,11 +10778,11 @@
               cy = pos.y + (lineH + 6) / 2;
             this.renderer.polyline(
               [cx - 3, cy, cx - 1, cy + 3, cx + 4, cy - 3],
-              this._col('checkMark'),
+              this._col("checkMark"),
               1.6,
             );
           }
-          this._drawText(tx, pos.y + 3, label, this._col('text'), fontOptions);
+          this._drawText(tx, pos.y + 3, label, this._col("text"), fontOptions);
 
           if (shortcutLabel) {
             const m = this._measure(shortcutLabel, fontOptions);
@@ -10017,7 +10790,7 @@
               pos.x + w - 8 - m.w,
               pos.y + 3,
               shortcutLabel,
-              this._col('textDisabled'),
+              this._col("textDisabled"),
               fontOptions,
             );
           }
@@ -10046,13 +10819,19 @@
       const pos = this._nextPos();
       const layout = guiState.layout;
       const availW = Math.max(10, layout.avail.w - layout.x - layout.indent);
-      const widths = opts.colWidths && opts.colWidths.length === cols ? opts.colWidths : null;
-      const fixedTotal = widths ? widths.reduce((a, b) => a + (b > 0 ? b : 0), 0) : 0;
+      const widths =
+        opts.colWidths && opts.colWidths.length === cols
+          ? opts.colWidths
+          : null;
+      const fixedTotal = widths
+        ? widths.reduce((a, b) => a + (b > 0 ? b : 0), 0)
+        : 0;
       const flexCount = widths ? widths.filter((b) => b <= 0).length : cols;
       const flexW = flexCount > 0 ? (availW - fixedTotal) / flexCount : 0;
       const colW = [];
 
-      for (let i = 0; i < cols; i++) colW.push(widths && widths[i] > 0 ? widths[i] : flexW);
+      for (let i = 0; i < cols; i++)
+        colW.push(widths && widths[i] > 0 ? widths[i] : flexW);
       guiState.table = {
         x0: pos.x,
         colW,
@@ -10094,7 +10873,14 @@
 
       for (let c = 1; c < t.cols; c++) {
         const x = this._tableCellX(c);
-        this.renderer.line(x + 0.5, y0, x + 0.5, y1, withAlpha(this._col('separator'), 0.5), 1);
+        this.renderer.line(
+          x + 0.5,
+          y0,
+          x + 0.5,
+          y1,
+          withAlpha(this._col("separator"), 0.5),
+          1,
+        );
       }
     }
     /**
@@ -10111,19 +10897,32 @@
       const lineH = this._lineH();
       const y = t.y;
       const totalW = t.colW.reduce((a, b) => a + b, 0);
-      this.renderer.fillRoundedRect(t.x0, y, totalW, t.rowH, 4, this._col('tableHeader'));
+      this.renderer.fillRoundedRect(
+        t.x0,
+        y,
+        totalW,
+        t.rowH,
+        4,
+        this._col("tableHeader"),
+      );
 
       for (let i = 0; i < t.cols; i++) {
         const x = this._tableCellX(i);
-        const str = labels && labels[i] != null ? String(labels[i]) : '';
-        this._drawText(x + 8, y + (t.rowH - lineH) / 2, str, this._col('text'), fontOptions);
+        const str = labels && labels[i] != null ? String(labels[i]) : "";
+        this._drawText(
+          x + 8,
+          y + (t.rowH - lineH) / 2,
+          str,
+          this._col("text"),
+          fontOptions,
+        );
       }
       this.renderer.line(
         t.x0,
         y + t.rowH - 0.5,
         t.x0 + totalW,
         y + t.rowH - 0.5,
-        this._col('separator'),
+        this._col("separator"),
         1,
       );
       this._tableVLines(y, y + t.rowH);
@@ -10147,25 +10946,41 @@
       const totalW = t.colW.reduce((a, b) => a + b, 0);
 
       if (t.rowIndex % 2 === 1)
-        this.renderer.fillRoundedRect(t.x0, y, totalW, t.rowH, 2, this._col('tableBgAlt'));
+        this.renderer.fillRoundedRect(
+          t.x0,
+          y,
+          totalW,
+          t.rowH,
+          2,
+          this._col("tableBgAlt"),
+        );
 
       for (let i = 0; i < t.cols; i++) {
         const x = this._tableCellX(i);
-        let str = values && values[i] != null ? String(values[i]) : '';
+        let str = values && values[i] != null ? String(values[i]) : "";
 
         if (this._measure(str, fontOptions).w > t.colW[i] - 14) {
-          while (str.length > 1 && this._measure(str + '…', fontOptions).w > t.colW[i] - 14)
+          while (
+            str.length > 1 &&
+            this._measure(str + "…", fontOptions).w > t.colW[i] - 14
+          )
             str = str.slice(0, -1);
-          str += '…';
+          str += "…";
         }
-        this._drawText(x + 8, y + (t.rowH - lineH) / 2, str, this._col('text'), fontOptions);
+        this._drawText(
+          x + 8,
+          y + (t.rowH - lineH) / 2,
+          str,
+          this._col("text"),
+          fontOptions,
+        );
       }
       this.renderer.line(
         t.x0,
         y + t.rowH - 0.5,
         t.x0 + totalW,
         y + t.rowH - 0.5,
-        withAlpha(this._col('separator'), 0.6),
+        withAlpha(this._col("separator"), 0.6),
         1,
       );
       this._tableVLines(y, y + t.rowH);
@@ -10218,14 +11033,17 @@
         return;
       }
       const layout = this.state.layout;
-      t.rowBottom = Math.max(t.rowBottom, layout.origin.y + layout.y - layout.scroll.y);
+      t.rowBottom = Math.max(
+        t.rowBottom,
+        layout.origin.y + layout.y - layout.scroll.y,
+      );
       const totalW = t.colW.reduce((a, b) => a + b, 0);
       this.renderer.line(
         t.x0,
         t.rowBottom - 0.5,
         t.x0 + totalW,
         t.rowBottom - 0.5,
-        withAlpha(this._col('separator'), 0.6),
+        withAlpha(this._col("separator"), 0.6),
         1,
       );
       this._tableVLines(t.y, t.rowBottom);
@@ -10251,7 +11069,7 @@
         totalW - 1,
         h - 1,
         4,
-        this._col('separator'),
+        this._col("separator"),
         1,
       );
       this._tableSyncLayout();
@@ -10279,7 +11097,7 @@
       opts = opts || {};
       extra = extra || 0;
       const guiState = this.state;
-      const itemSpacing = this._var('itemSpacing');
+      const itemSpacing = this._var("itemSpacing");
       const avail = this.getRegionAvail().h;
 
       if (opts.share > 0) {
@@ -10288,7 +11106,8 @@
           guiState._shareGroups = {};
         }
         const cont = guiState.layout && guiState.layout.container;
-        const key = ((cont && (cont.title || cont.label)) || '') + ':' + opts.share;
+        const key =
+          ((cont && (cont.title || cont.label)) || "") + ":" + opts.share;
         let g = guiState._shareGroups[key];
 
         if (!g) {
@@ -10301,7 +11120,9 @@
         // safety margin: content bookkeeping (trailing spacing + padding
         // rounding) exceeds the raw avail by ~one spacing — stay clear of
         // the scrollbar rather than overflow it
-        const ideal = (g.avail0 - g.n * (extra + itemSpacing[1]) - itemSpacing[1] - 20) / g.n;
+        const ideal =
+          (g.avail0 - g.n * (extra + itemSpacing[1]) - itemSpacing[1] - 20) /
+          g.n;
 
         return Math.max(minH, Math.min(ideal, avail));
       }
@@ -10336,7 +11157,6 @@
         let vmax = options.max != null ? options.max : -Infinity;
 
         if (options.min == null || options.max == null)
-
           for (const v of seriesValues) {
             if (v < vmin) {
               vmin = v;
@@ -10358,9 +11178,10 @@
 
         for (let i = 0; i < seriesValues.length; i++) {
           pts[i * 2] = px + (i / (seriesValues.length - 1)) * pw;
-          pts[i * 2 + 1] = py + ph - ((seriesValues[i] - vmin) / (vmax - vmin)) * ph;
+          pts[i * 2 + 1] =
+            py + ph - ((seriesValues[i] - vmin) / (vmax - vmin)) * ph;
         }
-        this.renderer.polyline(pts, this._col('plotLine'), 1.5);
+        this.renderer.polyline(pts, this._col("plotLine"), 1.5);
 
         if (item.hovered) {
           const frac = clamp01((this.state.mouse.x - px) / pw);
@@ -10370,28 +11191,53 @@
             seriesValues.length - 1,
           );
           const vx = px + (vi / (seriesValues.length - 1)) * pw;
-          this.renderer.line(vx, py, vx, py + ph, withAlpha(this._col('text'), 110), 1);
-          const overlay = fmtVal(seriesValues[vi], '%.2f');
+          this.renderer.line(
+            vx,
+            py,
+            vx,
+            py + ph,
+            withAlpha(this._col("text"), 110),
+            1,
+          );
+          const overlay = fmtVal(seriesValues[vi], "%.2f");
           const m = this._measure(overlay, fw.fo);
-          this._drawText(fw.x + fw.w - m.w - 5, fw.y + 2, overlay, this._col('text'), fw.fo);
+          this._drawText(
+            fw.x + fw.w - m.w - 5,
+            fw.y + 2,
+            overlay,
+            this._col("text"),
+            fw.fo,
+          );
         } else if (options.overlay != null) {
           const m = this._measure(String(options.overlay), fw.fo);
           this._drawText(
             fw.x + fw.w - m.w - 5,
             fw.y + 2,
             options.overlay,
-            this._col('textDisabled'),
+            this._col("textDisabled"),
             fw.fo,
           );
         }
 
         if (fw.labelRect.w > 0)
-          this._drawText(fw.labelRect.x, fw.labelRect.y, label, this._col('textDisabled'), fw.fo);
+          this._drawText(
+            fw.labelRect.x,
+            fw.labelRect.y,
+            label,
+            this._col("textDisabled"),
+            fw.fo,
+          );
       } else if (item.visible) {
         this._drawFrame(fw.x, fw.y, fw.w, fw.h, item);
 
         if (fw.labelRect.w > 0)
-          this._drawText(fw.labelRect.x, fw.labelRect.y, label, this._col('textDisabled'), fw.fo);
+          this._drawText(
+            fw.labelRect.x,
+            fw.labelRect.y,
+            label,
+            this._col("textDisabled"),
+            fw.fo,
+          );
       }
       this._advance(item.x, item.y, item.w, item.h);
 
@@ -10409,9 +11255,16 @@
     image(imageId, w, h, opts) {
       opts = opts || {};
       const pos = this._nextPos();
-      const item = this._item(pos.x, pos.y, w, h, this._id('##img' + (opts.id || imageId)).itemId, {
-        focusable: false,
-      });
+      const item = this._item(
+        pos.x,
+        pos.y,
+        w,
+        h,
+        this._id("##img" + (opts.id || imageId)).itemId,
+        {
+          focusable: false,
+        },
+      );
 
       if (item.visible)
         this.renderer.drawImage(
@@ -10430,7 +11283,7 @@
 
   /* Small local helper for combo preview padding */
 
-// ---- misc helpers ----
+  // ---- misc helpers ----
 
   function fpPad(gui) {
     return 8;
@@ -10449,7 +11302,7 @@
    * registry (Mim.registerAddon).
    */
 
-// ---- public export object ----
+  // ---- public export object ----
 
   const Mim = {
     /** @member {GUI} The GUI class (the main entry point). */
@@ -10530,4 +11383,10 @@
   }
 
   return Mim;
-})(typeof globalThis !== 'undefined' ? globalThis : typeof self !== 'undefined' ? self : this);
+})(
+  typeof globalThis !== "undefined"
+    ? globalThis
+    : typeof self !== "undefined"
+      ? self
+      : this,
+);

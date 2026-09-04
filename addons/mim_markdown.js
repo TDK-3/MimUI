@@ -44,7 +44,7 @@
  * gui.renderer.
  */
 (function (root) {
-  'use strict';
+  "use strict";
   const Mim = root.Mim;
   if (!Mim) return;
 
@@ -52,20 +52,43 @@
   function parseLine(line) {
     const runs = [];
     let i = 0;
-    let plain = '';
+    let plain = "";
     const flush = (style) => {
-      if (plain) { runs.push({ text: plain, style: style || 'plain' }); plain = ''; }
+      if (plain) {
+        runs.push({ text: plain, style: style || "plain" });
+        plain = "";
+      }
     };
     while (i < line.length) {
       const rest = line.slice(i);
       let m = rest.match(/^\*\*([^*]+)\*\*/);
-      if (m) { flush(); runs.push({ text: m[1], style: 'bold' }); i += m[0].length; continue; }
+      if (m) {
+        flush();
+        runs.push({ text: m[1], style: "bold" });
+        i += m[0].length;
+        continue;
+      }
       m = rest.match(/^\`([^\`]+)\`/);
-      if (m) { flush(); runs.push({ text: m[1], style: 'code' }); i += m[0].length; continue; }
+      if (m) {
+        flush();
+        runs.push({ text: m[1], style: "code" });
+        i += m[0].length;
+        continue;
+      }
       m = rest.match(/^\*([^*\s][^*]*)\*/); // *word* (word must not start with space)
-      if (m) { flush(); runs.push({ text: m[1], style: 'italic' }); i += m[0].length; continue; }
+      if (m) {
+        flush();
+        runs.push({ text: m[1], style: "italic" });
+        i += m[0].length;
+        continue;
+      }
       m = rest.match(/^_([^_\s][^_]*)_/);
-      if (m) { flush(); runs.push({ text: m[1], style: 'italic' }); i += m[0].length; continue; }
+      if (m) {
+        flush();
+        runs.push({ text: m[1], style: "italic" });
+        i += m[0].length;
+        continue;
+      }
       plain += line[i];
       i++;
     }
@@ -73,7 +96,7 @@
     return runs;
   }
 
-  Mim.registerAddon('markdown', function (gui, M) {
+  Mim.registerAddon("markdown", function (gui, M) {
     const r = gui.renderer;
 
     function col(name, a) {
@@ -97,12 +120,17 @@
         // font options per style (fontId lets a backend swap families)
         const foFor = (style) => {
           const f = Object.assign({}, fo);
-          const id = fonts[style === 'italic' ? 'italic' : style === 'bold' ? 'bold' : 'mono'];
+          const id =
+            fonts[
+              style === "italic" ? "italic" : style === "bold" ? "bold" : "mono"
+            ];
           if (id) f.fontId = id;
           return f;
         };
 
-        const src = String(text == null ? '' : text).replace(/\r\n?/g, '\n').split('\n');
+        const src = String(text == null ? "" : text)
+          .replace(/\r\n?/g, "\n")
+          .split("\n");
 
         /* ---- measure: wrap each line into visual rows ------------------
            Word-based greedy wrap. Runs are flattened into styled words;
@@ -117,12 +145,12 @@
               words.push({ text: p, style: run.style });
             }
           }
-          if (!words.length) return [[{ text: ' ', style: 'plain' }]];
+          if (!words.length) return [[{ text: " ", style: "plain" }]];
           const rows = [];
           let row = [];
-          let rowText = '';
+          let rowText = "";
           for (const word of words) {
-            const probe = rowText ? rowText + ' ' + word.text : word.text;
+            const probe = rowText ? rowText + " " + word.text : word.text;
             if (row.length && gui._measure(probe, foFor(word.style)).w > w) {
               rows.push(row);
               row = [word];
@@ -143,27 +171,45 @@
           totalH += rows.length * lineH;
           return { rows };
         });
-        totalH += (blocks.filter((b) => b.blank).length) * lineH * 0.5;
+        totalH += blocks.filter((b) => b.blank).length * lineH * 0.5;
 
         /* ---- draw ------------------------------------------------------ */
         let y = pos.y;
         for (const block of blocks) {
-          if (block.blank) { y += lineH * 0.5; continue; }
+          if (block.blank) {
+            y += lineH * 0.5;
+            continue;
+          }
           for (const row of block.rows) {
             let x = pos.x;
             row.forEach((piece, i) => {
               const f = foFor(piece.style);
-              if (i > 0) x += gui._measure(' ', f).w;
+              if (i > 0) x += gui._measure(" ", f).w;
               const tw = gui._measure(piece.text, f).w;
-              if (piece.style === 'code') {
-                r.fillRect(x - 2, y + 1, tw + 4, lineH - 2, col('childBg', 0.9));
-                r.strokeRoundedRect(x - 2, y + 1, tw + 4, lineH - 2, 3, col('border', 0.5), 1);
+              if (piece.style === "code") {
+                r.fillRect(
+                  x - 2,
+                  y + 1,
+                  tw + 4,
+                  lineH - 2,
+                  col("childBg", 0.9),
+                );
+                r.strokeRoundedRect(
+                  x - 2,
+                  y + 1,
+                  tw + 4,
+                  lineH - 2,
+                  3,
+                  col("border", 0.5),
+                  1,
+                );
               }
-              let c = col('text');
-              if (piece.style === 'italic') c = col('text', 0.72);
-              if (piece.style === 'code') c = col(opts.codeColor || 'text', 0.95);
+              let c = col("text");
+              if (piece.style === "italic") c = col("text", 0.72);
+              if (piece.style === "code")
+                c = col(opts.codeColor || "text", 0.95);
               gui._drawText(x, y, piece.text, c, f);
-              if (piece.style === 'bold' && !fonts.bold) {
+              if (piece.style === "bold" && !fonts.bold) {
                 // fake bold: a second pass offset by half a pixel
                 gui._drawText(x + 0.5, y, piece.text, c, f);
               }
@@ -173,8 +219,16 @@
           }
         }
         gui._advance(pos.x, pos.y, w, totalH);
-        return blocks.filter((b) => !b.blank).reduce((n, b) => n + b.rows.length, 0);
+        return blocks
+          .filter((b) => !b.blank)
+          .reduce((n, b) => n + b.rows.length, 0);
       },
     };
   });
-})(typeof globalThis !== 'undefined' ? globalThis : (typeof self !== 'undefined' ? self : this));
+})(
+  typeof globalThis !== "undefined"
+    ? globalThis
+    : typeof self !== "undefined"
+      ? self
+      : this,
+);

@@ -77,7 +77,7 @@
 (function (global) {
   'use strict';
 
-  const VERSION = '1.5.0';
+  const VERSION = '1.5.1';
 
   /* ------------------------------------------------------------------------
    * Small utilities
@@ -1629,13 +1629,14 @@
           claim = null; // the modal blocks windows drawn beneath it
 
         if (claim)
-          // visible-order rule: the band only claims the point when the
-          // claimed window is the TOPMOST window there — another window
-          // painted over the band owns the point (input must not travel
-          // through it to the band underneath). The app menu bar is drawn
-          // above all windows, so it owns its region too.
+          if (s.appBarGrab)
+            // visible-order rule: the band only claims the point when the
+            // claimed window is the TOPMOST window there — another window
+            // painted over the band owns the point (input must not travel
+            // through it to the band underneath). The app menu bar is drawn
+            // above all windows, so it owns its region too.
 
-          if (s.appBarGrab) claim = null;
+            claim = null;
           else {
             let topAt = null;
             for (let i = s.zOrder.length - 1; i >= 0; i--) {
