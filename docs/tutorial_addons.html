@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>mim 1.0.0: Writing an addon</title>
+<style>
+:root { color-scheme: light; }
+* { box-sizing: border-box; }
+body { margin:0; font: 14px/1.55 "Segoe UI", "Helvetica Neue", Helvetica, Arial, sans-serif; color:#222; background:#e6e6e6; }
+a { color:#1a4a7c; text-decoration:none; }
+a:hover { text-decoration:underline; }
+code, pre { font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace; }
+.nav { background:#2f4368; color:#fff; padding:0 18px; display:flex; flex-wrap:wrap; align-items:baseline; gap:2px 14px; }
+.nav .brand { font-weight:600; font-size:15px; padding:10px 0 2px; margin-right:10px; }
+.nav a { color:#cfd9ea; padding:10px 0 2px; font-size:13px; }
+.nav a:hover { color:#fff; text-decoration:underline; }
+.nav .sep { color:#8fa3c4; font-size:12px; }
+.wrap { max-width:1100px; margin:0 auto; padding:18px 14px 60px; }
+.card { background:#fff; border:1px solid #c8c8c8; border-radius:3px; padding:22px 28px 30px; box-shadow:0 1px 3px rgba(0,0,0,.08); }
+h1 { font-size:22px; color:#1a3a5c; margin:.2em 0 .6em; border-bottom:2px solid #1a4a7c; padding-bottom:6px; }
+h2 { font-size:17px; color:#1a4a7c; margin:1.4em 0 .5em; border-bottom:1px solid #d5dde8; padding-bottom:3px; }
+h3 { font-size:15px; color:#2f4368; margin:1.2em 0 .4em; }
+p { margin:.55em 0; }
+table { border-collapse:collapse; width:100%; margin:.7em 0 1em; }
+th, td { border:1px solid #c9d2de; padding:5px 9px; text-align:left; vertical-align:top; font-size:13px; }
+th { background:#eef1f5; }
+tr:nth-child(even) td { background:#f7f9fc; }
+.crumbs { font-size:12px; color:#555; margin-bottom:8px; }
+.crumbs b { color:#222; }
+.membrief { border:1px solid #c9d2de; margin:.8em 0 1.2em; }
+.membrief td { font-size:13px; }
+.membrief .sig { white-space:nowrap; }
+.membrief .sig b { font-family:Consolas,monospace; font-size:13px; }
+.memitem { border:1px solid #c9d2de; border-left:4px solid #1a4a7c; margin:0 0 1em; }
+.memname { background:#eef1f5; padding:6px 10px; font-family:Consolas,monospace; font-size:13px; border-bottom:1px solid #c9d2de; }
+.memname b { font-size:14px; }
+.memname .p { color:#555; }
+.memdoc { padding:8px 12px 10px; }
+.memdoc .ptype { color:#0b60b0; font-family:Consolas,monospace; font-size:12px; }
+table.params { width:auto; min-width:60%; }
+table.params .pt { color:#0b60b0; font-family:Consolas,monospace; font-size:12px; white-space:nowrap; }
+table.params .pn { font-family:Consolas,monospace; font-size:12px; white-space:nowrap; font-weight:600; }
+table.params .pd { }
+dl { margin:.4em 0; }
+dt { font-weight:600; color:#1a4a7c; font-size:13px; }
+dd { margin:0 0 .4em 1.4em; }
+pre { background:#f4f6f8; border:1px solid #d5dde8; padding:10px 12px; overflow-x:auto; font-size:12.5px; line-height:1.45; border-radius:2px; }
+.note { background:#fff8e6; border:1px solid #e3cf8b; border-radius:2px; padding:8px 12px; margin:.8em 0; font-size:13px; }
+.footer { max-width:1100px; margin:0 auto; padding:0 14px 30px; font-size:12px; color:#667; }
+.xref { color:#1a4a7c; }
+</style>
+</head>
+<body>
+<div class="nav"><span class="brand">mim 1.0.0</span><a href="index.html">Index</a><span class="sep">Classes:</span><a href="GUI.html">GUI</a><a href="Style.html">Style</a><span class="sep">Namespaces:</span><a href="Mim.html">Mim</a><a href="Mim_Color.html">Color</a><a href="gui_addons_plots.html">plots</a><a href="gui_addons_t3d.html">t3d</a><a href="gui_addons_tables.html">tables</a><a href="gui_addons_color.html">color</a><a href="gui_addons_notifs.html">notifs</a><a href="gui_addons_widgets.html">widgets</a><a href="gui_addons_markdown.html">markdown</a><span class="sep">Constants:</span><a href="Layers.html">Layers</a><a href="Key.html">Key</a><a href="MouseButton.html">MouseButton</a><a href="WindowFlags.html">WindowFlags</a><span class="sep">Tutorials:</span><a href="tutorial_backend.html">Writing a backend</a><a href="tutorial_addons.html" style="color:#fff;font-weight:600">Writing an addon</a></div><div class="wrap"><div class="card">
+<div class="crumbs"><a href="index.html">mim 1.0.0</a> &raquo; <b>Tutorials</b> &raquo; Addons</div><h1>Building an addon for Mim</h1>
+<h2 id="h_building_an_addon_for_mim">Building an addon for <a class="xref" href="Mim.html">Mim</a></h2>
+<p>An addon is a plain JavaScript file that teaches the <a class="xref" href="GUI.html">GUI</a> a new widget, plot, or table. It has no build step, no dependencies, no DOM. It calls <code>Mim.registerAddon(name, factory)</code> once, and every <a class="xref" href="GUI.html">GUI</a> instance grows a namespace <code>gui.addons.&lt;name&gt;</code> with your methods in it. That is the whole contract.</p>
+<p>If BACKEND.md is "how do I make <a class="xref" href="Mim.html">Mim</a> draw on my surface", this is "how do I make <a class="xref" href="Mim.html">Mim</a> draw things it does not know yet".</p>
+<h3 id="h_the_shape_of_an_addon">The shape of an addon</h3>
+<pre>// my_addon.js
+(function (Mim) {
+  Mim.registerAddon('myname', function (gui, M) {
+    // `gui` is the live GUI instance that will call your methods.
+    // `M` is the Mim namespace (M.Color, M.WindowFlags, ...).
+    // Return a plain object: its methods become your API.
+    return {
+      myWidget(label, value) {
+        // ...one frame of immediate-mode work...
+        return value;
+      },
+    };
+  });
+})(typeof globalThis !== 'undefined' ? globalThis.Mim : require('../mim.js'));
+</pre>
+<p>Three properties follow from that shape:</p>
+<p>offset, style and id scope are already in place when you start. You do not manage any of that.</p>
+<p>id-keyed widget <a class="xref" href="GUI.html#a_GUI_state">state</a> (<code>gui._state(...)</code>), so two windows that draw the same label get two independent widgets.</p>
+<p><code>gui.renderer</code>.</p>
+<ul><li>Your methods run inside the caller's window: the current clip, scroll</li><li>You hold no state of your own. Everything persistent goes into the</li><li>You work on any backend, because you only use the public API and</li></ul>
+<p>Load the file with a <code>&lt;script&gt;</code> tag (or <code>require</code> in Node) after <code>mim.js</code>. Existing instances pick the addon up with <code>gui.reloadAddons()</code>; new instances get it automatically, unless they were built with <code>{ addons: false }</code> or <code>{ addons: ['plots'] }</code>.</p>
+<h3 id="h_the_public_api_is_the_default">The public API is the default</h3>
+<p>For most addons you never need to touch an underscore method. A bar chart is layout (<code>gui._nextPos()</code>-free): measure, draw rectangles through <code>gui.renderer</code>, advance the layout with <code>gui._advance()</code>. The demos and the bundled addons show the pattern:</p>
+<pre>gui.renderer.fillRect(x, y, w, h, [88, 138, 240, 255]);
+gui.renderer.line(x, y, x2, y2, [255, 255, 255, 40], 1);
+</pre>
+<p>The calls are clipped to the current window, translated for scroll, and culled before they reach the backend. Draw in absolute screen coordinates (you get them from layout calls, not from <code>gui.renderer</code>).</p>
+<p>Two public helpers matter for any plot-shaped addon:</p>
+<p>width should follow it, so the widget rescales with the window.</p>
+<p>contract below.</p>
+<ul><li><code>gui.getRegionAvail()</code> -- the space left below/right of the cursor. Your</li><li><code>gui.plotHeight(opts, minH, extra)</code> -- resolves the shared sizing</li></ul>
+<h3 id="h_the_h_share_sizing_contract">The h / share sizing contract</h3>
+<p>Every plot in this repository accepts the same two options:</p>
+<p>among the n siblings in the same window (tracked per frame, so if a sibling disappears the rest grow).</p>
+<ul><li><code>h: px</code> -- explicit height (the legacy behavior).</li><li><code>share: n</code> -- take 1/n of the region's remaining height, split evenly</li><li>neither -- fill the remaining height.</li></ul>
+<p>The implementation is ~10 lines (see <code>shareHeight</code> in <code>addons/mim_plots.js</code> or <code>frame3D</code> in <code>addons/mim_3d.js</code>); copy it and your plot joins the family. Widths always follow the window either way.</p>
+<h3 id="h_the_documented_internal_surface">The documented internal surface</h3>
+<p>When you build a real widget (frame, label, hit testing, value), you reach for the documented underscore surface. These are stable by agreement -- they are listed in the <code>Mim.registerAddon</code> docs, and the bundled addons rely on all of them:</p>
+<pre>gui._id(label)
+    -&gt; { stateKey, itemId, instance }
+    Build the ids for a widget from a label. `stateKey` is scoped by
+    the id stack (window / child / group / popup context plus any
+    pushId), so identical labels in different contexts are different
+    widgets. `instance` is the duplicate counter within the current
+    scope: two visible widgets with the same label both work.
+
+gui._state(stateKey)
+    -&gt; a persistent object (plain, yours to fill)
+    The per-widget store, kept across frames. Its `lastFrame` is
+    updated for you, which is how the core garbage-collects state that
+    stopped being drawn.
+
+gui._nextPos()
+    -&gt; { x, y } (absolute screen coords)
+    Where the next item would go, honoring sameLine/indent/cursor.
+
+gui._advance(x, y, w, h)
+    Move the layout cursor past your widget. Call it exactly once per
+    widget with the rect you actually drew (or reserved).
+
+gui._item(x, y, w, h, itemId, opts)
+    -&gt; the item for this frame, or a recycled one
+    Registers your rect so hover/click/scroll/gating work. `it.visible`
+    tells you whether the core will draw for you (clip + scroll).
+
+gui._clickable(it)
+    -&gt; { active, pressed, released, clicked }
+    The whole press/drag/release lifecycle against the input, with
+    hover gating (a covered item is never clicked) and the pointer
+    cursor set for you. `clicked` is true on the press frame.
+
+gui._col(name, alphaMul)
+    -&gt; [r, g, b, a]
+    A palette color ('text', 'frameBg', 'border', ...), respecting the
+    active push/pop style stack and window style. `alphaMul` (0..1)
+    fades it.
+
+gui._var(name)   a style var ('fontSize', 'framePadding', ...)
+gui._fo()        -&gt; { fontSize, fontId } for the current text font
+gui._lineH()     the current line height (px)
+gui._measure(str, fo) -&gt; { w, h }   cached text metrics
+gui._drawText(x, y, str, color, fo) draw text with the standard font
+gui.beginChild(label, opts) / gui.endChild()   nested scrollable area
+gui.renderer        the live RendererProxy for your own drawing
+
+</pre>
+<h3 id="h_a_worked_widget_start_to_finish">A worked widget, start to finish</h3>
+<p>A grabber: a horizontal drag bar that returns its value. This is, almost verbatim, the <code>grabber</code> in <code>addons/mim_widgets.js</code> -- the same pattern as every slider and drag in the core.</p>
+<pre>grabber(label, value, opts) {
+  opts = opts || {};
+  const min = opts.min != null ? opts.min : 0;
+  const max = opts.max != null ? opts.max : 1;
+  if (max &lt;= min) max = min + 1;
+  const fo = gui._fo();
+  const pos = gui._nextPos();                  // where do I go?
+  const avail = gui.getRegionAvail();
+  const w = opts.w &gt; 0 ? opts.w : Math.max(80, avail.w);
+  const h = opts.h &gt; 0 ? opts.h : 18;
+  const s = gui.state;
+
+  const st = gui._state('##grab' + label);     // persistent per label
+  const v = clamp(value, min, max);            // the caller's suggestion
+  const t = (v - min) / (max - min);           // 0..1 along the track
+
+  const it = gui._item(pos.x, pos.y, w, h,
+    gui._id('##gr' + label).itemId, { focusable: false });
+  if (it.visible) {
+    r.fillRoundedRect(pos.x, pos.y + h / 2 - 3, w, 6, 3, col('childBg')); // track
+    if (t &gt; 0.004)
+      r.fillRoundedRect(pos.x, pos.y + h / 2 - 3, w * t, 6, 3, col('sliderGrab'));
+    r.fillRoundedRect(pos.x + w * t - 5, pos.y + 1, 10, h - 2, 3,
+      col(it.hovered ? 'headerActive' : 'sliderGrab'));                   // knob
+    // ...label on the right, measured first...
+  }
+
+  // Input. A fresh left click that nobody else owns:
+  const clicked = gui.isMouseClicked(0) &amp;&amp; s.activeId === 0 &amp;&amp; !s.drag
+    &amp;&amp; s.disabledCount === 0;
+  if (s.drag &amp;&amp; s.drag.type === 'grab' &amp;&amp; s.drag.st === st &amp;&amp; gui.isMouseDown(0)) {
+    // dragging: the mouse owns the value (px/pw = the press point and
+    // track width, st = this state object, so other grabbers ignore us)
+    st.v = min + clamp((s.mouse.x - s.drag.px) / s.drag.pw, 0, 1) * (max - min);
+    st._dragging = true;
+    gui._setCursor('ew-resize', 2);
+  } else if (clicked &amp;&amp; it.hovered) {
+    // press on the track: jump to the click position, then keep dragging
+    st.v = min + clamp((s.mouse.x - pos.x) / w, 0, 1) * (max - min);
+    st._dragging = true;
+    s.drag = { type: 'grab', st, px: pos.x, pw: w };
+    s.activeId = -1;                    // "I own the press now"
+  } else if (st._dragging) {
+    // release frame: the core already cleared s.drag at frame start,
+    // so this branch IS the release. Keep the dragged value.
+    st._dragging = false;
+  } else {
+    // idle: follow the value the caller passed in
+    st.v = v;
+  }
+  gui._advance(pos.x, pos.y, w, h);      // take the space
+  return st.v;
+}
+</pre>
+<p>Notes on what is going on:</p>
+<p>argument <code>value</code> is a suggestion, <code>st.v</code> is the truth, and you return the truth. The first frame seeds <code>st.v</code> from the argument; after that the user owns it.</p>
+<p>dragging now": the window-move logic steps aside while you drag, and the core clears <code>s.drag</code> on the release frame (before your widget runs). That is why the release is detected from your own <code>st._dragging</code> flag, not from the core: by the time your code runs on that frame, the core has already forgotten the drag.</p>
+<p>several instances of the same widget coexist: each only follows the drag it started.</p>
+<p>dance for you against a single item; widgets that need multi-instance or custom geometry (like the grabber) do it by hand with the pattern shown. For pure hover/draw work you do not need either -- just <code>it.visible</code> and <code>it.hovered</code>.</p>
+<ul><li>The value lives in <code>st</code>, not in your closure. Immediate mode: the</li><li><code>gui.state.drag = { type: 'grab', ... }</code> is the convention for "I am</li><li>Tagging your state object onto <code>s.drag</code> (<code>s.drag.st === st</code>) is how</li><li><code>gui._clickable(it)</code> (see the list above) does this press/drag/release</li></ul>
+<h3 id="h_state_and_its_one_trap">State, and its one trap</h3>
+<p><code>gui._state(stateKey)</code> hands you an object that survives frames and is garbage-collected when you stop drawing the widget. Fill it with anything plain (numbers, arrays, small objects). The one trap is feedback loops: if your widget's output feeds back into its input (a text field editing a string, a slider driving a quantized value), only re-derive internal formatting when the user actually changed something. Check <code>res.clicked</code> / <code>res.pressed</code> or compare against the last stored value -- do not re-parse your own output every frame, or rounding and formatting will fight each other and the value will jitter.</p>
+<h3 id="h_ids_and_labels">IDs and labels</h3>
+<p>The label you pass to <code>gui._id</code> becomes the widget's identity together with the current id scope:</p>
+<p>string: <code>gui._id('##grabVolume')</code>.</p>
+<p>tables) so row 3 of panel A and row 3 of panel B are different widgets.</p>
+<p>label legitimately appears twice in the same scope (two columns in a row), each gets its own ids automatically. You never have to fix it.</p>
+<ul><li>Use a visible label for widgets that show one: <code>gui._id('Volume')</code>.</li><li>Use a <code>##</code> suffix for the invisible part when a label is also a display</li><li>Wrap repeated regions in <code>gui.pushId(i)</code> / <code>gui.popId()</code> (lists,</li><li><code>instance</code> in the <code>_id</code> result is the duplicate counter: if the same</li></ul>
+<p>Two state-key styles are both in use here:</p>
+<p>different windows/children/ids is a different widget. Use this for widgets that may legitimately appear in more than one window.</p>
+<p>Shorter, and fine when the label is unique per app (all the bundled addons do this). The <code>##</code> prefix is a convention that keeps these keys away from visible labels.</p>
+<ul><li><code>gui._state(gui._id(label).stateKey)</code> -- scope-aware: the same label in</li><li><code>gui._state('##grab' + label)</code> -- a plain string, global to the app.</li></ul>
+<p>Pick one per widget and stay consistent; the danger is only mixing a scope-aware key and a string key for the same visual thing.</p>
+<h3 id="h_colors">Colors</h3>
+<p>Always 4-component arrays <code>[r, g, b, a]</code>, 0..255. The renderer proxy silently drops a draw call whose color has no alpha, so a missing fourth component is a "nothing appears" bug, not an error.</p>
+<p>follow themes, per-window style and push/pop stacks).</p>
+<p><code>M.Color.mix(c1, c2, t)</code> for ramps (heatmaps, progress bars).</p>
+<ul><li>Theme colors: <code>gui._col('frameBg')</code>, <code>gui._col('text')</code>, ... (these</li><li>Your own colors: <code>[88, 138, 240, 255]</code>, or <code>M.Color.hex('#588af0')</code>, or</li><li>Faded versions of a theme color: <code>gui._col('border', 0.4)</code>.</li></ul>
+<h3 id="h_testing_your_addon_headlessly">Testing your addon headlessly</h3>
+<p>Everything in <code>test/addons.js</code> runs in Node, no browser. The harness:</p>
+<p>(<code>this.calls.push([method, ...args])</code>),</p>
+<p>frames: hover, press, release, click, dragTo, and typed text,</p>
+<p><code>gui.state.widgetStates</code>.</p>
+<ul><li>a <code>Mock</code> renderer that records every draw call</li><li>an <code>Env</code> class that builds a <a class="xref" href="GUI.html">GUI</a> on the mock and lets you synthesize</li><li>assertions on (a) the recorded draw calls and (b) the widget state in</li></ul>
+<p>The shape of a test:</p>
+<pre>const e = new Env({ addons: true });
+e.frame(() =&gt; {
+  if (e.gui.beginWindow('T')) {
+    value = e.gui.addons.widgets.grabber('volume', value, { min: 0, max: 1 });
+    e.gui.endWindow();
+  }
+});
+// frame 1: find where the track was drawn (a fillRect in the log),
+// press inside it, frame, drag, frame, release, frame.
+// assert on `value` and on st._dragging in gui.state.widgetStates.
+</pre>
+<p>Two conventions the tests rely on, so keep them: draw your chrome with distinct colors (the tests find your widget by its rectangles), and keep your state keys stable (the tests read them out of <code>gui.state.widgetStates</code>). The mock records calls across frames, so clear the log between the frames you assert on if you need to.</p>
+<p>Run <code>node test/addons.js</code> after a change; 88 checks in about a second.</p>
+<h3 id="h_checklist">Checklist</h3>
+<ol><li>Self-contained file, no imports, no globals but the <code><a class="xref" href="Mim.html">Mim</a></code> hook.</li><li><code>Mim.registerAddon(name, factory)</code> returning a plain object.</li><li>Identity through <code>gui._id</code> + <code>gui._state</code> (never the raw label).</li><li>One <code>gui._item</code> + <code>gui._clickable</code> + <code>gui._advance</code> per widget.</li><li>Colors always 4-component; theme colors through <code>gui._col</code>.</li><li>Value in state, suggestion in the argument, truth in the return.</li><li>A headless test that presses it and asserts the state changed.</li></ol>
+<p>Do those seven things and your addon behaves like one of the bundled ones on every backend, in every window, at any size.</p>
+<h3 id="h_where_to_look">Where to look</h3>
+<p>hex editing, a checkerboard, all on the internal surface.</p>
+<p>(bezier), and the hover-to-nearest-sample pattern (series).</p>
+<p>"state outlives re-sorting" pattern.</p>
+<p>on.</p>
+<ul><li><code>addons/mim_color.js</code> -- the richest example: pad + hue + alpha drags,</li><li><code>addons/mim_plots.js</code> -- the h/share sizing, normalized-point persistence</li><li><code>addons/mim_tables.js</code> -- sorting, selection-by-id, filtering, and the</li><li><code>test/addons.js</code> -- the <code>Env</code>/<code>Mock</code> harness, ready to copy.</li><li>BACKEND.md -- the other side of the fence: what your drawing calls land</li></ul>
+</div></div>
+<div class="footer">mim 1.0.0 -- API reference generated from the JSDoc in mim.js and addons/*.js (jsdoc 4 + tools/make-docs.js). Tutorials: BACKEND.md, ADDONS.md.</div>
+</body>
+</html>

@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>mim 1.0.0: gui.addons.notifs Reference</title>
+<style>
+:root { color-scheme: light; }
+* { box-sizing: border-box; }
+body { margin:0; font: 14px/1.55 "Segoe UI", "Helvetica Neue", Helvetica, Arial, sans-serif; color:#222; background:#e6e6e6; }
+a { color:#1a4a7c; text-decoration:none; }
+a:hover { text-decoration:underline; }
+code, pre { font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace; }
+.nav { background:#2f4368; color:#fff; padding:0 18px; display:flex; flex-wrap:wrap; align-items:baseline; gap:2px 14px; }
+.nav .brand { font-weight:600; font-size:15px; padding:10px 0 2px; margin-right:10px; }
+.nav a { color:#cfd9ea; padding:10px 0 2px; font-size:13px; }
+.nav a:hover { color:#fff; text-decoration:underline; }
+.nav .sep { color:#8fa3c4; font-size:12px; }
+.wrap { max-width:1100px; margin:0 auto; padding:18px 14px 60px; }
+.card { background:#fff; border:1px solid #c8c8c8; border-radius:3px; padding:22px 28px 30px; box-shadow:0 1px 3px rgba(0,0,0,.08); }
+h1 { font-size:22px; color:#1a3a5c; margin:.2em 0 .6em; border-bottom:2px solid #1a4a7c; padding-bottom:6px; }
+h2 { font-size:17px; color:#1a4a7c; margin:1.4em 0 .5em; border-bottom:1px solid #d5dde8; padding-bottom:3px; }
+h3 { font-size:15px; color:#2f4368; margin:1.2em 0 .4em; }
+p { margin:.55em 0; }
+table { border-collapse:collapse; width:100%; margin:.7em 0 1em; }
+th, td { border:1px solid #c9d2de; padding:5px 9px; text-align:left; vertical-align:top; font-size:13px; }
+th { background:#eef1f5; }
+tr:nth-child(even) td { background:#f7f9fc; }
+.crumbs { font-size:12px; color:#555; margin-bottom:8px; }
+.crumbs b { color:#222; }
+.membrief { border:1px solid #c9d2de; margin:.8em 0 1.2em; }
+.membrief td { font-size:13px; }
+.membrief .sig { white-space:nowrap; }
+.membrief .sig b { font-family:Consolas,monospace; font-size:13px; }
+.memitem { border:1px solid #c9d2de; border-left:4px solid #1a4a7c; margin:0 0 1em; }
+.memname { background:#eef1f5; padding:6px 10px; font-family:Consolas,monospace; font-size:13px; border-bottom:1px solid #c9d2de; }
+.memname b { font-size:14px; }
+.memname .p { color:#555; }
+.memdoc { padding:8px 12px 10px; }
+.memdoc .ptype { color:#0b60b0; font-family:Consolas,monospace; font-size:12px; }
+table.params { width:auto; min-width:60%; }
+table.params .pt { color:#0b60b0; font-family:Consolas,monospace; font-size:12px; white-space:nowrap; }
+table.params .pn { font-family:Consolas,monospace; font-size:12px; white-space:nowrap; font-weight:600; }
+table.params .pd { }
+dl { margin:.4em 0; }
+dt { font-weight:600; color:#1a4a7c; font-size:13px; }
+dd { margin:0 0 .4em 1.4em; }
+pre { background:#f4f6f8; border:1px solid #d5dde8; padding:10px 12px; overflow-x:auto; font-size:12.5px; line-height:1.45; border-radius:2px; }
+.note { background:#fff8e6; border:1px solid #e3cf8b; border-radius:2px; padding:8px 12px; margin:.8em 0; font-size:13px; }
+.footer { max-width:1100px; margin:0 auto; padding:0 14px 30px; font-size:12px; color:#667; }
+.xref { color:#1a4a7c; }
+</style>
+</head>
+<body>
+<div class="nav"><span class="brand">mim 1.0.0</span><a href="index.html">Index</a><span class="sep">Classes:</span><a href="GUI.html">GUI</a><a href="Style.html">Style</a><span class="sep">Namespaces:</span><a href="Mim.html">Mim</a><a href="Mim_Color.html">Color</a><a href="gui_addons_plots.html">plots</a><a href="gui_addons_t3d.html">t3d</a><a href="gui_addons_tables.html">tables</a><a href="gui_addons_color.html">color</a><a href="gui_addons_notifs.html" style="color:#fff;font-weight:600">notifs</a><a href="gui_addons_widgets.html">widgets</a><a href="gui_addons_markdown.html">markdown</a><span class="sep">Constants:</span><a href="Layers.html">Layers</a><a href="Key.html">Key</a><a href="MouseButton.html">MouseButton</a><a href="WindowFlags.html">WindowFlags</a><span class="sep">Tutorials:</span><a href="tutorial_backend.html">Writing a backend</a><a href="tutorial_addons.html">Writing an addon</a></div><div class="wrap"><div class="card">
+<div class="crumbs"><a href="index.html">mim 1.0.0</a> &raquo; <b>gui.addons.notifs</b></div><h1>Namespace gui.addons.notifs</h1><p>Toast notifications: a top-right stack with fade in/out, type-colored (info / success / error) and a time-to-live. Queue with toast(), then draw() once per frame from the Foreground layer: gui.layer(Mim.Layers.Foreground, function () { notifs.draw(); })</p><h2>Functions</h2>
+<table class="membrief"><tr><td class="sig"><a href="#a_gui_addons_notifs_count"><b>count()</b></a></td><td>The number of toasts currently in the queue.</td></tr><tr><td class="sig"><a href="#a_gui_addons_notifs_draw"><b>draw(opts)</b></a></td><td>Draws the queue (call once per frame, from the Foreground layer).</td></tr><tr><td class="sig"><a href="#a_gui_addons_notifs_toast"><b>toast(msg, opts, opts.type, opts.ttl)</b></a></td><td>Queue a toast; returns its index.</td></tr></table><div class="memitem" id="a_gui_addons_notifs_count">
+<div class="memname"><b>count</b> <span class="p">(</span><span class="p">)</span></div>
+<div class="memdoc"><p>The number of toasts currently in the queue.</p><dl><dt>Returns</dt><dd><span class="ptype">number</span> </dd></dl></div>
+</div>
+<div class="memitem" id="a_gui_addons_notifs_draw">
+<div class="memname"><b>draw</b> <span class="p">(</span><span class="ptype">Object</span> <code>[opts]</code><span class="p">)</span></div>
+<div class="memdoc"><p>Draws the queue (call once per frame, from the Foreground layer).</p><table class="params"><tr><th colspan="3">Parameters:</th></tr><tr><td class="pt">Object</td><td class="pn">opts <i>(optional)</i></td><td class="pd">{ w (default 260) }</td></tr></table></div>
+</div>
+<div class="memitem" id="a_gui_addons_notifs_toast">
+<div class="memname"><b>toast</b> <span class="p">(</span><span class="ptype">string</span> <code>msg</code>, <span class="ptype">Object</span> <code>[opts]</code>, <span class="ptype">string</span> <code>[opts.type]</code>, <span class="ptype">number</span> <code>[opts.ttl]</code><span class="p">)</span></div>
+<div class="memdoc"><p>Queue a toast; returns its index. The queue is capped (oldest dropped).</p><table class="params"><tr><th colspan="3">Parameters:</th></tr><tr><td class="pt">string</td><td class="pn">msg</td><td class="pd"></td></tr><tr><td class="pt">Object</td><td class="pn">opts <i>(optional)</i></td><td class="pd"></td></tr><tr><td class="pt">string</td><td class="pn">opts.type <i>(optional)</i></td><td class="pd">'info' (default) | 'success' | 'error'</td></tr><tr><td class="pt">number</td><td class="pn">opts.ttl <i>(optional)</i></td><td class="pd">lifetime in seconds (default 2.5)</td></tr></table><dl><dt>Returns</dt><dd><span class="ptype">number</span> the toast's index in the queue</dd></dl></div>
+</div>
+<div class="note">Provided by <code>addons/mim_notifications.js</code> -- load it after mim.js. See the <a href="tutorial_addons.html">addon tutorial</a> for how these are built.</div>
+</div></div>
+<div class="footer">mim 1.0.0 -- API reference generated from the JSDoc in mim.js and addons/*.js (jsdoc 4 + tools/make-docs.js). Tutorials: BACKEND.md, ADDONS.md.</div>
+</body>
+</html>

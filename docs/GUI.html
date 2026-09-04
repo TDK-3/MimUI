@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>mim 1.0.0: GUI Class Reference</title>
+<style>
+:root { color-scheme: light; }
+* { box-sizing: border-box; }
+body { margin:0; font: 14px/1.55 "Segoe UI", "Helvetica Neue", Helvetica, Arial, sans-serif; color:#222; background:#e6e6e6; }
+a { color:#1a4a7c; text-decoration:none; }
+a:hover { text-decoration:underline; }
+code, pre { font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace; }
+.nav { background:#2f4368; color:#fff; padding:0 18px; display:flex; flex-wrap:wrap; align-items:baseline; gap:2px 14px; }
+.nav .brand { font-weight:600; font-size:15px; padding:10px 0 2px; margin-right:10px; }
+.nav a { color:#cfd9ea; padding:10px 0 2px; font-size:13px; }
+.nav a:hover { color:#fff; text-decoration:underline; }
+.nav .sep { color:#8fa3c4; font-size:12px; }
+.wrap { max-width:1100px; margin:0 auto; padding:18px 14px 60px; }
+.card { background:#fff; border:1px solid #c8c8c8; border-radius:3px; padding:22px 28px 30px; box-shadow:0 1px 3px rgba(0,0,0,.08); }
+h1 { font-size:22px; color:#1a3a5c; margin:.2em 0 .6em; border-bottom:2px solid #1a4a7c; padding-bottom:6px; }
+h2 { font-size:17px; color:#1a4a7c; margin:1.4em 0 .5em; border-bottom:1px solid #d5dde8; padding-bottom:3px; }
+h3 { font-size:15px; color:#2f4368; margin:1.2em 0 .4em; }
+p { margin:.55em 0; }
+table { border-collapse:collapse; width:100%; margin:.7em 0 1em; }
+th, td { border:1px solid #c9d2de; padding:5px 9px; text-align:left; vertical-align:top; font-size:13px; }
+th { background:#eef1f5; }
+tr:nth-child(even) td { background:#f7f9fc; }
+.crumbs { font-size:12px; color:#555; margin-bottom:8px; }
+.crumbs b { color:#222; }
+.membrief { border:1px solid #c9d2de; margin:.8em 0 1.2em; }
+.membrief td { font-size:13px; }
+.membrief .sig { white-space:nowrap; }
+.membrief .sig b { font-family:Consolas,monospace; font-size:13px; }
+.memitem { border:1px solid #c9d2de; border-left:4px solid #1a4a7c; margin:0 0 1em; }
+.memname { background:#eef1f5; padding:6px 10px; font-family:Consolas,monospace; font-size:13px; border-bottom:1px solid #c9d2de; }
+.memname b { font-size:14px; }
+.memname .p { color:#555; }
+.memdoc { padding:8px 12px 10px; }
+.memdoc .ptype { color:#0b60b0; font-family:Consolas,monospace; font-size:12px; }
+table.params { width:auto; min-width:60%; }
+table.params .pt { color:#0b60b0; font-family:Consolas,monospace; font-size:12px; white-space:nowrap; }
+table.params .pn { font-family:Consolas,monospace; font-size:12px; white-space:nowrap; font-weight:600; }
+table.params .pd { }
+dl { margin:.4em 0; }
+dt { font-weight:600; color:#1a4a7c; font-size:13px; }
+dd { margin:0 0 .4em 1.4em; }
+pre { background:#f4f6f8; border:1px solid #d5dde8; padding:10px 12px; overflow-x:auto; font-size:12.5px; line-height:1.45; border-radius:2px; }
+.note { background:#fff8e6; border:1px solid #e3cf8b; border-radius:2px; padding:8px 12px; margin:.8em 0; font-size:13px; }
+.footer { max-width:1100px; margin:0 auto; padding:0 14px 30px; font-size:12px; color:#667; }
+.xref { color:#1a4a7c; }
+</style>
+</head>
+<body>
+<div class="nav"><span class="brand">mim 1.0.0</span><a href="index.html">Index</a><span class="sep">Classes:</span><a href="GUI.html" style="color:#fff;font-weight:600">GUI</a><a href="Style.html">Style</a><span class="sep">Namespaces:</span><a href="Mim.html">Mim</a><a href="Mim_Color.html">Color</a><a href="gui_addons_plots.html">plots</a><a href="gui_addons_t3d.html">t3d</a><a href="gui_addons_tables.html">tables</a><a href="gui_addons_color.html">color</a><a href="gui_addons_notifs.html">notifs</a><a href="gui_addons_widgets.html">widgets</a><a href="gui_addons_markdown.html">markdown</a><span class="sep">Constants:</span><a href="Layers.html">Layers</a><a href="Key.html">Key</a><a href="MouseButton.html">MouseButton</a><a href="WindowFlags.html">WindowFlags</a><span class="sep">Tutorials:</span><a href="tutorial_backend.html">Writing a backend</a><a href="tutorial_addons.html">Writing an addon</a></div><div class="wrap"><div class="card">
+<div class="crumbs"><a href="index.html">mim 1.0.0</a> &raquo; <b>GUI</b></div><h1>Class GUI</h1><p>The immediate-mode GUI. One instance per app; it owns the window/widget state, the style, the flags, the renderer proxy and the addons.</p><p>A frame is: <code>beginFrame(input)</code> &rarr; <code>beginWindow</code> / widgets / <code>endWindow</code> (repeat) &rarr; <code>endFrame()</code>. See the README &ldquo;Quick start&rdquo; section for a full example.</p><h2>Constructor</h2>
+<div class="memitem" id="a_GUI_constructor">
+<div class="memname"><b>GUI</b> <span class="p">(</span><span class="ptype">Object</span> <code>renderer</code>, <span class="ptype">Object</span> <code>[options]</code>, <span class="ptype">Object</span> <code>[options.style]</code>, <span class="ptype">Object</span> <code>[options.flags]</code>, <span class="ptype">Object</span> <code>[options.clipboard]</code>, <span class="ptype">boolean</span> <code>[options.addons]</code>, <span class="ptype">boolean</span> <code>[options.debugOverlay]</code><span class="p">)</span></div>
+<div class="memdoc"><p>Creates a <a class="xref" href="GUI.html">GUI</a> instance.</p><table class="params"><tr><th colspan="3">Parameters:</th></tr><tr><td class="pt">Object</td><td class="pn">renderer</td><td class="pd">the backend renderer object -- see the &amp;ldquo;Implementing a backend&amp;rdquo; README section and the backend tutorial for the full contract</td></tr><tr><td class="pt">Object</td><td class="pn">options <i>(optional)</i></td><td class="pd">construction options (see below)</td></tr><tr><td class="pt">Object</td><td class="pn">options.style <i>(optional)</i></td><td class="pd">partial style ({ theme, colors, vars, font })</td></tr><tr><td class="pt">Object</td><td class="pn">options.flags <i>(optional)</i></td><td class="pd">behavior flags -- every key of gui.flags is toggleable, at construction time or later at runtime</td></tr><tr><td class="pt">Object</td><td class="pn">options.clipboard <i>(optional)</i></td><td class="pd">{ read: () =&gt; string, write: (text) =&gt; void }</td></tr><tr><td class="pt">boolean</td><td class="pn">options.addons <i>(optional)</i></td><td class="pd">which addons to attach: all registered addons (default), false for none, or a list of names</td></tr><tr><td class="pt">boolean</td><td class="pn">options.debugOverlay <i>(optional)</i></td><td class="pd">draw the debug overlay in endFrame</td></tr></table></div>
+</div>
+<h2>Public Member Functions</h2>
+<table class="membrief"><tr><td class="sig"><a href="#a_GUI_activateMenu"><b>activateMenu(path)</b></a></td><td>Triggers an app-menu item programmatically, by path: e.</td></tr><tr><td class="sig"><a href="#a_GUI_beginChild"><b>beginChild(label, opts)</b></a></td><td>Starts a scrollable child region inside the current window (its own clip, scroll and id scope).</td></tr><tr><td class="sig"><a href="#a_GUI_beginDisabled"><b>beginDisabled()</b></a></td><td>Starts a disabled region: everything inside is drawn greyed out and ignores input.</td></tr><tr><td class="sig"><a href="#a_GUI_beginFrame"><b>beginFrame(input)</b></a></td><td>Starts a <a class="xref" href="GUI.html">GUI</a> frame. Call once per frame, before any widgets: it routes wheel scrolling, updates focus/keyboard...</td></tr><tr><td class="sig"><a href="#a_GUI_beginGroup"><b>beginGroup()</b></a></td><td>Starts a group: layout runs from a local origin so the elements that follow can be treated as one item (<a class="xref" href="GUI.html#a_GUI_lastItemRect">lastItemRect</a>(), .</td></tr><tr><td class="sig"><a href="#a_GUI_beginMenu"><b>beginMenu(label)</b></a></td><td>Opens a menu inside the current window menu bar.</td></tr><tr><td class="sig"><a href="#a_GUI_beginMenuBar"><b>beginMenuBar()</b></a></td><td>Begins a window menu bar (a row of menus in the title area).</td></tr><tr><td class="sig"><a href="#a_GUI_beginPopup"><b>beginPopup(id)</b></a></td><td>Begins drawing the contents of an open popup.</td></tr><tr><td class="sig"><a href="#a_GUI_beginPopupContextItem"><b>beginPopupContextItem(id)</b></a></td><td>Opens a context popup on right-click of the last item.</td></tr><tr><td class="sig"><a href="#a_GUI_beginPopupContextWindow"><b>beginPopupContextWindow(id)</b></a></td><td>Opens a context popup on right-click of the current window (or of the hovered item when no window is open).</td></tr><tr><td class="sig"><a href="#a_GUI_beginTabBar"><b>beginTabBar(id)</b></a></td><td>Begins a tab bar; the following <a class="xref" href="GUI.html#a_GUI_beginTabItem">beginTabItem</a>() calls fill it.</td></tr><tr><td class="sig"><a href="#a_GUI_beginTabItem"><b>beginTabItem(label, opts)</b></a></td><td>Begins a tab item inside the current tab bar.</td></tr><tr><td class="sig"><a href="#a_GUI_beginTable"><b>beginTable(label, cols, opts)</b></a></td><td>Begins a table with cols columns.</td></tr><tr><td class="sig"><a href="#a_GUI_beginTooltip"><b>beginTooltip()</b></a></td><td>Begins a rich tooltip (widgets allowed inside); drawn after flags.</td></tr><tr><td class="sig"><a href="#a_GUI_beginWindow"><b>beginWindow(title, opts)</b></a></td><td>Opens (or re-enters) a window; draw its contents and call <a class="xref" href="GUI.html#a_GUI_endWindow">endWindow</a>() in the same frame.</td></tr><tr><td class="sig"><a href="#a_GUI_button"><b>button(label, opts)</b></a></td><td>A push button; returns true on the frame it is clicked.</td></tr><tr><td class="sig"><a href="#a_GUI_changed"><b>changed()</b></a></td><td>Shortcut for <a class="xref" href="GUI.html#a_GUI_lastItemChanged">lastItemChanged</a>().</td></tr><tr><td class="sig"><a href="#a_GUI_checkbox"><b>checkbox(label, value)</b></a></td><td>A checkbox with a label.</td></tr><tr><td class="sig"><a href="#a_GUI_clearAppMenuBar"><b>clearAppMenuBar()</b></a></td><td>Removes the app menu bar set with <a class="xref" href="GUI.html#a_GUI_setAppMenuBar">setAppMenuBar</a>().</td></tr><tr><td class="sig"><a href="#a_GUI_closePopup"><b>closePopup(id)</b></a></td><td>Closes the popup with the given id (no-op when it is not open).</td></tr><tr><td class="sig"><a href="#a_GUI_collapsingHeader"><b>collapsingHeader(label, opts)</b></a></td><td>A collapsible section header (chevron + label); clicking toggles its open state.</td></tr><tr><td class="sig"><a href="#a_GUI_combo"><b>combo(label, value, items, opts)</b></a></td><td>A dropdown list: clicking opens a popup of the items; the selected row is shown on the button.</td></tr><tr><td class="sig"><a href="#a_GUI_dock"><b>dock(opts)</b></a></td><td>Joins windows a and b into a single dock: one frame, two panes, a draggable split divider and a shared title bar.</td></tr><tr><td class="sig"><a href="#a_GUI_dockToEdge"><b>dockToEdge()</b></a></td><td>&amp;nbsp;</td></tr><tr><td class="sig"><a href="#a_GUI_dragFloat"><b>dragFloat(label, value, speed, vmin, vmax)</b></a></td><td>A float drag: while held, the value changes by speed per pixel of mouse movement.</td></tr><tr><td class="sig"><a href="#a_GUI_dragInt"><b>dragInt(label, value, speed, vmin, vmax)</b></a></td><td>An integer drag (a dragFloat with rounded results).</td></tr><tr><td class="sig"><a href="#a_GUI_dummy"><b>dummy(w, h)</b></a></td><td>Reserves an empty w x h rect at the cursor (layout only, nothing is drawn).</td></tr><tr><td class="sig"><a href="#a_GUI_endChild"><b>endChild()</b></a></td><td>Ends the child region started with <a class="xref" href="GUI.html#a_GUI_beginChild">beginChild</a>().</td></tr><tr><td class="sig"><a href="#a_GUI_endDisabled"><b>endDisabled()</b></a></td><td>Ends a disabled region started with <a class="xref" href="GUI.html#a_GUI_beginDisabled">beginDisabled</a>().</td></tr><tr><td class="sig"><a href="#a_GUI_endFrame"><b>endFrame()</b></a></td><td>Ends the frame: draws popups, tooltips and the debug overlay, then compacts per-frame state.</td></tr><tr><td class="sig"><a href="#a_GUI_endGroup"><b>endGroup()</b></a></td><td>Ends the current group.</td></tr><tr><td class="sig"><a href="#a_GUI_endMenu"><b>endMenu()</b></a></td><td>Closes the menu started with <a class="xref" href="GUI.html#a_GUI_beginMenu">beginMenu</a>().</td></tr><tr><td class="sig"><a href="#a_GUI_endMenuBar"><b>endMenuBar()</b></a></td><td>Ends the window menu bar started with <a class="xref" href="GUI.html#a_GUI_beginMenuBar">beginMenuBar</a>().</td></tr><tr><td class="sig"><a href="#a_GUI_endPopup"><b>endPopup()</b></a></td><td>Ends the popup contents started with <a class="xref" href="GUI.html#a_GUI_beginPopup">beginPopup</a>().</td></tr><tr><td class="sig"><a href="#a_GUI_endTabBar"><b>endTabBar()</b></a></td><td>Ends the tab bar started with <a class="xref" href="GUI.html#a_GUI_beginTabBar">beginTabBar</a>().</td></tr><tr><td class="sig"><a href="#a_GUI_endTabItem"><b>endTabItem()</b></a></td><td>Ends the tab item started with <a class="xref" href="GUI.html#a_GUI_beginTabItem">beginTabItem</a>().</td></tr><tr><td class="sig"><a href="#a_GUI_endTable"><b>endTable()</b></a></td><td>Ends the table started with <a class="xref" href="GUI.html#a_GUI_beginTable">beginTable</a>().</td></tr><tr><td class="sig"><a href="#a_GUI_endTooltip"><b>endTooltip()</b></a></td><td>Ends the tooltip started with <a class="xref" href="GUI.html#a_GUI_beginTooltip">beginTooltip</a>().</td></tr><tr><td class="sig"><a href="#a_GUI_endWindow"><b>endWindow()</b></a></td><td>Closes the window opened by beginWindow: draws the frame, shadow, scrollbars and title bar.</td></tr><tr><td class="sig"><a href="#a_GUI_getCursorPos"><b>getCursorPos()</b></a></td><td>The layout cursor position, relative to the current window/child origin.</td></tr><tr><td class="sig"><a href="#a_GUI_getCursorScreenPos"><b>getCursorScreenPos()</b></a></td><td>The layout cursor position in absolute screen coordinates.</td></tr><tr><td class="sig"><a href="#a_GUI_getDocks"><b>getDocks()</b></a></td><td>All active docks, as plain objects.</td></tr><tr><td class="sig"><a href="#a_GUI_getRegionAvail"><b>getRegionAvail()</b></a></td><td>The remaining space right/below the cursor in the current region.</td></tr><tr><td class="sig"><a href="#a_GUI_getWindow"><b>getWindow(title)</b></a></td><td>The internal window object for the title (position, size, open state), or null when the window does not exist.</td></tr><tr><td class="sig"><a href="#a_GUI_image"><b>image(imageId, w, h, opts)</b></a></td><td>Draws an <a class="xref" href="GUI.html#a_GUI_image">image</a> (the backend resolves imageId via its drawImage method).</td></tr><tr><td class="sig"><a href="#a_GUI_indent"><b>indent(amount)</b></a></td><td>Increases the layout indent by amount px (default: the 'indentSpacing' style var); pair with <a class="xref" href="GUI.html#a_GUI_unindent">unindent</a>().</td></tr><tr><td class="sig"><a href="#a_GUI_inputFloat"><b>inputFloat(label, value, opts)</b></a></td><td>An editable float field (same editing as inputInt).</td></tr><tr><td class="sig"><a href="#a_GUI_inputInt"><b>inputInt(label, value, opts)</b></a></td><td>An editable integer field: typing, arrow steps (step / stepFast), select-all, undo/redo and right-click numeric entry.</td></tr><tr><td class="sig"><a href="#a_GUI_inputText"><b>inputText(label, value, opts)</b></a></td><td>A full-featured text field: caret, selection, copy/paste (via the clipboard callbacks), select-all, undo/redo, arrow keys, Home/End and word delete.</td></tr><tr><td class="sig"><a href="#a_GUI_isDockCollapsed"><b>isDockCollapsed(a, b)</b></a></td><td>True when the dock of a and b is collapsed to just its title bar.</td></tr><tr><td class="sig"><a href="#a_GUI_isDocked"><b>isDocked(a, b)</b></a></td><td>True when a and b are currently members of the same dock.</td></tr><tr><td class="sig"><a href="#a_GUI_isKeyDown"><b>isKeyDown(k)</b></a></td><td>True while key token k is held.</td></tr><tr><td class="sig"><a href="#a_GUI_isKeyPressed"><b>isKeyPressed(k)</b></a></td><td>True on the frame key k was pressed.</td></tr><tr><td class="sig"><a href="#a_GUI_isKeyReleased"><b>isKeyReleased(k)</b></a></td><td>True on the frame key k was released.</td></tr><tr><td class="sig"><a href="#a_GUI_isMouseClicked"><b>isMouseClicked(b)</b></a></td><td>True on the frame mouse button b was pressed.</td></tr><tr><td class="sig"><a href="#a_GUI_isMouseDoubleClicked"><b>isMouseDoubleClicked(b)</b></a></td><td>True on the frame mouse button b was double-clicked (two presses within the double-click interval).</td></tr><tr><td class="sig"><a href="#a_GUI_isMouseDown"><b>isMouseDown(b)</b></a></td><td>True while mouse button b (0 left, 1 right, 2 middle, 3 back, 4 forward) is held down.</td></tr><tr><td class="sig"><a href="#a_GUI_isMouseReleased"><b>isMouseReleased(b)</b></a></td><td>True on the frame mouse button b was released.</td></tr><tr><td class="sig"><a href="#a_GUI_isPopupOpen"><b>isPopupOpen(id)</b></a></td><td>True when the popup with the given id is open.</td></tr><tr><td class="sig"><a href="#a_GUI_isWindowOpen"><b>isWindowOpen(title)</b></a></td><td>True when the window is open.</td></tr><tr><td class="sig"><a href="#a_GUI_lastItem"><b>lastItem()</b></a></td><td>The last item registered this frame (an internal item object, or null if none).</td></tr><tr><td class="sig"><a href="#a_GUI_lastItemActive"><b>lastItemActive()</b></a></td><td>True if the last item is active (pressed or being dragged).</td></tr><tr><td class="sig"><a href="#a_GUI_lastItemChanged"><b>lastItemChanged()</b></a></td><td>True if the last item's value changed this frame.</td></tr><tr><td class="sig"><a href="#a_GUI_lastItemClicked"><b>lastItemClicked()</b></a></td><td>True if the last item was clicked this frame.</td></tr><tr><td class="sig"><a href="#a_GUI_lastItemHovered"><b>lastItemHovered()</b></a></td><td>True if the last item is hovered (and reachable by the cursor).</td></tr><tr><td class="sig"><a href="#a_GUI_lastItemRect"><b>lastItemRect()</b></a></td><td>The screen rect of the last item, or null.</td></tr><tr><td class="sig"><a href="#a_GUI_layer"><b>layer()</b></a></td><td>Runs fn with the renderer switched to the given <a class="xref" href="GUI.html#a_GUI_layer">layer</a> ('background', 'gui', or 'foreground'), then restores the previous layer.</td></tr><tr><td class="sig"><a href="#a_GUI_listBox"><b>listBox(label, value, items, opts)</b></a></td><td>A selectable list box: a bordered, scrollable list of rows where the user picks exactly one entry.</td></tr><tr><td class="sig"><a href="#a_GUI_menuItem"><b>menuItem(label, shortcut, opts)</b></a></td><td>A menu row with an optional shortcut label.</td></tr><tr><td class="sig"><a href="#a_GUI_mouseDelta"><b>mouseDelta()</b></a></td><td>The cursor movement since the previous frame.</td></tr><tr><td class="sig"><a href="#a_GUI_mousePos"><b>mousePos()</b></a></td><td>The current cursor position in screen coordinates.</td></tr><tr><td class="sig"><a href="#a_GUI_openPopup"><b>openPopup(id, anchor, opts)</b></a></td><td>Opens a popup anchored near (x, y).</td></tr><tr><td class="sig"><a href="#a_GUI_plotHeight"><b>plotHeight(opts, minH, extra)</b></a></td><td>Computes the height (px) a plot with these opts should take, using the same h/share rules as <a class="xref" href="GUI.html#a_GUI_plotLines">plotLines</a>() and the plot addons.</td></tr><tr><td class="sig"><a href="#a_GUI_plotLines"><b>plotLines(label, values, opts)</b></a></td><td>A mini line chart of the given values.</td></tr><tr><td class="sig"><a href="#a_GUI_popId"><b>popId(count)</b></a></td><td>Pops n (default 1) id scopes pushed with <a class="xref" href="GUI.html#a_GUI_pushId">pushId</a>().</td></tr><tr><td class="sig"><a href="#a_GUI_popStyleColor"><b>popStyleColor(n)</b></a></td><td>Pops n (default 1) pushed style-color overrides.</td></tr><tr><td class="sig"><a href="#a_GUI_popStyleVar"><b>popStyleVar(n)</b></a></td><td>Pops n (default 1) pushed style-var overrides.</td></tr><tr><td class="sig"><a href="#a_GUI_progressBar"><b>progressBar(fraction, opts)</b></a></td><td>A progress bar filled to fraction (clamped to 0.</td></tr><tr><td class="sig"><a href="#a_GUI_pushId"><b>pushId()</b></a></td><td>&amp;nbsp;</td></tr><tr><td class="sig"><a href="#a_GUI_pushStyleColor"><b>pushStyleColor(name, color)</b></a></td><td>Pushes an override for a style color (e.</td></tr><tr><td class="sig"><a href="#a_GUI_pushStyleVar"><b>pushStyleVar(name, value)</b></a></td><td>Pushes an override for a style var (e.</td></tr><tr><td class="sig"><a href="#a_GUI_radioButton"><b>radioButton(label, value, index)</b></a></td><td>A radio button; checked when value === index.</td></tr><tr><td class="sig"><a href="#a_GUI_sameLine"><b>sameLine()</b></a></td><td>&amp;nbsp;</td></tr><tr><td class="sig"><a href="#a_GUI_selectable"><b>selectable(label, selected, opts)</b></a></td><td>A full-width clickable row (list item).</td></tr><tr><td class="sig"><a href="#a_GUI_separator"><b>separator()</b></a></td><td>Draws a horizontal separator line; inside a menu, appends a separator row.</td></tr><tr><td class="sig"><a href="#a_GUI_separatorText"><b>separatorText(label)</b></a></td><td>Draws a separator line with a small label centered on it.</td></tr><tr><td class="sig"><a href="#a_GUI_setAppMenuBar"><b>setAppMenuBar()</b></a></td><td>&amp;nbsp;</td></tr><tr><td class="sig"><a href="#a_GUI_setCursorPos"><b>setCursorPos(x, y)</b></a></td><td>Moves the layout cursor to (x, y) relative to the current window/child origin; the next item is placed there.</td></tr><tr><td class="sig"><a href="#a_GUI_setCursorScreenPos"><b>setCursorScreenPos(x, y)</b></a></td><td>Moves the layout cursor to absolute screen coordinates (x, y).</td></tr><tr><td class="sig"><a href="#a_GUI_setDockCollapsed"><b>setDockCollapsed()</b></a></td><td>&amp;nbsp;</td></tr><tr><td class="sig"><a href="#a_GUI_setDockRatio"><b>setDockRatio(a, b, ratio)</b></a></td><td>Sets the split ratio of the dock containing a and b (0.</td></tr><tr><td class="sig"><a href="#a_GUI_setNextItemWidth"><b>setNextItemWidth(w)</b></a></td><td>Forces the width of the next widget; 0 means the widget's default width.</td></tr><tr><td class="sig"><a href="#a_GUI_setNextWindowPos"><b>setNextWindowPos(x, y)</b></a></td><td>Sets the screen position used by the next <a class="xref" href="GUI.html#a_GUI_beginWindow">beginWindow</a>() call.</td></tr><tr><td class="sig"><a href="#a_GUI_setNextWindowSize"><b>setNextWindowSize(w, h)</b></a></td><td>Sets the size used by the next <a class="xref" href="GUI.html#a_GUI_beginWindow">beginWindow</a>() call.</td></tr><tr><td class="sig"><a href="#a_GUI_setState"><b>setState(label, value)</b></a></td><td>Stores an id-scoped value that can be read back with <a class="xref" href="GUI.html#a_GUI_state">state</a>().</td></tr><tr><td class="sig"><a href="#a_GUI_setTheme"><b>setTheme(name)</b></a></td><td>Switches the global color theme ('dark' or 'light'): replaces gui.</td></tr><tr><td class="sig"><a href="#a_GUI_setTooltip"><b>setTooltip(text)</b></a></td><td>Sets a text tooltip for the hovered last item.</td></tr><tr><td class="sig"><a href="#a_GUI_setWindowOpen"><b>setWindowOpen(title, open)</b></a></td><td>Opens or closes a window by title (takes effect on the window's next <a class="xref" href="GUI.html#a_GUI_beginWindow">beginWindow</a>()).</td></tr><tr><td class="sig"><a href="#a_GUI_slider"><b>slider(label, value, min, max, opts)</b></a></td><td>A slider that routes to sliderInt when min/max/value are int-like, otherwise to sliderFloat.</td></tr><tr><td class="sig"><a href="#a_GUI_sliderFloat"><b>sliderFloat(label, value, vmin, vmax, fmt)</b></a></td><td>A horizontal float slider: clicking the track jumps the value to the click position, dragging adjusts relative to the grabbed point, and right-clicking opens an exact numeric entry field.</td></tr><tr><td class="sig"><a href="#a_GUI_sliderInt"><b>sliderInt(label, value, vmin, vmax, fmt)</b></a></td><td>A horizontal integer <a class="xref" href="GUI.html#a_GUI_slider">slider</a> (values rounded); same interactions as sliderFloat.</td></tr><tr><td class="sig"><a href="#a_GUI_smallButton"><b>smallButton(label)</b></a></td><td>A compact button sized to a text line (no frame padding); true when clicked.</td></tr><tr><td class="sig"><a href="#a_GUI_spacing"><b>spacing()</b></a></td><td>Consumes one empty line (the vertical item spacing).</td></tr><tr><td class="sig"><a href="#a_GUI_state"><b>state(label)</b></a></td><td>Reads the id-scoped value stored with <a class="xref" href="GUI.html#a_GUI_setState">setState</a>() (undefined when none was stored yet).</td></tr><tr><td class="sig"><a href="#a_GUI_tableCell"><b>tableCell(i)</b></a></td><td>Opens a manual table cell; draw its content (even a widget) and close the row with <a class="xref" href="GUI.html#a_GUI_tableEndRow">tableEndRow</a>().</td></tr><tr><td class="sig"><a href="#a_GUI_tableEndRow"><b>tableEndRow()</b></a></td><td>Closes the current table row (after manual cells).</td></tr><tr><td class="sig"><a href="#a_GUI_tableHeader"><b>tableHeader(labels)</b></a></td><td>Draws the table's header row from the column definitions.</td></tr><tr><td class="sig"><a href="#a_GUI_tableRow"><b>tableRow(values)</b></a></td><td>Draws a table row from an array of cell values.</td></tr><tr><td class="sig"><a href="#a_GUI_text"><b>text(str, color)</b></a></td><td>Draws a line of text at the cursor position.</td></tr><tr><td class="sig"><a href="#a_GUI_textColored"><b>textColored(color, str)</b></a></td><td>Draws a line of text in the given color.</td></tr><tr><td class="sig"><a href="#a_GUI_textWrapped"><b>textWrapped(str, opts)</b></a></td><td>Draws text wrapped to a width.</td></tr><tr><td class="sig"><a href="#a_GUI_treeNode"><b>treeNode(label)</b></a></td><td>A tree node (one indent step deeper while open).</td></tr><tr><td class="sig"><a href="#a_GUI_treePop"><b>treePop()</b></a></td><td>Closes one open tree node.</td></tr><tr><td class="sig"><a href="#a_GUI_treePopToLevel"><b>treePopToLevel(n)</b></a></td><td>Closes tree nodes until the depth is n.</td></tr><tr><td class="sig"><a href="#a_GUI_undock"><b>undock(a, b)</b></a></td><td>Splits the dock of a and b back into two independent windows (each keeps the sub-rect it occupied).</td></tr><tr><td class="sig"><a href="#a_GUI_undockEdge"><b>undockEdge(a)</b></a></td><td>Removes a window (or a combined window) from its screen-edge stack, freeing it as a free window at its current rect.</td></tr><tr><td class="sig"><a href="#a_GUI_unindent"><b>unindent(amount)</b></a></td><td>Decreases the layout indent by amount px (default: the 'indentSpacing' style var), never below 0.</td></tr></table><div class="memitem" id="a_GUI_activateMenu">
+<div class="memname"><b>activateMenu</b> <span class="p">(</span><span class="ptype">string</span> <code>path</code><span class="p">)</span></div>
+<div class="memdoc"><p>Triggers an app-menu item programmatically, by path: e.g. <a class="xref" href="GUI.html#a_GUI_activateMenu">activateMenu</a>('File', 'Save layout').</p><table class="params"><tr><th colspan="3">Parameters:</th></tr><tr><td class="pt">string</td><td class="pn">path</td><td class="pd">top-level label, then item (or submenu) labels</td></tr></table><dl><dt>Returns</dt><dd><span class="ptype">boolean</span> false when the path does not resolve</dd></dl></div>
+</div>
+<div class="memitem" id="a_GUI_beginChild">
+<div class="memname"><b>beginChild</b> <span class="p">(</span><span class="ptype">string</span> <code>label</code>, <span class="ptype">Object</span> <code>[opts]</code><span class="p">)</span></div>
+<div class="memdoc"><p>Starts a scrollable child region inside the current window (its own clip, scroll and id scope).</p><table class="params"><tr><th colspan="3">Parameters:</th></tr><tr><td class="pt">string</td><td class="pn">label</td><td class="pd">id label (##-prefixed for label-less)</td></tr><tr><td class="pt">Object</td><td class="pn">opts <i>(optional)</i></td><td class="pd">{ border, size, scrollX }</td></tr></table><dl><dt>Returns</dt><dd><span class="ptype">boolean</span> false when no window is open, otherwise true</dd></dl></div>
+</div>
+<div class="memitem" id="a_GUI_beginDisabled">
+<div class="memname"><b>beginDisabled</b> <span class="p">(</span><span class="p">)</span></div>
+<div class="memdoc"><p>Starts a disabled region: everything inside is drawn greyed out and ignores input. Pair with <a class="xref" href="GUI.html#a_GUI_endDisabled">endDisabled</a>().</p></div>
+</div>
+<div class="memitem" id="a_GUI_beginFrame">
+<div class="memname"><b>beginFrame</b> <span class="p">(</span><span class="ptype">object</span> <code>input</code><span class="p">)</span></div>
+<div class="memdoc"><p>Starts a <a class="xref" href="GUI.html">GUI</a> frame. Call once per frame, before any widgets: it routes wheel scrolling, updates focus/keyboard bookkeeping and detects key/mouse edge events from the input snapshot.</p><table class="params"><tr><th colspan="3">Parameters:</th></tr><tr><td class="pt">object</td><td class="pn">input</td><td class="pd">normalized input snapshot: { width, height,
+     mouse: { x, y, buttons[5], wheelX, wheelY }, keys: Set of key
+     tokens, text: characters typed since the last frame }</td></tr></table></div>
+</div>
+<div class="memitem" id="a_GUI_beginGroup">
+<div class="memname"><b>beginGroup</b> <span class="p">(</span><span class="p">)</span></div>
+<div class="memdoc"><p>Starts a group: layout runs from a local origin so the elements that follow can be treated as one item (<a class="xref" href="GUI.html#a_GUI_lastItemRect">lastItemRect</a>(), ...).</p><dl><dt>Returns</dt><dd><span class="ptype">Object</span> the group's start {x, y}</dd></dl></div>
+</div>
+<div class="memitem" id="a_GUI_beginMenu">
+<div class="memname"><b>beginMenu</b> <span class="p">(</span><span class="ptype">string</span> <code>label</code><span class="p">)</span></div>
+<div class="memdoc"><p>Opens a menu inside the current window menu bar.</p><table class="params"><tr><th colspan="3">Parameters:</th></tr><tr><td class="pt">string</td><td class="pn">label</td><td class="pd"></td></tr></table><dl><dt>Returns</dt><dd><span class="ptype">boolean</span> false when the menu is not open, otherwise true</dd></dl></div>
+</div>
+<div class="memitem" id="a_GUI_beginMenuBar">
+<div class="memname"><b>beginMenuBar</b> <span class="p">(</span><span class="p">)</span></div>
+<div class="memdoc"><p>Begins a window menu bar (a row of menus in the title area).</p><dl><dt>Returns</dt><dd><span class="ptype">boolean</span> false when not drawn, otherwise true</dd></dl></div>
+</div>
+<div class="memitem" id="a_GUI_beginPopup">
+<div class="memname"><b>beginPopup</b> <span class="p">(</span><span class="ptype">string</span> <code>id</code><span class="p">)</span></div>
+<div class="memdoc"><p>Begins drawing the contents of an open popup.</p><table class="params"><tr><th colspan="3">Parameters:</th></tr><tr><td class="pt">string</td><td class="pn">id</td><td class="pd"></td></tr></table><dl><dt>Returns</dt><dd><span class="ptype">boolean</span> false when the popup is not open, otherwise true</dd></dl></div>
+</div>
+<div class="memitem" id="a_GUI_beginPopupContextItem">
+<div class="memname"><b>beginPopupContextItem</b> <span class="p">(</span><span class="ptype">string</span> <code>id</code><span class="p">)</span></div>
+<div class="memdoc"><p>Opens a context popup on right-click of the last item.</p><table class="params"><tr><th colspan="3">Parameters:</th></tr><tr><td class="pt">string</td><td class="pn">id</td><td class="pd"></td></tr></table><dl><dt>Returns</dt><dd><span class="ptype">boolean</span> true when the popup was opened this frame</dd></dl></div>
+</div>
+<div class="memitem" id="a_GUI_beginPopupContextWindow">
+<div class="memname"><b>beginPopupContextWindow</b> <span class="p">(</span><span class="ptype">string</span> <code>id</code><span class="p">)</span></div>
+<div class="memdoc"><p>Opens a context popup on right-click of the current window (or of the hovered item when no window is open).</p><table class="params"><tr><th colspan="3">Parameters:</th></tr><tr><td class="pt">string</td><td class="pn">id</td><td class="pd"></td></tr></table><dl><dt>Returns</dt><dd><span class="ptype">boolean</span> true when the popup was opened this frame</dd></dl></div>
+</div>
+<div class="memitem" id="a_GUI_beginTabBar">
+<div class="memname"><b>beginTabBar</b> <span class="p">(</span><span class="ptype">string</span> <code>id</code><span class="p">)</span></div>
+<div class="memdoc"><p>Begins a tab bar; the following <a class="xref" href="GUI.html#a_GUI_beginTabItem">beginTabItem</a>() calls fill it.</p><table class="params"><tr><th colspan="3">Parameters:</th></tr><tr><td class="pt">string</td><td class="pn">id</td><td class="pd"></td></tr></table><dl><dt>Returns</dt><dd><span class="ptype">boolean</span> true when the bar is drawn</dd></dl></div>
+</div>
+<div class="memitem" id="a_GUI_beginTabItem">
+<div class="memname"><b>beginTabItem</b> <span class="p">(</span><span class="ptype">string</span> <code>label</code>, <span class="ptype">Object</span> <code>[opts]</code><span class="p">)</span></div>
+<div class="memdoc"><p>Begins a tab item inside the current tab bar.</p><table class="params"><tr><th colspan="3">Parameters:</th></tr><tr><td class="pt">string</td><td class="pn">label</td><td class="pd"></td></tr><tr><td class="pt">Object</td><td class="pn">opts <i>(optional)</i></td><td class="pd"></td></tr></table><dl><dt>Returns</dt><dd><span class="ptype">boolean</span> true when this tab is active (draw its contents), otherwise false</dd></dl></div>
+</div>
+<div class="memitem" id="a_GUI_beginTable">
+<div class="memname"><b>beginTable</b> <span class="p">(</span><span class="ptype">string</span> <code>label</code>, <span class="ptype">number</span> <code>cols</code>, <span class="ptype">Object</span> <code>[opts]</code><span class="p">)</span></div>
+<div class="memdoc"><p>Begins a table with cols columns.</p><table class="params"><tr><th colspan="3">Parameters:</th></tr><tr><td class="pt">string</td><td class="pn">label</td><td class="pd"></td></tr><tr><td class="pt">number</td><td class="pn">cols</td><td class="pd">number of columns</td></tr><tr><td class="pt">Object</td><td class="pn">opts <i>(optional)</i></td><td class="pd">{ colWidths: [w, ...] (entries &lt;= 0 are flexible), borders (default true) }</td></tr></table><dl><dt>Returns</dt><dd><span class="ptype">boolean</span> true when the table is drawn</dd></dl></div>
+</div>
+<div class="memitem" id="a_GUI_beginTooltip">
+<div class="memname"><b>beginTooltip</b> <span class="p">(</span><span class="p">)</span></div>
+<div class="memdoc"><p>Begins a rich tooltip (widgets allowed inside); drawn after flags.tooltipDelay seconds of hover over the last item.</p><dl><dt>Returns</dt><dd><span class="ptype">boolean</span> false when it should not be drawn, otherwise true</dd></dl></div>
+</div>
+<div class="memitem" id="a_GUI_beginWindow">
+<div class="memname"><b>beginWindow</b> <span class="p">(</span><span class="ptype">string</span> <code>title</code>, <span class="ptype">Object</span> <code>[opts]</code><span class="p">)</span></div>
+<div class="memdoc"><p>Opens (or re-enters) a window; draw its contents and call <a class="xref" href="GUI.html#a_GUI_endWindow">endWindow</a>() in the same frame.</p><table class="params"><tr><th colspan="3">Parameters:</th></tr><tr><td class="pt">string</td><td class="pn">title</td><td class="pd">window title (unique per <a class="xref" href="GUI.html">GUI</a> instance)</td></tr><tr><td class="pt">Object</td><td class="pn">opts <i>(optional)</i></td><td class="pd">{ pos, size, minSize, maxSize, zIndex, open, collapsed,
+     flags (<a class="xref" href="Mim.html">Mim</a>.<a class="xref" href="WindowFlags.html">WindowFlags</a> bits: Closable, ScrollX, AlwaysOnTop, Modal,
+     NoTitleBar, NoClip, NoScrollbar, AutoResize, FixedSize, NoMove,
+     NoResize, NoCollapse, NoDock), style, onClose, persist }</td></tr></table><dl><dt>Returns</dt><dd><span class="ptype">boolean</span> false when the window is closed / not drawn this frame; otherwise true (draw the contents)</dd></dl></div>
+</div>
+<div class="memitem" id="a_GUI_button">
+<div class="memname"><b>button</b> <span class="p">(</span><span class="ptype">string</span> <code>label</code>, <span class="ptype">Object</span> <code>[opts]</code><span class="p">)</span></div>
+<div class="memdoc"><p>A push button; returns true on the frame it is clicked.</p><table class="params"><tr><th colspan="3">Parameters:</th></tr><tr><td class="pt">string</td><td class="pn">label</td><td class="pd"></td></tr><tr><td class="pt">Object</td><td class="pn">opts <i>(optional)</i></td><td class="pd">{ w, h, disabled, tooltip }</td></tr></table><dl><dt>Returns</dt><dd><span class="ptype">boolean</span> </dd></dl></div>
+</div>
+<div class="memitem" id="a_GUI_changed">
+<div class="memname"><b>changed</b> <span class="p">(</span><span class="p">)</span></div>
+<div class="memdoc"><p>Shortcut for <a class="xref" href="GUI.html#a_GUI_lastItemChanged">lastItemChanged</a>().</p><dl><dt>Returns</dt><dd><span class="ptype">boolean</span> </dd></dl></div>
+</div>
+<div class="memitem" id="a_GUI_checkbox">
+<div class="memname"><b>checkbox</b> <span class="p">(</span><span class="ptype">string</span> <code>label</code>, <span class="ptype">boolean</span> <code>value</code><span class="p">)</span></div>
+<div class="memdoc"><p>A checkbox with a label.</p><table class="params"><tr><th colspan="3">Parameters:</th></tr><tr><td class="pt">string</td><td class="pn">label</td><td class="pd"></td></tr><tr><td class="pt">boolean</td><td class="pn">value</td><td class="pd">current value, or null for library-kept state</td></tr></table><dl><dt>Returns</dt><dd><span class="ptype">boolean</span> the checkbox value (possibly toggled)</dd></dl></div>
+</div>
+<div class="memitem" id="a_GUI_clearAppMenuBar">
+<div class="memname"><b>clearAppMenuBar</b> <span class="p">(</span><span class="p">)</span></div>
+<div class="memdoc"><p>Removes the app menu bar set with <a class="xref" href="GUI.html#a_GUI_setAppMenuBar">setAppMenuBar</a>().</p></div>
+</div>
+<div class="memitem" id="a_GUI_closePopup">
+<div class="memname"><b>closePopup</b> <span class="p">(</span><span class="ptype">string</span> <code>id</code><span class="p">)</span></div>
+<div class="memdoc"><p>Closes the popup with the given id (no-op when it is not open).</p><table class="params"><tr><th colspan="3">Parameters:</th></tr><tr><td class="pt">string</td><td class="pn">id</td><td class="pd"></td></tr></table></div>
+</div>
+<div class="memitem" id="a_GUI_collapsingHeader">
+<div class="memname"><b>collapsingHeader</b> <span class="p">(</span><span class="ptype">string</span> <code>label</code>, <span class="ptype">Object</span> <code>[opts]</code><span class="p">)</span></div>
+<div class="memdoc"><p>A collapsible section header (chevron + label); clicking toggles its open state.</p><table class="params"><tr><th colspan="3">Parameters:</th></tr><tr><td class="pt">string</td><td class="pn">label</td><td class="pd"></td></tr><tr><td class="pt">Object</td><td class="pn">opts <i>(optional)</i></td><td class="pd">{ open: initial open state, or null for library-kept state }</td></tr></table><dl><dt>Returns</dt><dd><span class="ptype">boolean</span> true when the section is open (draw its contents in that case)</dd></dl></div>
+</div>
+<div class="memitem" id="a_GUI_combo">
+<div class="memname"><b>combo</b> <span class="p">(</span><span class="ptype">string</span> <code>label</code>, <span class="ptype">number</span> <code>value</code>, <span class="ptype">Array</span> <code>items</code>, <span class="ptype">Object</span> <code>[opts]</code><span class="p">)</span></div>
+<div class="memdoc"><p>A dropdown list: clicking opens a popup of the items; the selected row is shown on the button.</p><table class="params"><tr><th colspan="3">Parameters:</th></tr><tr><td class="pt">string</td><td class="pn">label</td><td class="pd"></td></tr><tr><td class="pt">number</td><td class="pn">value</td><td class="pd">selected index into items, or null for library-kept state</td></tr><tr><td class="pt">Array</td><td class="pn">items</td><td class="pd">row labels</td></tr><tr><td class="pt">Object</td><td class="pn">opts <i>(optional)</i></td><td class="pd">{ w, maxVisible (default 8) }</td></tr></table><dl><dt>Returns</dt><dd><span class="ptype">number</span> the selected index</dd></dl></div>
+</div>
+<div class="memitem" id="a_GUI_dock">
+<div class="memname"><b>dock</b> <span class="p">(</span><span class="ptype">Object</span> <code>[opts]</code><span class="p">)</span></div>
+<div class="memdoc"><p>Joins windows a and b into a single dock: one frame, two panes, a draggable split divider and a shared title bar. The join is lazy: the dock is created on the first frame both windows are open. @param {string} a title of the first window @param {string} b title of the second window</p><table class="params"><tr><th colspan="3">Parameters:</th></tr><tr><td class="pt">Object</td><td class="pn">opts <i>(optional)</i></td><td class="pd">{ dir: 'h' (side by side, default) | 'v' (stacked),
+     ratio: 0.12..0.88 fraction taken by the first member, pos/size: dock
+     rect, title: dock title }</td></tr></table></div>
+</div>
+<div class="memitem" id="a_GUI_dockToEdge">
+<div class="memname"><b>dockToEdge</b> <span class="p">(</span><span class="p">)</span></div>
+<div class="memdoc"></div>
+</div>
+<div class="memitem" id="a_GUI_dragFloat">
+<div class="memname"><b>dragFloat</b> <span class="p">(</span><span class="ptype">string</span> <code>label</code>, <span class="ptype">number</span> <code>value</code>, <span class="ptype">number</span> <code>speed</code>, <span class="ptype">number</span> <code>vmin</code>, <span class="ptype">number</span> <code>vmax</code><span class="p">)</span></div>
+<div class="memdoc"><p>A float drag: while held, the value changes by speed per pixel of mouse movement.</p><table class="params"><tr><th colspan="3">Parameters:</th></tr><tr><td class="pt">string</td><td class="pn">label</td><td class="pd"></td></tr><tr><td class="pt">number</td><td class="pn">value</td><td class="pd"></td></tr><tr><td class="pt">number</td><td class="pn">speed</td><td class="pd">value change per pixel</td></tr><tr><td class="pt">number</td><td class="pn">vmin</td><td class="pd"></td></tr><tr><td class="pt">number</td><td class="pn">vmax</td><td class="pd"></td></tr></table><dl><dt>Returns</dt><dd><span class="ptype">number</span> the new value</dd></dl></div>
+</div>
+<div class="memitem" id="a_GUI_dragInt">
+<div class="memname"><b>dragInt</b> <span class="p">(</span><span class="ptype">string</span> <code>label</code>, <span class="ptype">number</span> <code>value</code>, <span class="ptype">number</span> <code>speed</code>, <span class="ptype">number</span> <code>vmin</code>, <span class="ptype">number</span> <code>vmax</code><span class="p">)</span></div>
+<div class="memdoc"><p>An integer drag (a dragFloat with rounded results).</p><table class="params"><tr><th colspan="3">Parameters:</th></tr><tr><td class="pt">string</td><td class="pn">label</td><td class="pd"></td></tr><tr><td class="pt">number</td><td class="pn">value</td><td class="pd"></td></tr><tr><td class="pt">number</td><td class="pn">speed</td><td class="pd"></td></tr><tr><td class="pt">number</td><td class="pn">vmin</td><td class="pd"></td></tr><tr><td class="pt">number</td><td class="pn">vmax</td><td class="pd"></td></tr></table><dl><dt>Returns</dt><dd><span class="ptype">number</span> the new integer value</dd></dl></div>
+</div>
+<div class="memitem" id="a_GUI_dummy">
+<div class="memname"><b>dummy</b> <span class="p">(</span><span class="ptype">number</span> <code>w</code>, <span class="ptype">number</span> <code>h</code><span class="p">)</span></div>
+<div class="memdoc"><p>Reserves an empty w x h rect at the cursor (layout only, nothing is drawn).</p><table class="params"><tr><th colspan="3">Parameters:</th></tr><tr><td class="pt">number</td><td class="pn">w</td><td class="pd"></td></tr><tr><td class="pt">number</td><td class="pn">h</td><td class="pd"></td></tr></table><dl><dt>Returns</dt><dd><span class="ptype">Object</span> the created item (internal)</dd></dl></div>
+</div>
+<div class="memitem" id="a_GUI_endChild">
+<div class="memname"><b>endChild</b> <span class="p">(</span><span class="p">)</span></div>
+<div class="memdoc"><p>Ends the child region started with <a class="xref" href="GUI.html#a_GUI_beginChild">beginChild</a>().</p></div>
+</div>
+<div class="memitem" id="a_GUI_endDisabled">
+<div class="memname"><b>endDisabled</b> <span class="p">(</span><span class="p">)</span></div>
+<div class="memdoc"><p>Ends a disabled region started with <a class="xref" href="GUI.html#a_GUI_beginDisabled">beginDisabled</a>().</p></div>
+</div>
+<div class="memitem" id="a_GUI_endFrame">
+<div class="memname"><b>endFrame</b> <span class="p">(</span><span class="p">)</span></div>
+<div class="memdoc"><p>Ends the frame: draws popups, tooltips and the debug overlay, then compacts per-frame state.</p></div>
+</div>
+<div class="memitem" id="a_GUI_endGroup">
+<div class="memname"><b>endGroup</b> <span class="p">(</span><span class="p">)</span></div>
+<div class="memdoc"><p>Ends the current group.</p><dl><dt>Returns</dt><dd><span class="ptype">Object</span> the group's combined screen rect {x, y, w, h} (null when no group is open)</dd></dl></div>
+</div>
+<div class="memitem" id="a_GUI_endMenu">
+<div class="memname"><b>endMenu</b> <span class="p">(</span><span class="p">)</span></div>
+<div class="memdoc"><p>Closes the menu started with <a class="xref" href="GUI.html#a_GUI_beginMenu">beginMenu</a>().</p></div>
+</div>
+<div class="memitem" id="a_GUI_endMenuBar">
+<div class="memname"><b>endMenuBar</b> <span class="p">(</span><span class="p">)</span></div>
+<div class="memdoc"><p>Ends the window menu bar started with <a class="xref" href="GUI.html#a_GUI_beginMenuBar">beginMenuBar</a>().</p></div>
+</div>
+<div class="memitem" id="a_GUI_endPopup">
+<div class="memname"><b>endPopup</b> <span class="p">(</span><span class="p">)</span></div>
+<div class="memdoc"><p>Ends the popup contents started with <a class="xref" href="GUI.html#a_GUI_beginPopup">beginPopup</a>().</p></div>
+</div>
+<div class="memitem" id="a_GUI_endTabBar">
+<div class="memname"><b>endTabBar</b> <span class="p">(</span><span class="p">)</span></div>
+<div class="memdoc"><p>Ends the tab bar started with <a class="xref" href="GUI.html#a_GUI_beginTabBar">beginTabBar</a>().</p></div>
+</div>
+<div class="memitem" id="a_GUI_endTabItem">
+<div class="memname"><b>endTabItem</b> <span class="p">(</span><span class="p">)</span></div>
+<div class="memdoc"><p>Ends the tab item started with <a class="xref" href="GUI.html#a_GUI_beginTabItem">beginTabItem</a>().</p></div>
+</div>
+<div class="memitem" id="a_GUI_endTable">
+<div class="memname"><b>endTable</b> <span class="p">(</span><span class="p">)</span></div>
+<div class="memdoc"><p>Ends the table started with <a class="xref" href="GUI.html#a_GUI_beginTable">beginTable</a>().</p></div>
+</div>
+<div class="memitem" id="a_GUI_endTooltip">
+<div class="memname"><b>endTooltip</b> <span class="p">(</span><span class="p">)</span></div>
+<div class="memdoc"><p>Ends the tooltip started with <a class="xref" href="GUI.html#a_GUI_beginTooltip">beginTooltip</a>().</p></div>
+</div>
+<div class="memitem" id="a_GUI_endWindow">
+<div class="memname"><b>endWindow</b> <span class="p">(</span><span class="p">)</span></div>
+<div class="memdoc"><p>Closes the window opened by beginWindow: draws the frame, shadow, scrollbars and title bar.</p></div>
+</div>
+<div class="memitem" id="a_GUI_getCursorPos">
+<div class="memname"><b>getCursorPos</b> <span class="p">(</span><span class="p">)</span></div>
+<div class="memdoc"><p>The layout cursor position, relative to the current window/child origin.</p><dl><dt>Returns</dt><dd><span class="ptype">Object</span> {x, y}</dd></dl></div>
+</div>
+<div class="memitem" id="a_GUI_getCursorScreenPos">
+<div class="memname"><b>getCursorScreenPos</b> <span class="p">(</span><span class="p">)</span></div>
+<div class="memdoc"><p>The layout cursor position in absolute screen coordinates.</p><dl><dt>Returns</dt><dd><span class="ptype">Object</span> {x, y}</dd></dl></div>
+</div>
+<div class="memitem" id="a_GUI_getDocks">
+<div class="memname"><b>getDocks</b> <span class="p">(</span><span class="p">)</span></div>
+<div class="memdoc"><p>All active docks, as plain objects.</p><dl><dt>Returns</dt><dd><span class="ptype">Array</span> [{ id, a, b, dir, ratio, x, y, w, h, collapsed }] with a/b = member titles</dd></dl></div>
+</div>
+<div class="memitem" id="a_GUI_getRegionAvail">
+<div class="memname"><b>getRegionAvail</b> <span class="p">(</span><span class="p">)</span></div>
+<div class="memdoc"><p>The remaining space right/below the cursor in the current region.</p><dl><dt>Returns</dt><dd><span class="ptype">Object</span> {w, h}</dd></dl></div>
+</div>
+<div class="memitem" id="a_GUI_getWindow">
+<div class="memname"><b>getWindow</b> <span class="p">(</span><span class="ptype">string</span> <code>title</code><span class="p">)</span></div>
+<div class="memdoc"><p>The internal window object for the title (position, size, open state), or null when the window does not exist. Read-only inspection; its fields are internal.</p><table class="params"><tr><th colspan="3">Parameters:</th></tr><tr><td class="pt">string</td><td class="pn">title</td><td class="pd"></td></tr></table><dl><dt>Returns</dt><dd><span class="ptype">Object</span> </dd></dl></div>
+</div>
+<div class="memitem" id="a_GUI_image">
+<div class="memname"><b>image</b> <span class="p">(</span><span class="ptype">*</span> <code>imageId</code>, <span class="ptype">number</span> <code>w</code>, <span class="ptype">number</span> <code>h</code>, <span class="ptype">Object</span> <code>[opts]</code><span class="p">)</span></div>
+<div class="memdoc"><p>Draws an <a class="xref" href="GUI.html#a_GUI_image">image</a> (the backend resolves imageId via its drawImage method).</p><table class="params"><tr><th colspan="3">Parameters:</th></tr><tr><td class="pt">*</td><td class="pn">imageId</td><td class="pd">string or object id for the backend</td></tr><tr><td class="pt">number</td><td class="pn">w</td><td class="pd"></td></tr><tr><td class="pt">number</td><td class="pn">h</td><td class="pd"></td></tr><tr><td class="pt">Object</td><td class="pn">opts <i>(optional)</i></td><td class="pd">{ id: id-scope label, tint }</td></tr></table><dl><dt>Returns</dt><dd><span class="ptype">boolean</span> true when hovered</dd></dl></div>
+</div>
+<div class="memitem" id="a_GUI_indent">
+<div class="memname"><b>indent</b> <span class="p">(</span><span class="ptype">number</span> <code>[amount]</code><span class="p">)</span></div>
+<div class="memdoc"><p>Increases the layout indent by amount px (default: the 'indentSpacing' style var); pair with <a class="xref" href="GUI.html#a_GUI_unindent">unindent</a>().</p><table class="params"><tr><th colspan="3">Parameters:</th></tr><tr><td class="pt">number</td><td class="pn">amount <i>(optional)</i></td><td class="pd"></td></tr></table></div>
+</div>
+<div class="memitem" id="a_GUI_inputFloat">
+<div class="memname"><b>inputFloat</b> <span class="p">(</span><span class="ptype">string</span> <code>label</code>, <span class="ptype">number</span> <code>value</code>, <span class="ptype">Object</span> <code>[opts]</code><span class="p">)</span></div>
+<div class="memdoc"><p>An editable float field (same editing as inputInt).</p><table class="params"><tr><th colspan="3">Parameters:</th></tr><tr><td class="pt">string</td><td class="pn">label</td><td class="pd"></td></tr><tr><td class="pt">number</td><td class="pn">value</td><td class="pd">or null for library-kept state</td></tr><tr><td class="pt">Object</td><td class="pn">opts <i>(optional)</i></td><td class="pd">{ w, min, max, step (default 0.1), stepFast (default 1), fmt }</td></tr></table><dl><dt>Returns</dt><dd><span class="ptype">number</span> the current value (invalid input is rejected and the last valid value kept)</dd></dl></div>
+</div>
+<div class="memitem" id="a_GUI_inputInt">
+<div class="memname"><b>inputInt</b> <span class="p">(</span><span class="ptype">string</span> <code>label</code>, <span class="ptype">number</span> <code>value</code>, <span class="ptype">Object</span> <code>[opts]</code><span class="p">)</span></div>
+<div class="memdoc"><p>An editable integer field: typing, arrow steps (step / stepFast), select-all, undo/redo and right-click numeric entry.</p><table class="params"><tr><th colspan="3">Parameters:</th></tr><tr><td class="pt">string</td><td class="pn">label</td><td class="pd"></td></tr><tr><td class="pt">number</td><td class="pn">value</td><td class="pd">or null for library-kept state</td></tr><tr><td class="pt">Object</td><td class="pn">opts <i>(optional)</i></td><td class="pd">{ w, min, max, step (default 1), stepFast (default 10) }</td></tr></table><dl><dt>Returns</dt><dd><span class="ptype">number</span> the current value (invalid input is rejected and the last valid value kept)</dd></dl></div>
+</div>
+<div class="memitem" id="a_GUI_inputText">
+<div class="memname"><b>inputText</b> <span class="p">(</span><span class="ptype">string</span> <code>label</code>, <span class="ptype">string</span> <code>value</code>, <span class="ptype">Object</span> <code>[opts]</code><span class="p">)</span></div>
+<div class="memdoc"><p>A full-featured text field: caret, selection, copy/paste (via the clipboard callbacks), select-all, undo/redo, arrow keys, Home/End and word delete.</p><table class="params"><tr><th colspan="3">Parameters:</th></tr><tr><td class="pt">string</td><td class="pn">label</td><td class="pd"></td></tr><tr><td class="pt">string</td><td class="pn">value</td><td class="pd">or null for library-kept state</td></tr><tr><td class="pt">Object</td><td class="pn">opts <i>(optional)</i></td><td class="pd">{ w, maxLength, onSubmit }</td></tr></table><dl><dt>Returns</dt><dd><span class="ptype">string</span> the current text</dd></dl></div>
+</div>
+<div class="memitem" id="a_GUI_isDockCollapsed">
+<div class="memname"><b>isDockCollapsed</b> <span class="p">(</span><span class="ptype">string</span> <code>a</code>, <span class="ptype">string</span> <code>b</code><span class="p">)</span></div>
+<div class="memdoc"><p>True when the dock of a and b is collapsed to just its title bar.</p><table class="params"><tr><th colspan="3">Parameters:</th></tr><tr><td class="pt">string</td><td class="pn">a</td><td class="pd"></td></tr><tr><td class="pt">string</td><td class="pn">b</td><td class="pd"></td></tr></table><dl><dt>Returns</dt><dd><span class="ptype">boolean</span> </dd></dl></div>
+</div>
+<div class="memitem" id="a_GUI_isDocked">
+<div class="memname"><b>isDocked</b> <span class="p">(</span><span class="ptype">string</span> <code>a</code>, <span class="ptype">string</span> <code>b</code><span class="p">)</span></div>
+<div class="memdoc"><p>True when a and b are currently members of the same dock.</p><table class="params"><tr><th colspan="3">Parameters:</th></tr><tr><td class="pt">string</td><td class="pn">a</td><td class="pd"></td></tr><tr><td class="pt">string</td><td class="pn">b</td><td class="pd"></td></tr></table><dl><dt>Returns</dt><dd><span class="ptype">boolean</span> </dd></dl></div>
+</div>
+<div class="memitem" id="a_GUI_isKeyDown">
+<div class="memname"><b>isKeyDown</b> <span class="p">(</span><span class="ptype">string</span> <code>k</code><span class="p">)</span></div>
+<div class="memdoc"><p>True while key token k is held. Tokens: Mim.<a class="xref" href="Key.html">Key</a> constants, single lowercase letters, '0'..'9', 'f1'..'f12', 'tab', 'enter', 'escape', 'backspace', 'delete', 'insert', 'home', 'end', 'pageup', 'pagedown', arrows, 'shift', 'ctrl', 'alt', 'meta', ' '.</p><table class="params"><tr><th colspan="3">Parameters:</th></tr><tr><td class="pt">string</td><td class="pn">k</td><td class="pd"></td></tr></table><dl><dt>Returns</dt><dd><span class="ptype">boolean</span> </dd></dl></div>
+</div>
+<div class="memitem" id="a_GUI_isKeyPressed">
+<div class="memname"><b>isKeyPressed</b> <span class="p">(</span><span class="ptype">string</span> <code>k</code><span class="p">)</span></div>
+<div class="memdoc"><p>True on the frame key k was pressed.</p><table class="params"><tr><th colspan="3">Parameters:</th></tr><tr><td class="pt">string</td><td class="pn">k</td><td class="pd"></td></tr></table><dl><dt>Returns</dt><dd><span class="ptype">boolean</span> </dd></dl></div>
+</div>
+<div class="memitem" id="a_GUI_isKeyReleased">
+<div class="memname"><b>isKeyReleased</b> <span class="p">(</span><span class="ptype">string</span> <code>k</code><span class="p">)</span></div>
+<div class="memdoc"><p>True on the frame key k was released.</p><table class="params"><tr><th colspan="3">Parameters:</th></tr><tr><td class="pt">string</td><td class="pn">k</td><td class="pd"></td></tr></table><dl><dt>Returns</dt><dd><span class="ptype">boolean</span> </dd></dl></div>
+</div>
+<div class="memitem" id="a_GUI_isMouseClicked">
+<div class="memname"><b>isMouseClicked</b> <span class="p">(</span><span class="ptype">number</span> <code>[b = 0]</code><span class="p">)</span></div>
+<div class="memdoc"><p>True on the frame mouse button b was pressed.</p><table class="params"><tr><th colspan="3">Parameters:</th></tr><tr><td class="pt">number</td><td class="pn">b <i>(optional, default 0)</i></td><td class="pd"></td></tr></table><dl><dt>Returns</dt><dd><span class="ptype">boolean</span> </dd></dl></div>
+</div>
+<div class="memitem" id="a_GUI_isMouseDoubleClicked">
+<div class="memname"><b>isMouseDoubleClicked</b> <span class="p">(</span><span class="ptype">number</span> <code>[b = 0]</code><span class="p">)</span></div>
+<div class="memdoc"><p>True on the frame mouse button b was double-clicked (two presses within the double-click interval).</p><table class="params"><tr><th colspan="3">Parameters:</th></tr><tr><td class="pt">number</td><td class="pn">b <i>(optional, default 0)</i></td><td class="pd"></td></tr></table><dl><dt>Returns</dt><dd><span class="ptype">boolean</span> </dd></dl></div>
+</div>
+<div class="memitem" id="a_GUI_isMouseDown">
+<div class="memname"><b>isMouseDown</b> <span class="p">(</span><span class="ptype">number</span> <code>[b = 0]</code><span class="p">)</span></div>
+<div class="memdoc"><p>True while mouse button b (0 left, 1 right, 2 middle, 3 back, 4 forward) is held down.</p><table class="params"><tr><th colspan="3">Parameters:</th></tr><tr><td class="pt">number</td><td class="pn">b <i>(optional, default 0)</i></td><td class="pd"></td></tr></table><dl><dt>Returns</dt><dd><span class="ptype">boolean</span> </dd></dl></div>
+</div>
+<div class="memitem" id="a_GUI_isMouseReleased">
+<div class="memname"><b>isMouseReleased</b> <span class="p">(</span><span class="ptype">number</span> <code>[b = 0]</code><span class="p">)</span></div>
+<div class="memdoc"><p>True on the frame mouse button b was released.</p><table class="params"><tr><th colspan="3">Parameters:</th></tr><tr><td class="pt">number</td><td class="pn">b <i>(optional, default 0)</i></td><td class="pd"></td></tr></table><dl><dt>Returns</dt><dd><span class="ptype">boolean</span> </dd></dl></div>
+</div>
+<div class="memitem" id="a_GUI_isPopupOpen">
+<div class="memname"><b>isPopupOpen</b> <span class="p">(</span><span class="ptype">string</span> <code>id</code><span class="p">)</span></div>
+<div class="memdoc"><p>True when the popup with the given id is open.</p><table class="params"><tr><th colspan="3">Parameters:</th></tr><tr><td class="pt">string</td><td class="pn">id</td><td class="pd"></td></tr></table><dl><dt>Returns</dt><dd><span class="ptype">boolean</span> </dd></dl></div>
+</div>
+<div class="memitem" id="a_GUI_isWindowOpen">
+<div class="memname"><b>isWindowOpen</b> <span class="p">(</span><span class="ptype">string</span> <code>title</code><span class="p">)</span></div>
+<div class="memdoc"><p>True when the window is open. A title that was never created (and has no persisted state) counts as open: windows are created lazily on their first <a class="xref" href="GUI.html#a_GUI_beginWindow">beginWindow</a>().</p><table class="params"><tr><th colspan="3">Parameters:</th></tr><tr><td class="pt">string</td><td class="pn">title</td><td class="pd"></td></tr></table><dl><dt>Returns</dt><dd><span class="ptype">boolean</span> </dd></dl></div>
+</div>
+<div class="memitem" id="a_GUI_lastItem">
+<div class="memname"><b>lastItem</b> <span class="p">(</span><span class="p">)</span></div>
+<div class="memdoc"><p>The last item registered this frame (an internal item object, or null if none).</p><dl><dt>Returns</dt><dd><span class="ptype">Object</span> </dd></dl></div>
+</div>
+<div class="memitem" id="a_GUI_lastItemActive">
+<div class="memname"><b>lastItemActive</b> <span class="p">(</span><span class="p">)</span></div>
+<div class="memdoc"><p>True if the last item is active (pressed or being dragged).</p><dl><dt>Returns</dt><dd><span class="ptype">boolean</span> </dd></dl></div>
+</div>
+<div class="memitem" id="a_GUI_lastItemChanged">
+<div class="memname"><b>lastItemChanged</b> <span class="p">(</span><span class="p">)</span></div>
+<div class="memdoc"><p>True if the last item's value changed this frame.</p><dl><dt>Returns</dt><dd><span class="ptype">boolean</span> </dd></dl></div>
+</div>
+<div class="memitem" id="a_GUI_lastItemClicked">
+<div class="memname"><b>lastItemClicked</b> <span class="p">(</span><span class="p">)</span></div>
+<div class="memdoc"><p>True if the last item was clicked this frame.</p><dl><dt>Returns</dt><dd><span class="ptype">boolean</span> </dd></dl></div>
+</div>
+<div class="memitem" id="a_GUI_lastItemHovered">
+<div class="memname"><b>lastItemHovered</b> <span class="p">(</span><span class="p">)</span></div>
+<div class="memdoc"><p>True if the last item is hovered (and reachable by the cursor).</p><dl><dt>Returns</dt><dd><span class="ptype">boolean</span> </dd></dl></div>
+</div>
+<div class="memitem" id="a_GUI_lastItemRect">
+<div class="memname"><b>lastItemRect</b> <span class="p">(</span><span class="p">)</span></div>
+<div class="memdoc"><p>The screen rect of the last item, or null.</p><dl><dt>Returns</dt><dd><span class="ptype">Object</span> {x, y, w, h}</dd></dl></div>
+</div>
+<div class="memitem" id="a_GUI_layer">
+<div class="memname"><b>layer</b> <span class="p">(</span><span class="p">)</span></div>
+<div class="memdoc"><p>Runs fn with the renderer switched to the given <a class="xref" href="GUI.html#a_GUI_layer">layer</a> ('background', 'gui', or 'foreground'), then restores the previous layer. Use it for custom drawing passes around the <a class="xref" href="GUI.html">GUI</a> (e.g. a background grid before the windows, or a HUD overlay after gui.endFrame()).</p></div>
+</div>
+<div class="memitem" id="a_GUI_listBox">
+<div class="memname"><b>listBox</b> <span class="p">(</span><span class="ptype">string</span> <code>label</code>, <span class="ptype">number</span> <code>value</code>, <span class="ptype">Array</span> <code>items</code>, <span class="ptype">Object</span> <code>[opts]</code><span class="p">)</span></div>
+<div class="memdoc"><p>A selectable list box: a bordered, scrollable list of rows where the user picks exactly one entry. The selected row is highlighted, the box scrolls with the wheel (and a scrollbar when needed), and the selected row is kept in view.</p><table class="params"><tr><th colspan="3">Parameters:</th></tr><tr><td class="pt">string</td><td class="pn">label</td><td class="pd"></td></tr><tr><td class="pt">number</td><td class="pn">value</td><td class="pd">selected index (or null for stateful)</td></tr><tr><td class="pt">Array</td><td class="pn">items</td><td class="pd">row texts</td></tr><tr><td class="pt">Object</td><td class="pn">opts <i>(optional)</i></td><td class="pd">{ w, h, rows, rowH, label } — label:false hides the caption</td></tr></table><dl><dt>Returns</dt><dd><span class="ptype">number</span> the selected index</dd></dl></div>
+</div>
+<div class="memitem" id="a_GUI_menuItem">
+<div class="memname"><b>menuItem</b> <span class="p">(</span><span class="ptype">string</span> <code>label</code>, <span class="ptype">string</span> <code>[shortcut]</code>, <span class="ptype">Object</span> <code>[opts]</code><span class="p">)</span></div>
+<div class="memdoc"><p>A menu row with an optional shortcut label.</p><table class="params"><tr><th colspan="3">Parameters:</th></tr><tr><td class="pt">string</td><td class="pn">label</td><td class="pd"></td></tr><tr><td class="pt">string</td><td class="pn">shortcut <i>(optional)</i></td><td class="pd">'ctrl+s'-style display string</td></tr><tr><td class="pt">Object</td><td class="pn">opts <i>(optional)</i></td><td class="pd">{ selected: bool or () =&gt; bool (checkmark), disabled }</td></tr></table><dl><dt>Returns</dt><dd><span class="ptype">boolean</span> true when clicked</dd></dl></div>
+</div>
+<div class="memitem" id="a_GUI_mouseDelta">
+<div class="memname"><b>mouseDelta</b> <span class="p">(</span><span class="p">)</span></div>
+<div class="memdoc"><p>The cursor movement since the previous frame.</p><dl><dt>Returns</dt><dd><span class="ptype">Object</span> {x, y}</dd></dl></div>
+</div>
+<div class="memitem" id="a_GUI_mousePos">
+<div class="memname"><b>mousePos</b> <span class="p">(</span><span class="p">)</span></div>
+<div class="memdoc"><p>The current cursor position in screen coordinates.</p><dl><dt>Returns</dt><dd><span class="ptype">Object</span> {x, y}</dd></dl></div>
+</div>
+<div class="memitem" id="a_GUI_openPopup">
+<div class="memname"><b>openPopup</b> <span class="p">(</span><span class="ptype">string</span> <code>id</code>, <span class="ptype">Object</span> <code>anchor</code>, <span class="ptype">Object</span> <code>[opts]</code><span class="p">)</span></div>
+<div class="memdoc"><p>Opens a popup anchored near (x, y).</p><table class="params"><tr><th colspan="3">Parameters:</th></tr><tr><td class="pt">string</td><td class="pn">id</td><td class="pd"></td></tr><tr><td class="pt">Object</td><td class="pn">anchor</td><td class="pd">{x, y}</td></tr><tr><td class="pt">Object</td><td class="pn">opts <i>(optional)</i></td><td class="pd">{ kind, owner }</td></tr></table></div>
+</div>
+<div class="memitem" id="a_GUI_plotHeight">
+<div class="memname"><b>plotHeight</b> <span class="p">(</span><span class="ptype">Object</span> <code>opts</code>, <span class="ptype">number</span> <code>minH</code>, <span class="ptype">number</span> <code>[extra]</code><span class="p">)</span></div>
+<div class="memdoc"><p>Computes the height (px) a plot with these opts should take, using the same h/share rules as <a class="xref" href="GUI.html#a_GUI_plotLines">plotLines</a>() and the plot addons.</p><table class="params"><tr><th colspan="3">Parameters:</th></tr><tr><td class="pt">Object</td><td class="pn">opts</td><td class="pd">{ h, share }</td></tr><tr><td class="pt">number</td><td class="pn">minH</td><td class="pd">minimum height</td></tr><tr><td class="pt">number</td><td class="pn">extra <i>(optional)</i></td><td class="pd">extra pixels reserved for other content</td></tr></table><dl><dt>Returns</dt><dd><span class="ptype">number</span> </dd></dl></div>
+</div>
+<div class="memitem" id="a_GUI_plotLines">
+<div class="memname"><b>plotLines</b> <span class="p">(</span><span class="ptype">string</span> <code>label</code>, <span class="ptype">Array</span> <code>values</code>, <span class="ptype">Object</span> <code>[opts]</code><span class="p">)</span></div>
+<div class="memdoc"><p>A mini line chart of the given values.</p><table class="params"><tr><th colspan="3">Parameters:</th></tr><tr><td class="pt">string</td><td class="pn">label</td><td class="pd"></td></tr><tr><td class="pt">Array</td><td class="pn">values</td><td class="pd">numbers</td></tr><tr><td class="pt">Object</td><td class="pn">opts <i>(optional)</i></td><td class="pd">{ h, share, min, max, overlay, color } — with no h the plot fills the remaining region; share: n splits the remaining height evenly with n-1 sibling plots</td></tr></table><dl><dt>Returns</dt><dd><span class="ptype">boolean</span> true when hovered</dd></dl></div>
+</div>
+<div class="memitem" id="a_GUI_popId">
+<div class="memname"><b>popId</b> <span class="p">(</span><span class="ptype">number</span> <code>[count = 1]</code><span class="p">)</span></div>
+<div class="memdoc"><p>Pops n (default 1) id scopes pushed with <a class="xref" href="GUI.html#a_GUI_pushId">pushId</a>().</p><table class="params"><tr><th colspan="3">Parameters:</th></tr><tr><td class="pt">number</td><td class="pn">count <i>(optional, default 1)</i></td><td class="pd"></td></tr></table></div>
+</div>
+<div class="memitem" id="a_GUI_popStyleColor">
+<div class="memname"><b>popStyleColor</b> <span class="p">(</span><span class="ptype">number</span> <code>[n = 1]</code><span class="p">)</span></div>
+<div class="memdoc"><p>Pops n (default 1) pushed style-color overrides.</p><table class="params"><tr><th colspan="3">Parameters:</th></tr><tr><td class="pt">number</td><td class="pn">n <i>(optional, default 1)</i></td><td class="pd"></td></tr></table></div>
+</div>
+<div class="memitem" id="a_GUI_popStyleVar">
+<div class="memname"><b>popStyleVar</b> <span class="p">(</span><span class="ptype">number</span> <code>[n = 1]</code><span class="p">)</span></div>
+<div class="memdoc"><p>Pops n (default 1) pushed style-var overrides.</p><table class="params"><tr><th colspan="3">Parameters:</th></tr><tr><td class="pt">number</td><td class="pn">n <i>(optional, default 1)</i></td><td class="pd"></td></tr></table></div>
+</div>
+<div class="memitem" id="a_GUI_progressBar">
+<div class="memname"><b>progressBar</b> <span class="p">(</span><span class="ptype">number</span> <code>fraction</code>, <span class="ptype">Object</span> <code>[opts]</code><span class="p">)</span></div>
+<div class="memdoc"><p>A progress bar filled to fraction (clamped to 0..1), optionally with overlay text centered on the bar.</p><table class="params"><tr><th colspan="3">Parameters:</th></tr><tr><td class="pt">number</td><td class="pn">fraction</td><td class="pd"></td></tr><tr><td class="pt">Object</td><td class="pn">opts <i>(optional)</i></td><td class="pd">{ h, overlay: text or null, size }</td></tr></table><dl><dt>Returns</dt><dd><span class="ptype">boolean</span> true when hovered</dd></dl></div>
+</div>
+<div class="memitem" id="a_GUI_pushId">
+<div class="memname"><b>pushId</b> <span class="p">(</span><span class="p">)</span></div>
+<div class="memdoc"></div>
+</div>
+<div class="memitem" id="a_GUI_pushStyleColor">
+<div class="memname"><b>pushStyleColor</b> <span class="p">(</span><span class="ptype">string</span> <code>name</code>, <span class="ptype">Array.&lt;number&gt;</span> <code>color</code><span class="p">)</span></div>
+<div class="memdoc"><p>Pushes an override for a style color (e.g. 'WindowBg', 'FrameBg', 'Text'); pair with <a class="xref" href="GUI.html#a_GUI_popStyleColor">popStyleColor</a>().</p><table class="params"><tr><th colspan="3">Parameters:</th></tr><tr><td class="pt">string</td><td class="pn">name</td><td class="pd"></td></tr><tr><td class="pt">Array.&lt;number&gt;</td><td class="pn">color</td><td class="pd">[r, g, b, a] with a in 0..255</td></tr></table></div>
+</div>
+<div class="memitem" id="a_GUI_pushStyleVar">
+<div class="memname"><b>pushStyleVar</b> <span class="p">(</span><span class="ptype">string</span> <code>name</code>, <span class="ptype">number</span> <code>value</code><span class="p">)</span></div>
+<div class="memdoc"><p>Pushes an override for a style var (e.g. 'fontSize', 'framePadding', 'indentSpacing'); pair with <a class="xref" href="GUI.html#a_GUI_popStyleVar">popStyleVar</a>().</p><table class="params"><tr><th colspan="3">Parameters:</th></tr><tr><td class="pt">string</td><td class="pn">name</td><td class="pd"></td></tr><tr><td class="pt">number</td><td class="pn">value</td><td class="pd"></td></tr></table></div>
+</div>
+<div class="memitem" id="a_GUI_radioButton">
+<div class="memname"><b>radioButton</b> <span class="p">(</span><span class="ptype">string</span> <code>label</code>, <span class="ptype">number</span> <code>value</code>, <span class="ptype">number</span> <code>index</code><span class="p">)</span></div>
+<div class="memdoc"><p>A radio button; checked when value === index.</p><table class="params"><tr><th colspan="3">Parameters:</th></tr><tr><td class="pt">string</td><td class="pn">label</td><td class="pd"></td></tr><tr><td class="pt">number</td><td class="pn">value</td><td class="pd">the current selection, or null for library-kept state</td></tr><tr><td class="pt">number</td><td class="pn">index</td><td class="pd">this button's value</td></tr></table><dl><dt>Returns</dt><dd><span class="ptype">number</span> the current selection (this button's index when clicked, otherwise the passed value)</dd></dl></div>
+</div>
+<div class="memitem" id="a_GUI_sameLine">
+<div class="memname"><b>sameLine</b> <span class="p">(</span><span class="p">)</span></div>
+<div class="memdoc"></div>
+</div>
+<div class="memitem" id="a_GUI_selectable">
+<div class="memname"><b>selectable</b> <span class="p">(</span><span class="ptype">string</span> <code>label</code>, <span class="ptype">boolean</span> <code>selected</code>, <span class="ptype">Object</span> <code>[opts]</code><span class="p">)</span></div>
+<div class="memdoc"><p>A full-width clickable row (list item).</p><table class="params"><tr><th colspan="3">Parameters:</th></tr><tr><td class="pt">string</td><td class="pn">label</td><td class="pd"></td></tr><tr><td class="pt">boolean</td><td class="pn">selected</td><td class="pd">whether it is drawn as selected</td></tr><tr><td class="pt">Object</td><td class="pn">opts <i>(optional)</i></td><td class="pd">{ w, h, disabled }</td></tr></table><dl><dt>Returns</dt><dd><span class="ptype">boolean</span> true when clicked</dd></dl></div>
+</div>
+<div class="memitem" id="a_GUI_separator">
+<div class="memname"><b>separator</b> <span class="p">(</span><span class="p">)</span></div>
+<div class="memdoc"><p>Draws a horizontal separator line; inside a menu, appends a separator row.</p></div>
+</div>
+<div class="memitem" id="a_GUI_separatorText">
+<div class="memname"><b>separatorText</b> <span class="p">(</span><span class="ptype">string</span> <code>label</code><span class="p">)</span></div>
+<div class="memdoc"><p>Draws a separator line with a small label centered on it.</p><table class="params"><tr><th colspan="3">Parameters:</th></tr><tr><td class="pt">string</td><td class="pn">label</td><td class="pd"></td></tr></table></div>
+</div>
+<div class="memitem" id="a_GUI_setAppMenuBar">
+<div class="memname"><b>setAppMenuBar</b> <span class="p">(</span><span class="p">)</span></div>
+<div class="memdoc"></div>
+</div>
+<div class="memitem" id="a_GUI_setCursorPos">
+<div class="memname"><b>setCursorPos</b> <span class="p">(</span><span class="ptype">number</span> <code>x</code>, <span class="ptype">number</span> <code>y</code><span class="p">)</span></div>
+<div class="memdoc"><p>Moves the layout cursor to (x, y) relative to the current window/child origin; the next item is placed there.</p><table class="params"><tr><th colspan="3">Parameters:</th></tr><tr><td class="pt">number</td><td class="pn">x</td><td class="pd"></td></tr><tr><td class="pt">number</td><td class="pn">y</td><td class="pd"></td></tr></table></div>
+</div>
+<div class="memitem" id="a_GUI_setCursorScreenPos">
+<div class="memname"><b>setCursorScreenPos</b> <span class="p">(</span><span class="ptype">number</span> <code>x</code>, <span class="ptype">number</span> <code>y</code><span class="p">)</span></div>
+<div class="memdoc"><p>Moves the layout cursor to absolute screen coordinates (x, y).</p><table class="params"><tr><th colspan="3">Parameters:</th></tr><tr><td class="pt">number</td><td class="pn">x</td><td class="pd"></td></tr><tr><td class="pt">number</td><td class="pn">y</td><td class="pd"></td></tr></table></div>
+</div>
+<div class="memitem" id="a_GUI_setDockCollapsed">
+<div class="memname"><b>setDockCollapsed</b> <span class="p">(</span><span class="p">)</span></div>
+<div class="memdoc"></div>
+</div>
+<div class="memitem" id="a_GUI_setDockRatio">
+<div class="memname"><b>setDockRatio</b> <span class="p">(</span><span class="ptype">string</span> <code>a</code>, <span class="ptype">string</span> <code>b</code>, <span class="ptype">number</span> <code>ratio</code><span class="p">)</span></div>
+<div class="memdoc"><p>Sets the split ratio of the dock containing a and b (0.12..0.88, the fraction taken by the first member).</p><table class="params"><tr><th colspan="3">Parameters:</th></tr><tr><td class="pt">string</td><td class="pn">a</td><td class="pd"></td></tr><tr><td class="pt">string</td><td class="pn">b</td><td class="pd"></td></tr><tr><td class="pt">number</td><td class="pn">ratio</td><td class="pd"></td></tr></table><dl><dt>Returns</dt><dd><span class="ptype">boolean</span> true if the dock exists</dd></dl></div>
+</div>
+<div class="memitem" id="a_GUI_setNextItemWidth">
+<div class="memname"><b>setNextItemWidth</b> <span class="p">(</span><span class="ptype">number</span> <code>w</code><span class="p">)</span></div>
+<div class="memdoc"><p>Forces the width of the next widget; 0 means the widget's default width.</p><table class="params"><tr><th colspan="3">Parameters:</th></tr><tr><td class="pt">number</td><td class="pn">w</td><td class="pd"></td></tr></table></div>
+</div>
+<div class="memitem" id="a_GUI_setNextWindowPos">
+<div class="memname"><b>setNextWindowPos</b> <span class="p">(</span><span class="ptype">number</span> <code>x</code>, <span class="ptype">number</span> <code>y</code><span class="p">)</span></div>
+<div class="memdoc"><p>Sets the screen position used by the next <a class="xref" href="GUI.html#a_GUI_beginWindow">beginWindow</a>() call.</p><table class="params"><tr><th colspan="3">Parameters:</th></tr><tr><td class="pt">number</td><td class="pn">x</td><td class="pd"></td></tr><tr><td class="pt">number</td><td class="pn">y</td><td class="pd"></td></tr></table></div>
+</div>
+<div class="memitem" id="a_GUI_setNextWindowSize">
+<div class="memname"><b>setNextWindowSize</b> <span class="p">(</span><span class="ptype">number</span> <code>w</code>, <span class="ptype">number</span> <code>h</code><span class="p">)</span></div>
+<div class="memdoc"><p>Sets the size used by the next <a class="xref" href="GUI.html#a_GUI_beginWindow">beginWindow</a>() call.</p><table class="params"><tr><th colspan="3">Parameters:</th></tr><tr><td class="pt">number</td><td class="pn">w</td><td class="pd"></td></tr><tr><td class="pt">number</td><td class="pn">h</td><td class="pd"></td></tr></table></div>
+</div>
+<div class="memitem" id="a_GUI_setState">
+<div class="memname"><b>setState</b> <span class="p">(</span><span class="ptype">string</span> <code>label</code>, <span class="ptype">*</span> <code>value</code><span class="p">)</span></div>
+<div class="memdoc"><p>Stores an id-scoped value that can be read back with <a class="xref" href="GUI.html#a_GUI_state">state</a>(). Survives across frames; scoped by the current id stack.</p><table class="params"><tr><th colspan="3">Parameters:</th></tr><tr><td class="pt">string</td><td class="pn">label</td><td class="pd"></td></tr><tr><td class="pt">*</td><td class="pn">value</td><td class="pd"></td></tr></table><dl><dt>Returns</dt><dd><span class="ptype">GUI</span> the gui instance (chainable)</dd></dl></div>
+</div>
+<div class="memitem" id="a_GUI_setTheme">
+<div class="memname"><b>setTheme</b> <span class="p">(</span><span class="ptype">string</span> <code>name</code><span class="p">)</span></div>
+<div class="memdoc"><p>Switches the global color theme ('dark' or 'light'): replaces gui.style.colors with the theme palette. Per-window style overrides and push/pop stacks are unaffected.</p><table class="params"><tr><th colspan="3">Parameters:</th></tr><tr><td class="pt">string</td><td class="pn">name</td><td class="pd">'dark' or 'light'</td></tr></table></div>
+</div>
+<div class="memitem" id="a_GUI_setTooltip">
+<div class="memname"><b>setTooltip</b> <span class="p">(</span><span class="ptype">string</span> <code>text</code><span class="p">)</span></div>
+<div class="memdoc"><p>Sets a text tooltip for the hovered last item. It appears after flags.tooltipDelay seconds of continuous hover, above every window, just above the cursor (flipping below when there is no room).</p><table class="params"><tr><th colspan="3">Parameters:</th></tr><tr><td class="pt">string</td><td class="pn">text</td><td class="pd"></td></tr></table></div>
+</div>
+<div class="memitem" id="a_GUI_setWindowOpen">
+<div class="memname"><b>setWindowOpen</b> <span class="p">(</span><span class="ptype">string</span> <code>title</code>, <span class="ptype">boolean</span> <code>open</code><span class="p">)</span></div>
+<div class="memdoc"><p>Opens or closes a window by title (takes effect on the window's next <a class="xref" href="GUI.html#a_GUI_beginWindow">beginWindow</a>()).</p><table class="params"><tr><th colspan="3">Parameters:</th></tr><tr><td class="pt">string</td><td class="pn">title</td><td class="pd"></td></tr><tr><td class="pt">boolean</td><td class="pn">open</td><td class="pd"></td></tr></table></div>
+</div>
+<div class="memitem" id="a_GUI_slider">
+<div class="memname"><b>slider</b> <span class="p">(</span><span class="ptype">string</span> <code>label</code>, <span class="ptype">number</span> <code>value</code>, <span class="ptype">number</span> <code>min</code>, <span class="ptype">number</span> <code>max</code>, <span class="ptype">Object</span> <code>[opts]</code><span class="p">)</span></div>
+<div class="memdoc"><p>A slider that routes to sliderInt when min/max/value are int-like, otherwise to sliderFloat.</p><table class="params"><tr><th colspan="3">Parameters:</th></tr><tr><td class="pt">string</td><td class="pn">label</td><td class="pd"></td></tr><tr><td class="pt">number</td><td class="pn">value</td><td class="pd"></td></tr><tr><td class="pt">number</td><td class="pn">min</td><td class="pd"></td></tr><tr><td class="pt">number</td><td class="pn">max</td><td class="pd"></td></tr><tr><td class="pt">Object</td><td class="pn">opts <i>(optional)</i></td><td class="pd">{ int, fmt }</td></tr></table><dl><dt>Returns</dt><dd><span class="ptype">number</span> the new value</dd></dl></div>
+</div>
+<div class="memitem" id="a_GUI_sliderFloat">
+<div class="memname"><b>sliderFloat</b> <span class="p">(</span><span class="ptype">string</span> <code>label</code>, <span class="ptype">number</span> <code>value</code>, <span class="ptype">number</span> <code>vmin</code>, <span class="ptype">number</span> <code>vmax</code>, <span class="ptype">string</span> <code>[fmt]</code><span class="p">)</span></div>
+<div class="memdoc"><p>A horizontal float slider: clicking the track jumps the value to the click position, dragging adjusts relative to the grabbed point, and right-clicking opens an exact numeric entry field.</p><table class="params"><tr><th colspan="3">Parameters:</th></tr><tr><td class="pt">string</td><td class="pn">label</td><td class="pd"></td></tr><tr><td class="pt">number</td><td class="pn">value</td><td class="pd"></td></tr><tr><td class="pt">number</td><td class="pn">vmin</td><td class="pd"></td></tr><tr><td class="pt">number</td><td class="pn">vmax</td><td class="pd"></td></tr><tr><td class="pt">string</td><td class="pn">fmt <i>(optional)</i></td><td class="pd">'%f'-style format (default '%.3f')</td></tr></table><dl><dt>Returns</dt><dd><span class="ptype">number</span> the new value</dd></dl></div>
+</div>
+<div class="memitem" id="a_GUI_sliderInt">
+<div class="memname"><b>sliderInt</b> <span class="p">(</span><span class="ptype">string</span> <code>label</code>, <span class="ptype">number</span> <code>value</code>, <span class="ptype">number</span> <code>vmin</code>, <span class="ptype">number</span> <code>vmax</code>, <span class="ptype">string</span> <code>[fmt]</code><span class="p">)</span></div>
+<div class="memdoc"><p>A horizontal integer <a class="xref" href="GUI.html#a_GUI_slider">slider</a> (values rounded); same interactions as sliderFloat.</p><table class="params"><tr><th colspan="3">Parameters:</th></tr><tr><td class="pt">string</td><td class="pn">label</td><td class="pd"></td></tr><tr><td class="pt">number</td><td class="pn">value</td><td class="pd"></td></tr><tr><td class="pt">number</td><td class="pn">vmin</td><td class="pd"></td></tr><tr><td class="pt">number</td><td class="pn">vmax</td><td class="pd"></td></tr><tr><td class="pt">string</td><td class="pn">fmt <i>(optional)</i></td><td class="pd">'%d'-style format</td></tr></table><dl><dt>Returns</dt><dd><span class="ptype">number</span> the new integer value</dd></dl></div>
+</div>
+<div class="memitem" id="a_GUI_smallButton">
+<div class="memname"><b>smallButton</b> <span class="p">(</span><span class="ptype">string</span> <code>label</code><span class="p">)</span></div>
+<div class="memdoc"><p>A compact button sized to a text line (no frame padding); true when clicked.</p><table class="params"><tr><th colspan="3">Parameters:</th></tr><tr><td class="pt">string</td><td class="pn">label</td><td class="pd"></td></tr></table><dl><dt>Returns</dt><dd><span class="ptype">boolean</span> </dd></dl></div>
+</div>
+<div class="memitem" id="a_GUI_spacing">
+<div class="memname"><b>spacing</b> <span class="p">(</span><span class="p">)</span></div>
+<div class="memdoc"><p>Consumes one empty line (the vertical item spacing).</p></div>
+</div>
+<div class="memitem" id="a_GUI_state">
+<div class="memname"><b>state</b> <span class="p">(</span><span class="ptype">string</span> <code>label</code><span class="p">)</span></div>
+<div class="memdoc"><p>Reads the id-scoped value stored with <a class="xref" href="GUI.html#a_GUI_setState">setState</a>() (undefined when none was stored yet). The label is scoped by the current id stack, so the same label in different windows/children is independent.</p><table class="params"><tr><th colspan="3">Parameters:</th></tr><tr><td class="pt">string</td><td class="pn">label</td><td class="pd"></td></tr></table><dl><dt>Returns</dt><dd><span class="ptype">*</span> the stored value, or undefined</dd></dl></div>
+</div>
+<div class="memitem" id="a_GUI_tableCell">
+<div class="memname"><b>tableCell</b> <span class="p">(</span><span class="ptype">number</span> <code>i</code><span class="p">)</span></div>
+<div class="memdoc"><p>Opens a manual table cell; draw its content (even a widget) and close the row with <a class="xref" href="GUI.html#a_GUI_tableEndRow">tableEndRow</a>().</p><table class="params"><tr><th colspan="3">Parameters:</th></tr><tr><td class="pt">number</td><td class="pn">i</td><td class="pd">column index</td></tr></table><dl><dt>Returns</dt><dd><span class="ptype">Object</span> the cell rect {x, y, w, h}, or null when no table is open</dd></dl></div>
+</div>
+<div class="memitem" id="a_GUI_tableEndRow">
+<div class="memname"><b>tableEndRow</b> <span class="p">(</span><span class="p">)</span></div>
+<div class="memdoc"><p>Closes the current table row (after manual cells).</p></div>
+</div>
+<div class="memitem" id="a_GUI_tableHeader">
+<div class="memname"><b>tableHeader</b> <span class="p">(</span><span class="ptype">Array</span> <code>labels</code><span class="p">)</span></div>
+<div class="memdoc"><p>Draws the table's header row from the column definitions.</p><table class="params"><tr><th colspan="3">Parameters:</th></tr><tr><td class="pt">Array</td><td class="pn">labels</td><td class="pd">cell texts (same length as cols)</td></tr></table></div>
+</div>
+<div class="memitem" id="a_GUI_tableRow">
+<div class="memname"><b>tableRow</b> <span class="p">(</span><span class="ptype">Array</span> <code>values</code><span class="p">)</span></div>
+<div class="memdoc"><p>Draws a table row from an array of cell values.</p><table class="params"><tr><th colspan="3">Parameters:</th></tr><tr><td class="pt">Array</td><td class="pn">values</td><td class="pd">missing cells render as a dash</td></tr></table></div>
+</div>
+<div class="memitem" id="a_GUI_text">
+<div class="memname"><b>text</b> <span class="p">(</span><span class="ptype">string</span> <code>str</code>, <span class="ptype">Array.&lt;number&gt;</span> <code>[color]</code><span class="p">)</span></div>
+<div class="memdoc"><p>Draws a line of text at the cursor position.</p><table class="params"><tr><th colspan="3">Parameters:</th></tr><tr><td class="pt">string</td><td class="pn">str</td><td class="pd"></td></tr><tr><td class="pt">Array.&lt;number&gt;</td><td class="pn">color <i>(optional)</i></td><td class="pd">optional [r, g, b, a]</td></tr></table></div>
+</div>
+<div class="memitem" id="a_GUI_textColored">
+<div class="memname"><b>textColored</b> <span class="p">(</span><span class="ptype">Array.&lt;number&gt;</span> <code>color</code>, <span class="ptype">string</span> <code>str</code><span class="p">)</span></div>
+<div class="memdoc"><p>Draws a line of text in the given color.</p><table class="params"><tr><th colspan="3">Parameters:</th></tr><tr><td class="pt">Array.&lt;number&gt;</td><td class="pn">color</td><td class="pd"></td></tr><tr><td class="pt">string</td><td class="pn">str</td><td class="pd"></td></tr></table></div>
+</div>
+<div class="memitem" id="a_GUI_textWrapped">
+<div class="memname"><b>textWrapped</b> <span class="p">(</span><span class="ptype">string</span> <code>str</code>, <span class="ptype">Object</span> <code>[opts]</code><span class="p">)</span></div>
+<div class="memdoc"><p>Draws text wrapped to a width.</p><table class="params"><tr><th colspan="3">Parameters:</th></tr><tr><td class="pt">string</td><td class="pn">str</td><td class="pd"></td></tr><tr><td class="pt">Object</td><td class="pn">opts <i>(optional)</i></td><td class="pd">{ w: wrap width (default: the full available width) }</td></tr></table></div>
+</div>
+<div class="memitem" id="a_GUI_treeNode">
+<div class="memname"><b>treeNode</b> <span class="p">(</span><span class="ptype">string</span> <code>label</code><span class="p">)</span></div>
+<div class="memdoc"><p>A tree node (one indent step deeper while open).</p><table class="params"><tr><th colspan="3">Parameters:</th></tr><tr><td class="pt">string</td><td class="pn">label</td><td class="pd"></td></tr></table><dl><dt>Returns</dt><dd><span class="ptype">boolean</span> true when open (draw the nested content in that case)</dd></dl></div>
+</div>
+<div class="memitem" id="a_GUI_treePop">
+<div class="memname"><b>treePop</b> <span class="p">(</span><span class="p">)</span></div>
+<div class="memdoc"><p>Closes one open tree node.</p></div>
+</div>
+<div class="memitem" id="a_GUI_treePopToLevel">
+<div class="memname"><b>treePopToLevel</b> <span class="p">(</span><span class="ptype">number</span> <code>n</code><span class="p">)</span></div>
+<div class="memdoc"><p>Closes tree nodes until the depth is n.</p><table class="params"><tr><th colspan="3">Parameters:</th></tr><tr><td class="pt">number</td><td class="pn">n</td><td class="pd"></td></tr></table></div>
+</div>
+<div class="memitem" id="a_GUI_undock">
+<div class="memname"><b>undock</b> <span class="p">(</span><span class="ptype">string</span> <code>a</code>, <span class="ptype">string</span> <code>b</code><span class="p">)</span></div>
+<div class="memdoc"><p>Splits the dock of a and b back into two independent windows (each keeps the sub-rect it occupied).</p><table class="params"><tr><th colspan="3">Parameters:</th></tr><tr><td class="pt">string</td><td class="pn">a</td><td class="pd"></td></tr><tr><td class="pt">string</td><td class="pn">b</td><td class="pd"></td></tr></table><dl><dt>Returns</dt><dd><span class="ptype">boolean</span> true if a dock was split</dd></dl></div>
+</div>
+<div class="memitem" id="a_GUI_undockEdge">
+<div class="memname"><b>undockEdge</b> <span class="p">(</span><span class="ptype">string</span> <code>a</code><span class="p">)</span></div>
+<div class="memdoc"><p>Removes a window (or a combined window) from its screen-edge stack, freeing it as a free window at its current rect.</p><table class="params"><tr><th colspan="3">Parameters:</th></tr><tr><td class="pt">string</td><td class="pn">a</td><td class="pd">title (of the unit, or of any member of a combined unit)</td></tr></table><dl><dt>Returns</dt><dd><span class="ptype">boolean</span> true if it was edge-docked</dd></dl></div>
+</div>
+<div class="memitem" id="a_GUI_unindent">
+<div class="memname"><b>unindent</b> <span class="p">(</span><span class="ptype">number</span> <code>[amount]</code><span class="p">)</span></div>
+<div class="memdoc"><p>Decreases the layout indent by amount px (default: the 'indentSpacing' style var), never below 0.</p><table class="params"><tr><th colspan="3">Parameters:</th></tr><tr><td class="pt">number</td><td class="pn">amount <i>(optional)</i></td><td class="pd"></td></tr></table></div>
+</div>
+<h2>Public Attributes</h2>
+<table class="membrief"><tr><td class="sig"><a href="#a_GUI_state"><b>state</b></a></td><td>Live per-window/per-widget <a class="xref" href="GUI.html#a_GUI_state">state</a> (ids -&gt; values).</td></tr><tr><td class="sig"><a href="#a_GUI_flags"><b>flags</b></a></td><td>The behavior flags (tooltips, animations, docking, .</td></tr><tr><td class="sig"><a href="#a_GUI_style"><b>style</b></a></td><td>The active <a class="xref" href="Style.html">Style</a> object (colors, vars, font).</td></tr><tr><td class="sig"><a href="#a_GUI_addons"><b>addons</b></a></td><td>The addon namespaces attached to this instance: gui.</td></tr><tr><td class="sig"><a href="#a_GUI_renderer"><b>renderer</b></a></td><td>The live RendererProxy: use it for custom drawing from inside a window (gui.</td></tr><tr><td class="sig"><a href="#a_GUI_debugOverlay"><b>debugOverlay</b></a></td><td>When true, endFrame draws a small debug overlay (frame count, ids, .</td></tr><tr><td class="sig"><a href="#a_GUI_clipboard"><b>clipboard</b></a></td><td>The clipboard callbacks ({ read: () =&gt; string, write: (text) =&gt; void }) used by inputText copy/paste.</td></tr></table><div class="memitem" id="a_GUI_state">
+<div class="memname"><b>state</b> <span class="p">(</span><span class="p">)</span></div>
+<div class="memdoc"><p>Live per-window/per-widget <a class="xref" href="GUI.html#a_GUI_state">state</a> (ids -&gt; values). Readable for inspection and by addons; the internal shape may change.</p></div>
+</div>
+<div class="memitem" id="a_GUI_flags">
+<div class="memname"><b>flags</b> <span class="p">(</span><span class="p">)</span></div>
+<div class="memdoc"><p>The behavior flags (tooltips, animations, docking, ...). All of them are live-toggleable at runtime: gui.flags.animations = false;</p></div>
+</div>
+<div class="memitem" id="a_GUI_style">
+<div class="memname"><b>style</b> <span class="p">(</span><span class="p">)</span></div>
+<div class="memdoc"><p>The active <a class="xref" href="Style.html">Style</a> object (colors, vars, font).</p></div>
+</div>
+<div class="memitem" id="a_GUI_addons">
+<div class="memname"><b>addons</b> <span class="p">(</span><span class="p">)</span></div>
+<div class="memdoc"><p>The addon namespaces attached to this instance: gui.addons.&lt;name&gt;.&lt;fn&gt;().</p></div>
+</div>
+<div class="memitem" id="a_GUI_renderer">
+<div class="memname"><b>renderer</b> <span class="p">(</span><span class="p">)</span></div>
+<div class="memdoc"><p>The live RendererProxy: use it for custom drawing from inside a window (gui.renderer.rect(...), .line(...), .drawText(...), ...). Calls are clipped, scroll-offset and culled automatically.</p></div>
+</div>
+<div class="memitem" id="a_GUI_debugOverlay">
+<div class="memname"><b>debugOverlay</b> <span class="p">(</span><span class="p">)</span></div>
+<div class="memdoc"><p>When true, endFrame draws a small debug overlay (frame count, ids, ...).</p></div>
+</div>
+<div class="memitem" id="a_GUI_clipboard">
+<div class="memname"><b>clipboard</b> <span class="p">(</span><span class="p">)</span></div>
+<div class="memdoc"><p>The clipboard callbacks ({ read: () =&gt; string, write: (text) =&gt; void }) used by inputText copy/paste.</p></div>
+</div>
+<div class="note">The documented <b>internal</b> surface used by addons (<code>gui._id</code>, <code>gui._state</code>, <code>gui._item</code>, <code>gui._clickable</code>, <code>gui._col</code>, ...) is described in the <a href="tutorial_addons.html">addon tutorial</a>. It is an agreement, not a guarantee: use it only from addon code.</div>
+</div></div>
+<div class="footer">mim 1.0.0 -- API reference generated from the JSDoc in mim.js and addons/*.js (jsdoc 4 + tools/make-docs.js). Tutorials: BACKEND.md, ADDONS.md.</div>
+</body>
+</html>
