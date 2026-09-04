@@ -1,54 +1,42 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-    <head>
-        <meta charset="utf-8" />
-        <title>MimUI demo (HTML canvas, no dependencies)</title>
-        <style>
-            html,
-            body {
-                margin: 0;
-                padding: 0;
-                height: 100%;
-                overflow: hidden;
-                background: #0f1014;
-            }
-            canvas {
-                display: block;
-            }
-            #hint {
-                position: fixed;
-                left: 10px;
-                bottom: 8px;
-                z-index: 10;
-                font: 11px/1.5 sans-serif;
-                color: #aab;
-                pointer-events: none;
-                text-shadow: 0 1px 2px #000;
-            }
-        </style>
-    </head>
-    <body>
-        <canvas id="gui-canvas"></canvas>
-        <div id="hint">
-            Mim demo (plain canvas, zero libraries) - drag title bars to move, bottom-right corner
-            to resize. Right-click sliders for exact entry · Tab to focus · Ctrl+A/C/V/Z in text
-            fields · Settings window has live toggles.
-        </div>
+<head>
+  <meta charset="utf-8" />
+  <title>Mim — immediate mode GUI demo (HTML canvas, no dependencies)</title>
+  <style>
+    html, body { margin: 0; padding: 0; height: 100%; overflow: hidden; background: #0f1014; }
+    canvas { display: block; }
+    #hint {
+      position: fixed; left: 10px; bottom: 8px; z-index: 10;
+      font: 11px/1.5 sans-serif; color: #aab; pointer-events: none;
+      text-shadow: 0 1px 2px #000;
+    }
+  </style>
+</head>
+<body>
+  <canvas id="gui-canvas"></canvas>
+  <div id="hint">
+    Mim demo (plain canvas, zero libraries) — drag title bars to move, bottom-right corner to resize.
+    Right-click sliders for exact entry · Tab to focus · Ctrl+A/C/V/Z in text fields ·
+    Settings window has live toggles.
+  </div>
 
-        <!-- The GUI library -->
-        <script src="../mim.js"></script>
+  <!-- The GUI library (single self-contained file, zero dependencies) -->
+  <script src="../mim.js"></script>
 
-        <!-- Addons (optional) -->
-        <script src="../addons/mim_plots.js"></script>
-        <script src="../addons/mim_3d.js"></script>
-        <script src="../addons/mim_tables.js"></script>
-        <script src="../addons/mim_color.js"></script>
-        <script src="../addons/mim_notifications.js"></script>
+  <!-- Addons (optional; each is self-contained and registers onto gui.addons) -->
+  <script src="../addons/mim_plots.js"></script>
+  <script src="../addons/mim_3d.js"></script>
+  <script src="../addons/mim_tables.js"></script>
+  <script src="../addons/mim_color.js"></script>
+  <script src="../addons/mim_notifications.js"></script>
+  <script src="../addons/mim_widgets.js"></script>
+  <script src="../addons/mim_markdown.js"></script>
 
-        <!-- canvas renderer + input adapter -->
-        <script src="canvas-backend.js"></script>
+  <!-- canvas renderer + input adapter -->
+  <script src="canvas-backend.js"></script>
 
-        <!-- the demo app -->
-        <script src="sketch.js"></script>
-    </body>
+  <!-- the demo app -->
+  <script src="sketch.js"></script>
+</body>
 </html>

@@ -1,0 +1,21 @@
+{
+  "name": "mim",
+  "version": "1.0.0",
+  "description": "A single-file, immediate-mode GUI library for JavaScript (Dear-ImGui style, zero dependencies, backend-agnostic).",
+  "private": true,
+  "scripts": {
+    "test": "sh run-tests.sh",
+    "make:compressed": "node tools/make-compressed.js",
+    "make:expanded": "node tools/make-expanded.js && prettier --single-quote --print-width 100 --write mim.js && node tools/postprocess-expanded.js",
+    "docs": "jsdoc -c .jsdoc-dump.json -X > .jsdoc-doclets.json && node tools/make-docs.js"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.29.7",
+    "@babel/generator": "^7.29.8",
+    "@babel/parser": "^7.29.8",
+    "@babel/traverse": "^7.29.8",
+    "@babel/types": "^7.29.8",
+    "jsdoc": "^4.0.5",
+    "prettier": "^3.9.6"
+  }
+}

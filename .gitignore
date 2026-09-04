@@ -1,3 +1,8 @@
 misc.md
 .prettierrc
 .gitignore
+.jsdoc*
+.sudo*
+.package-lock.json
+ADDONS.md
+BACKEND.md

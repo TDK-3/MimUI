@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>mim 1.0.0: Mim.Color Reference</title>
+<style>
+:root { color-scheme: light; }
+* { box-sizing: border-box; }
+body { margin:0; font: 14px/1.55 "Segoe UI", "Helvetica Neue", Helvetica, Arial, sans-serif; color:#222; background:#e6e6e6; }
+a { color:#1a4a7c; text-decoration:none; }
+a:hover { text-decoration:underline; }
+code, pre { font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace; }
+.nav { background:#2f4368; color:#fff; padding:0 18px; display:flex; flex-wrap:wrap; align-items:baseline; gap:2px 14px; }
+.nav .brand { font-weight:600; font-size:15px; padding:10px 0 2px; margin-right:10px; }
+.nav a { color:#cfd9ea; padding:10px 0 2px; font-size:13px; }
+.nav a:hover { color:#fff; text-decoration:underline; }
+.nav .sep { color:#8fa3c4; font-size:12px; }
+.wrap { max-width:1100px; margin:0 auto; padding:18px 14px 60px; }
+.card { background:#fff; border:1px solid #c8c8c8; border-radius:3px; padding:22px 28px 30px; box-shadow:0 1px 3px rgba(0,0,0,.08); }
+h1 { font-size:22px; color:#1a3a5c; margin:.2em 0 .6em; border-bottom:2px solid #1a4a7c; padding-bottom:6px; }
+h2 { font-size:17px; color:#1a4a7c; margin:1.4em 0 .5em; border-bottom:1px solid #d5dde8; padding-bottom:3px; }
+h3 { font-size:15px; color:#2f4368; margin:1.2em 0 .4em; }
+p { margin:.55em 0; }
+table { border-collapse:collapse; width:100%; margin:.7em 0 1em; }
+th, td { border:1px solid #c9d2de; padding:5px 9px; text-align:left; vertical-align:top; font-size:13px; }
+th { background:#eef1f5; }
+tr:nth-child(even) td { background:#f7f9fc; }
+.crumbs { font-size:12px; color:#555; margin-bottom:8px; }
+.crumbs b { color:#222; }
+.membrief { border:1px solid #c9d2de; margin:.8em 0 1.2em; }
+.membrief td { font-size:13px; }
+.membrief .sig { white-space:nowrap; }
+.membrief .sig b { font-family:Consolas,monospace; font-size:13px; }
+.memitem { border:1px solid #c9d2de; border-left:4px solid #1a4a7c; margin:0 0 1em; }
+.memname { background:#eef1f5; padding:6px 10px; font-family:Consolas,monospace; font-size:13px; border-bottom:1px solid #c9d2de; }
+.memname b { font-size:14px; }
+.memname .p { color:#555; }
+.memdoc { padding:8px 12px 10px; }
+.memdoc .ptype { color:#0b60b0; font-family:Consolas,monospace; font-size:12px; }
+table.params { width:auto; min-width:60%; }
+table.params .pt { color:#0b60b0; font-family:Consolas,monospace; font-size:12px; white-space:nowrap; }
+table.params .pn { font-family:Consolas,monospace; font-size:12px; white-space:nowrap; font-weight:600; }
+table.params .pd { }
+dl { margin:.4em 0; }
+dt { font-weight:600; color:#1a4a7c; font-size:13px; }
+dd { margin:0 0 .4em 1.4em; }
+pre { background:#f4f6f8; border:1px solid #d5dde8; padding:10px 12px; overflow-x:auto; font-size:12.5px; line-height:1.45; border-radius:2px; }
+.note { background:#fff8e6; border:1px solid #e3cf8b; border-radius:2px; padding:8px 12px; margin:.8em 0; font-size:13px; }
+.footer { max-width:1100px; margin:0 auto; padding:0 14px 30px; font-size:12px; color:#667; }
+.xref { color:#1a4a7c; }
+</style>
+</head>
+<body>
+<div class="nav"><span class="brand">mim 1.0.0</span><a href="index.html">Index</a><span class="sep">Classes:</span><a href="GUI.html">GUI</a><a href="Style.html">Style</a><span class="sep">Namespaces:</span><a href="Mim.html">Mim</a><a href="Mim_Color.html" style="color:#fff;font-weight:600">Color</a><a href="gui_addons_plots.html">plots</a><a href="gui_addons_t3d.html">t3d</a><a href="gui_addons_tables.html">tables</a><a href="gui_addons_color.html">color</a><a href="gui_addons_notifs.html">notifs</a><a href="gui_addons_widgets.html">widgets</a><a href="gui_addons_markdown.html">markdown</a><span class="sep">Constants:</span><a href="Layers.html">Layers</a><a href="Key.html">Key</a><a href="MouseButton.html">MouseButton</a><a href="WindowFlags.html">WindowFlags</a><span class="sep">Tutorials:</span><a href="tutorial_backend.html">Writing a backend</a><a href="tutorial_addons.html">Writing an addon</a></div><div class="wrap"><div class="card">
+<div class="crumbs"><a href="index.html">mim 1.0.0</a> &raquo; <a href="Mim.html">Mim</a> &raquo; <b>Color</b></div><h1>Mim.Color</h1><p>Color helpers. Colors are plain [r, g, b, a] arrays (0..255). Never mutate a color you obtained from the style; mix/withAlpha return new arrays.</p><h2>Functions</h2>
+<table class="membrief"><tr><td class="sig"><a href="#a_Mim_Color_rgba"><b>Mim.Color.rgba(...)</b></a></td><td>Builds an [r, g, b, a] color array (ints, alpha defaults to 255).</td></tr><tr><td class="sig"><a href="#a_Mim_Color_hex"><b>Mim.Color.hex(...)</b></a></td><td>Converts a hex string to [r, g, b, a]: '#rgb', '#rrggbb', '#rgba', '#rrggbbaa' (with or without the leading '#').</td></tr><tr><td class="sig"><a href="#a_Mim_Color_mix"><b>Mim.Color.mix(...)</b></a></td><td>Linear blend of two colors: mix = c1 + (c2 - c1) * t.</td></tr><tr><td class="sig"><a href="#a_Mim_Color_withAlpha"><b>Mim.Color.withAlpha(...)</b></a></td><td>Returns a copy of the color with its alpha replaced.</td></tr></table><div class="memitem" id="a_Mim_Color_rgba">
+<div class="memname"><b>rgba</b> <span class="p">(</span><span class="ptype">number</span> <code>r</code>, <span class="ptype">number</span> <code>g</code>, <span class="ptype">number</span> <code>b</code>, <span class="ptype">number</span> <code>[a = 255]</code><span class="p">)</span></div>
+<div class="memdoc"><p>Builds an [r, g, b, a] color array (ints, alpha defaults to 255).</p><table class="params"><tr><th colspan="3">Parameters:</th></tr><tr><td class="pt">number</td><td class="pn">r</td><td class="pd">0..255</td></tr><tr><td class="pt">number</td><td class="pn">g</td><td class="pd">0..255</td></tr><tr><td class="pt">number</td><td class="pn">b</td><td class="pd">0..255</td></tr><tr><td class="pt">number</td><td class="pn">a <i>(optional, default 255)</i></td><td class="pd">0..255</td></tr></table><dl><dt>Returns</dt><dd><span class="ptype">Array.&lt;number&gt;</span> [r, g, b, a]</dd></dl></div>
+</div>
+<div class="memitem" id="a_Mim_Color_hex">
+<div class="memname"><b>hex</b> <span class="p">(</span><span class="ptype">string</span> <code>str</code><span class="p">)</span></div>
+<div class="memdoc"><p>Converts a hex string to [r, g, b, a]: '#rgb', '#rrggbb', '#rgba', '#rrggbbaa' (with or without the leading '#'). Invalid input yields magenta [255, 0, 255, 255] so errors are visible.</p><table class="params"><tr><th colspan="3">Parameters:</th></tr><tr><td class="pt">string</td><td class="pn">str</td><td class="pd"></td></tr></table><dl><dt>Returns</dt><dd><span class="ptype">Array.&lt;number&gt;</span> [r, g, b, a]</dd></dl></div>
+</div>
+<div class="memitem" id="a_Mim_Color_mix">
+<div class="memname"><b>mix</b> <span class="p">(</span><span class="ptype">Array.&lt;number&gt;</span> <code>c1</code>, <span class="ptype">Array.&lt;number&gt;</span> <code>c2</code>, <span class="ptype">number</span> <code>t</code><span class="p">)</span></div>
+<div class="memdoc"><p>Linear blend of two colors: mix = c1 + (c2 - c1) * t.</p><table class="params"><tr><th colspan="3">Parameters:</th></tr><tr><td class="pt">Array.&lt;number&gt;</td><td class="pn">c1</td><td class="pd">[r, g, b, a]</td></tr><tr><td class="pt">Array.&lt;number&gt;</td><td class="pn">c2</td><td class="pd">[r, g, b, a]</td></tr><tr><td class="pt">number</td><td class="pn">t</td><td class="pd">0..1</td></tr></table><dl><dt>Returns</dt><dd><span class="ptype">Array.&lt;number&gt;</span> the blended color</dd></dl></div>
+</div>
+<div class="memitem" id="a_Mim_Color_withAlpha">
+<div class="memname"><b>withAlpha</b> <span class="p">(</span><span class="ptype">Array.&lt;number&gt;</span> <code>c</code>, <span class="ptype">number</span> <code>a</code><span class="p">)</span></div>
+<div class="memdoc"><p>Returns a copy of the color with its alpha replaced.</p><table class="params"><tr><th colspan="3">Parameters:</th></tr><tr><td class="pt">Array.&lt;number&gt;</td><td class="pn">c</td><td class="pd">[r, g, b, a]</td></tr><tr><td class="pt">number</td><td class="pn">a</td><td class="pd">0..255</td></tr></table><dl><dt>Returns</dt><dd><span class="ptype">Array.&lt;number&gt;</span> a new color</dd></dl></div>
+</div>
+
+</div></div>
+<div class="footer">mim 1.0.0 -- API reference generated from the JSDoc in mim.js and addons/*.js (jsdoc 4 + tools/make-docs.js). Tutorials: BACKEND.md, ADDONS.md.</div>
+</body>
+</html>

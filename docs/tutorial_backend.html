@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>mim 1.0.0: Writing a rendering backend</title>
+<style>
+:root { color-scheme: light; }
+* { box-sizing: border-box; }
+body { margin:0; font: 14px/1.55 "Segoe UI", "Helvetica Neue", Helvetica, Arial, sans-serif; color:#222; background:#e6e6e6; }
+a { color:#1a4a7c; text-decoration:none; }
+a:hover { text-decoration:underline; }
+code, pre { font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace; }
+.nav { background:#2f4368; color:#fff; padding:0 18px; display:flex; flex-wrap:wrap; align-items:baseline; gap:2px 14px; }
+.nav .brand { font-weight:600; font-size:15px; padding:10px 0 2px; margin-right:10px; }
+.nav a { color:#cfd9ea; padding:10px 0 2px; font-size:13px; }
+.nav a:hover { color:#fff; text-decoration:underline; }
+.nav .sep { color:#8fa3c4; font-size:12px; }
+.wrap { max-width:1100px; margin:0 auto; padding:18px 14px 60px; }
+.card { background:#fff; border:1px solid #c8c8c8; border-radius:3px; padding:22px 28px 30px; box-shadow:0 1px 3px rgba(0,0,0,.08); }
+h1 { font-size:22px; color:#1a3a5c; margin:.2em 0 .6em; border-bottom:2px solid #1a4a7c; padding-bottom:6px; }
+h2 { font-size:17px; color:#1a4a7c; margin:1.4em 0 .5em; border-bottom:1px solid #d5dde8; padding-bottom:3px; }
+h3 { font-size:15px; color:#2f4368; margin:1.2em 0 .4em; }
+p { margin:.55em 0; }
+table { border-collapse:collapse; width:100%; margin:.7em 0 1em; }
+th, td { border:1px solid #c9d2de; padding:5px 9px; text-align:left; vertical-align:top; font-size:13px; }
+th { background:#eef1f5; }
+tr:nth-child(even) td { background:#f7f9fc; }
+.crumbs { font-size:12px; color:#555; margin-bottom:8px; }
+.crumbs b { color:#222; }
+.membrief { border:1px solid #c9d2de; margin:.8em 0 1.2em; }
+.membrief td { font-size:13px; }
+.membrief .sig { white-space:nowrap; }
+.membrief .sig b { font-family:Consolas,monospace; font-size:13px; }
+.memitem { border:1px solid #c9d2de; border-left:4px solid #1a4a7c; margin:0 0 1em; }
+.memname { background:#eef1f5; padding:6px 10px; font-family:Consolas,monospace; font-size:13px; border-bottom:1px solid #c9d2de; }
+.memname b { font-size:14px; }
+.memname .p { color:#555; }
+.memdoc { padding:8px 12px 10px; }
+.memdoc .ptype { color:#0b60b0; font-family:Consolas,monospace; font-size:12px; }
+table.params { width:auto; min-width:60%; }
+table.params .pt { color:#0b60b0; font-family:Consolas,monospace; font-size:12px; white-space:nowrap; }
+table.params .pn { font-family:Consolas,monospace; font-size:12px; white-space:nowrap; font-weight:600; }
+table.params .pd { }
+dl { margin:.4em 0; }
+dt { font-weight:600; color:#1a4a7c; font-size:13px; }
+dd { margin:0 0 .4em 1.4em; }
+pre { background:#f4f6f8; border:1px solid #d5dde8; padding:10px 12px; overflow-x:auto; font-size:12.5px; line-height:1.45; border-radius:2px; }
+.note { background:#fff8e6; border:1px solid #e3cf8b; border-radius:2px; padding:8px 12px; margin:.8em 0; font-size:13px; }
+.footer { max-width:1100px; margin:0 auto; padding:0 14px 30px; font-size:12px; color:#667; }
+.xref { color:#1a4a7c; }
+</style>
+</head>
+<body>
+<div class="nav"><span class="brand">mim 1.0.0</span><a href="index.html">Index</a><span class="sep">Classes:</span><a href="GUI.html">GUI</a><a href="Style.html">Style</a><span class="sep">Namespaces:</span><a href="Mim.html">Mim</a><a href="Mim_Color.html">Color</a><a href="gui_addons_plots.html">plots</a><a href="gui_addons_t3d.html">t3d</a><a href="gui_addons_tables.html">tables</a><a href="gui_addons_color.html">color</a><a href="gui_addons_notifs.html">notifs</a><a href="gui_addons_widgets.html">widgets</a><a href="gui_addons_markdown.html">markdown</a><span class="sep">Constants:</span><a href="Layers.html">Layers</a><a href="Key.html">Key</a><a href="MouseButton.html">MouseButton</a><a href="WindowFlags.html">WindowFlags</a><span class="sep">Tutorials:</span><a href="tutorial_backend.html" style="color:#fff;font-weight:600">Writing a backend</a><a href="tutorial_addons.html">Writing an addon</a></div><div class="wrap"><div class="card">
+<div class="crumbs"><a href="index.html">mim 1.0.0</a> &raquo; <b>Tutorials</b> &raquo; Backend</div><h1>Building a rendering backend for Mim</h1>
+<h2 id="h_building_a_rendering_backend_for_mim">Building a rendering backend for <a class="xref" href="Mim.html">Mim</a></h2>
+<p>This is the short, human version of how you teach <a class="xref" href="Mim.html">Mim</a> to draw on your surface of choice. If you can draw rectangles and text on it, you can render <a class="xref" href="Mim.html">Mim</a> on it. The core never touches your canvas, your WebGL context, your DOM, or any other platform object. It just hands you a list of commands every frame and asks you for a list of inputs. You do the translation. That is the whole job.</p>
+<h3 id="h_the_shape_of_a_backend">The shape of a backend</h3>
+<p>A backend is two things, both plain objects or small classes:</p>
+<p>interface", described below).</p>
+<p>keys, text) and returns one normalized object per frame.</p>
+<ol><li>A <b>renderer</b> -- an object with drawing methods (the "renderer</li><li>An <b>input snapshot</b> -- a function that reads your host's <a class="xref" href="GUI.html#a_GUI_state">state</a> (mouse,</li></ol>
+<p>You wire them together in two lines:</p>
+<pre>const gui = new Mim.GUI(renderer, { flags: { animations: false } });
+// ...every frame...
+gui.beginFrame(readMyInput());
+// ...draw windows/widgets...
+gui.endFrame();
+</pre>
+<p>The constructor options are optional: `{ style, flags, clipboard, addons, debugOverlay }<code>. </code>flags` turns behaviors on/off (every key of <code>gui.flags</code>), and you can also change them live at runtime (<code>gui.flags.tooltips = false;</code>).</p>
+<p>Note that <code>beginFrame</code> takes the input snapshot; it calls <code>renderer.beginFrame(width, height)</code> for you. You do not call it yourself.</p>
+<h3 id="h_the_renderer_interface">The renderer interface</h3>
+<p>These are the methods the core may call on your renderer. Coordinates are pixels, origin at the top-left, y grows downward. Colors are always 4-element arrays <code>[r, g, b, a]</code> with values 0..255. If you pass a 3-component color back into anything, the core will ignore the call (it validates alpha), so always supply 4 components when you draw your own extra pixels.</p>
+<p>Required -- the core will not degrade nicely without these:</p>
+<pre>beginFrame(width, height)      // new frame; set transforms, clear if you like
+endFrame()                     // flush / present
+textSize(text, options)        // -&gt; { w, h }  where h is the line height
+fillRect(x, y, w, h, color)
+fillRoundedRect(x, y, w, h, radius, color)
+strokeRect(x, y, w, h, color, thickness)
+strokeRoundedRect(x, y, w, h, radius, color, thickness)
+line(x1, y1, x2, y2, color, thickness)
+pushClip(x, y, w, h)           // intersect with current clip (scissor)
+popClip()
+</pre>
+<p>Optional -- the core checks for each with <code>typeof renderer.m === 'function'</code> and quietly skips the feature if it is missing:</p>
+<pre>fillCircle(cx, cy, radius, color)
+fillEllipse(cx, cy, rx, ry, color)
+polyline(points, color, thickness)   // points = [x0, y0, x1, y1, ...]
+fillPolygon(points, color)
+drawImage(imageId, x, y, w, h, tint) // tint is a color or null
+setLayer('background' | 'gui' | 'foreground')
+setCursor(name)                    // 'default','pointer','text','grab',...
+drawText(x, y, text, color, options)
+</pre>
+<p>Two notes on the optional ones:</p>
+<p>exists, but a <a class="xref" href="GUI.html">GUI</a> without text is not a <a class="xref" href="GUI.html">GUI</a>, so in practice you must implement it. <code>options</code> carries <code>{ fontSize, fontId }</code>. <code>fontId</code> is a string key you can map to any font you like (see "Fonts" below). The x, y is the top-left of the text, and the text grows right and down.</p>
+<p>absolute rectangles. Your job is to intersect each new clip with the one currently active and restore on <code>popClip</code>. A clip stack of two or three levels is enough; the core keeps them balanced for you.</p>
+<ul><li><code>drawText</code> is optional in the sense that the core only calls it when it</li><li><code>pushClip</code>/<code>popClip</code> are about scissoring. The core always passes</li></ul>
+<p><code>textSize</code> must return the same width your <code>drawText</code> will actually use for the same string and options, or the layout (wrapping, centering, truncation) will be wrong. If your font metrics are expensive, cache them; the core already caches the results, but not your computation.</p>
+<h3 id="h_the_input_snapshot">The input snapshot</h3>
+<p>Once per frame, your function returns:</p>
+<pre>{
+  width: 1280,          // display size in pixels (what you drew on)
+  height: 720,
+  mouse: {
+    x: 400, y: 250,     // pixel coords, same space as the renderer
+    buttons: [true, false, false, false, false],
+                            // [left, right, middle, back, forward]
+    wheelX: 0, wheelY: 0.1,  // deltas since last frame, then reset
+  },
+  keys: new Set(['shift']),  // tokens, see below; current frame only
+  text: 'ab',                // characters typed since last frame
+}
+</pre>
+<p><a class="xref" href="Key.html">Key</a> tokens are lowercase strings: <code>shift</code>, <code>ctrl</code>, <code>meta</code> (cmd on mac), <code>alt</code>, <code>enter</code>, <code>tab</code>, <code>escape</code>, <code>backspace</code>, <code>delete</code>, <code>home</code>, <code>end</code>, <code>left</code>, <code>right</code>, <code>up</code>, <code>down</code>, <code>pageup</code>, <code>pagedown</code>, plus plain letters and digits by name. The core tracks edge events (pressed/released) itself by comparing frames, so you only report the current set.</p>
+<p><code>text</code> is the free-form input: everything the user typed that is not a key token. The core routes it to the focused text field and clears it after each frame, so buffer it between frames on your side.</p>
+<p>If you are on a canvas behind a CSS-scaled element, convert mouse coordinates into the same pixel space you draw in before returning them. The core does no scaling.</p>
+<h3 id="h_a_minimal_canvas2d_backend">A minimal Canvas2D backend</h3>
+<p>This is genuinely almost everything. It renders the full demo.</p>
+<pre>class Canvas2DRenderer {
+  constructor(canvas) {
+    this.canvas = canvas;
+    this.ctx = canvas.getContext('2d');
+    this.clipStack = [];
+    this.layer = 'gui';
+    this.images = {};    // id -&gt; CanvasImageSource
+    this.fonts = {};     // fontId -&gt; font family string
+  }
+  beginFrame(w, h) { this.ctx.setTransform(1, 0, 0, 1, 0, 0); }
+  endFrame() {}
+  _c(c) { return 'rgba(' + c[0] + ',' + c[1] + ',' + c[2] + ',' + (c[3] / 255) + ')'; }
+  _font(o) { o = o || {}; return (o.fontSize || 13) + 'px ' + (this.fonts[o.fontId] || 'sans-serif'); }
+  drawText(x, y, str, c, o) {
+    const g = this.ctx;
+    g.font = this._font(o);
+    g.fillStyle = this._c(c);
+    g.textAlign = 'left';
+    g.textBaseline = 'top';
+    g.fillText(String(str), x, y);
+  }
+  textSize(str, o) {
+    const g = this.ctx;
+    g.font = this._font(o);
+    const w = g.measureText(String(str)).width;
+    return { w: w, h: (o &amp;&amp; o.fontSize || 13) * 1.25 };
+  }
+  fillRect(x, y, w, h, c) { this.ctx.fillStyle = this._c(c); this.ctx.fillRect(x, y, w, h); }
+  strokeRect(x, y, w, h, c, t) {
+    const g = this.ctx;
+    g.strokeStyle = this._c(c); g.lineWidth = t || 1;
+    g.strokeRect(x + (t || 1) / 2, y + (t || 1) / 2, w - (t || 1), h - (t || 1));
+  }
+  line(x1, y1, x2, y2, c, t) {
+    const g = this.ctx;
+    g.strokeStyle = this._c(c); g.lineWidth = t || 1;
+    g.beginPath(); g.moveTo(x1, y1); g.lineTo(x2, y2); g.stroke();
+  }
+  fillCircle(cx, cy, r, c) {
+    const g = this.ctx;
+    g.fillStyle = this._c(c);
+    g.beginPath(); g.arc(cx, cy, r, 0, Math.PI * 2); g.fill();
+  }
+  fillRoundedRect(x, y, w, h, r, c) { this._rounded(x, y, w, h, r, c, true); }
+  strokeRoundedRect(x, y, w, h, r, c, t) { this._rounded(x, y, w, h, r, c, false, t); }
+  _rounded(x, y, w, h, r, c, fill, t) {
+    const g = this.ctx;
+    r = Math.min(r, w / 2, h / 2);
+    g.beginPath();
+    g.moveTo(x + r, y);
+    g.arcTo(x + w, y, x + w, y + h, r);
+    g.arcTo(x + w, y + h, x, y + h, r);
+    g.arcTo(x, y + h, x, y, r);
+    g.arcTo(x, y, x + w, y, r);
+    g.closePath();
+    if (fill) { g.fillStyle = this._c(c); g.fill(); }
+    else { g.strokeStyle = this._c(c); g.lineWidth = t || 1; g.stroke(); }
+  }
+  pushClip(x, y, w, h) {
+    const g = this.ctx;
+    this.clipStack.push(g.getTransform());
+    g.save(); g.beginPath(); g.rect(x, y, w, h); g.clip();
+  }
+  popClip() { const g = this.ctx; g.restore(); this.clipStack.pop(); }
+}
+</pre>
+<p>If you want layers, add <code>setLayer(name)</code> and store <code>name</code>; in <code>endFrame</code> draw the three passes if your surface requires it. Most canvas setups can ignore layers entirely: the core draws in the right order, and a single canvas pass is just the <code>gui</code> layer.</p>
+<p><code>demo/canvas-backend.js</code> is this idea plus device-pixel-ratio scaling, image support, cursor styling, and capability flags. Read it if you want a fuller reference; it is one file and heavily commented.</p>
+<h3 id="h_fonts">Fonts</h3>
+<p>You decide what a <code>fontId</code> means. The core only sends the id and a size. A good pattern: keep a map from id to font family (or a texture atlas), default to your UI font for unknown ids, and optionally register a <code>bold</code> and a <code>mono</code> id so addons like <code>mim_markdown</code> can use them when available (they fall back to a double-draw fake bold and plain text when you do not register anything).</p>
+<p>Keep <code>textSize</code> and <code>drawText</code> in lockstep: same font, same size, same string, same width.</p>
+<h3 id="h_images">Images</h3>
+<p>If you implement <code>drawImage</code>, register your sources with the renderer before frames start (any registry you like; the core only passes the id):</p>
+<pre>renderer.images['logo'] = myCanvasElement;   // your bookkeeping
+// in the sketch:
+gui.image('logo', 120, 60, {});
+</pre>
+<p><code>tint</code> is a 4-color array or null. Applying it is your problem (canvas: draw to an offscreen and <code>globalCompositeOperation = 'source-in'</code>, or just ignore tint and draw the image plain).</p>
+<h3 id="h_how_the_core_uses_the_calls_so_you_can_debug">How the core uses the calls (so you can debug)</h3>
+<p>culling (it will not send you a fillRoundedRect that is fully outside the active clip), applies scroll offsets, and counts calls. If a call you expect never arrives, first check whether it was clipped.</p>
+<p>clip stack depth reaches 2 or 3 inside scroll areas.</p>
+<p>foreground). If you do not implement it, all drawing is one pass.</p>
+<ul><li>The core wraps your renderer in a small proxy. That proxy does clip</li><li>Every window body is drawn inside a <code>pushClip</code>/<code>popClip</code> pair, so your</li><li><code>setLayer</code> may be called a handful of times per frame (background, gui,</li><li><code>setCursor</code> is only called when you advertise it (see "Capabilities").</li></ul>
+<h3 id="h_capabilities">Capabilities</h3>
+<p>You can advertise what you support with a plain object:</p>
+<pre>renderer.features = { cursor: true, clip: true };
+</pre>
+<p>The core only calls <code>setCursor</code> when <code>features.cursor</code> is true. There is no capability list you must satisfy; missing methods are the capability system, and <code>features</code> is a small convenience on top.</p>
+<h3 id="h_testing_your_backend_without_a_browser">Testing your backend without a browser</h3>
+<p>The whole test suite in <code>test/</code> runs in Node with a mock renderer that just records calls. Copy the pattern from <code>test/headless.js</code>:</p>
+<pre>class Mock {
+  constructor() { this.calls = []; }
+  record(m, a) { this.calls.push([m, ...a]); }
+  beginFrame() {} endFrame() {}
+  fillRect(...a) { this.record('fillRect', a); }
+  // ...one line per method you implement...
+  drawText(...a) { this.record('drawText', a); }
+  pushClip() {} popClip() {}
+  textSize(s, o) { return { w: String(s).length * 7, h: 16 }; }
+}
+</pre>
+<p>Then drive frames with a fake input object (see the <code>Env</code> class in <code>test/addons.js</code>) and assert on the recorded calls: did the window's background arrive? did the text land at the expected coordinates? This is how a backend can be verified headlessly, and it is how the canvas backend is verified here. The mock does not need to draw anything; it only needs to have the right method names and to return a plausible <code>textSize</code>.</p>
+<h3 id="h_common_pitfalls">Common pitfalls</h3>
+<p>you build your own colors for custom drawing and forget alpha, the core proxy drops the call. Use <code>[r, g, b, 255]</code>.</p>
+<p>font, different baseline math), wrapped text and centered labels will be off by a pixel or a word. Measure with the exact font you draw with.</p>
+<p><code>text</code> are "since last frame". If you keep returning the same value, the UI will scroll and re-type forever.</p>
+<p>device-pixel-ratio-scaled surface), mouse coordinates arrive in CSS pixels while you draw in device pixels. Multiply by the scale before you return the input snapshot.</p>
+<p><code>restore()</code> in <code>popClip</code>, or your transforms and clips drift frame over frame. The core always balances the calls; your state must balance too.</p>
+<p>current <code>ctx.font</code>. Set it before you measure.</p>
+<ul><li><b>3-component colors.</b> The renderer interface wants <code>[r, g, b, a]</code>. If</li><li><b>Text metrics drift.</b> If <code>textSize</code> and <code>drawText</code> disagree (different</li><li><b>Forgetting to clear your input deltas.</b> <code>wheelX</code>, <code>wheelY</code>, and</li><li><b>CSS scaling.</b> If your canvas is scaled with CSS (or is a</li><li><b>Clip leaks.</b> If you implement <code>pushClip</code> with <code>save()</code> you must</li><li><b>Measuring before the font is set.</b> Canvas <code>measureText</code> uses the</li></ul>
+<h3 id="h_checklist">Checklist</h3>
+<ol><li>Object with the required methods (and <code>drawText</code>/<code>textSize</code>).</li><li>Input snapshot function returning the normalized shape.</li><li>Colors as 4 arrays, both in and out.</li><li><code>textSize</code> and <code>drawText</code> agree on widths.</li><li>Clip stack balanced.</li><li>A Node test that records calls and asserts on a frame or two.</li></ol>
+<p>Do those six things and <a class="xref" href="Mim.html">Mim</a> will render on your surface, with all the windows, docking, widgets, and addons included.</p>
+<h3 id="h_where_to_look">Where to look</h3>
+<p>images, cursors, layers).</p>
+<p>renderer + input harness used to test everything in this repository without a browser.</p>
+<ul><li><code>demo/canvas-backend.js</code> -- the full Canvas2D backend (with DPR,</li><li><code>test/headless.js</code>, <code>test/advanced.js</code>, <code>test/addons.js</code> -- the mock</li></ul>
+</div></div>
+<div class="footer">mim 1.0.0 -- API reference generated from the JSDoc in mim.js and addons/*.js (jsdoc 4 + tools/make-docs.js). Tutorials: BACKEND.md, ADDONS.md.</div>
+</body>
+</html>
